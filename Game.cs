@@ -76,6 +76,14 @@ static class Game{
         cambiarEstado((GameStates) (opcion+1));
     }
 
+    static void gameState(){
+    }
+    static void infoState(){
+
+    }
+    static void quitState(){
+        
+    }
     public static void GameInit(int xres, int yres)
     {
         Console.CursorVisible = false;
