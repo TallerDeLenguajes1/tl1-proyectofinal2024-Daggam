@@ -4,7 +4,7 @@ static class Text{
     //Dimensiones del texto
     //(int x,int y,int width,int height) textdim;
     //Borra el texto anterior creado.
-    public static void Start(string text,int speed=1000){
+    public static void Start(string text,int speed=25){
         var cursorInitialLeft = Console.CursorLeft;
         foreach(char c in text){
             if(c=='\n')
@@ -18,13 +18,15 @@ static class Text{
     }
     public static void WriteCenter(string text){
         int espacios = (Console.WindowWidth-text.Length)/2;
-        Console.Write(new string(' ',espacios) + text);
+        Console.CursorLeft = espacios;
+        Console.Write(text);
     }
     public static void borrarSeccion(int x, int y, int width, int height){
-      Console.CursorLeft = x;
       Console.CursorTop = y;
       for(int i = 0; i<=height;i++){
+            Console.CursorLeft = x;
             Console.Write(new string(' ', width));
+            Console.CursorTop++;     
       }  
     }
 }
