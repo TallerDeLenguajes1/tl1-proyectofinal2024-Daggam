@@ -82,7 +82,7 @@ static class Game{
 
     }
     static void quitState(){
-        
+
     }
     public static void GameInit(int xres, int yres)
     {
@@ -99,6 +99,15 @@ static class Game{
         switch(nuevoEstado){
             case GameStates.Menu:
                 MenuState();
+                break;
+            case GameStates.Game:
+                gameState();
+                break;
+            case GameStates.Info:
+                infoState();
+                break;
+            case GameStates.Quit:
+                quitState();
                 break;
         }        
         estadoActual = nuevoEstado;
