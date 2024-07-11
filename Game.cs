@@ -88,12 +88,12 @@ static class Game{
     {
         Console.CursorVisible = false;
         Console.SetWindowSize(xres,yres);
-        Console.Clear();
         //Meter una introducción para dar a conocer los controles.
         cambiarEstado(GameStates.Menu);
     }
 
     static void cambiarEstado(GameStates nuevoEstado){
+        Console.Clear();
         //Función de entrada.
         //Funcion de salida.
         switch(nuevoEstado){
