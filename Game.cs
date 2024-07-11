@@ -79,7 +79,8 @@ static class Game{
     }
 
     static void gameState(){
-        Caja cajita = new Caja(0,0,48,4);
+        Caja cajita = new Caja(0,0,48,10);
+        cajita.Escribir("¡Buenos días, país!");
         while (true)
         {
             
