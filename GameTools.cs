@@ -1,3 +1,5 @@
+using System.Reflection.Metadata.Ecma335;
+
 namespace ToolNamespace;
 
 static class Text{
@@ -16,9 +18,9 @@ static class Text{
             Thread.Sleep(speed);
         }
     }
-    public static void WriteCenter(string text){
-        int espacios = (Console.WindowWidth-text.Length)/2;
-        Console.CursorLeft = espacios;
+    public static void WriteCenter(string text,int width){
+        int espacios = (width-text.Length)/2;
+        Console.CursorLeft += espacios;
         Console.Write(text);
     }
     public static void borrarSeccion(int x, int y, int width, int height){
@@ -32,9 +34,20 @@ static class Text{
 }
 class Caja{
     int x,y,width,height;
+    public int X { get => x;}
+    public int Y { get => y;}
+    public int Width { get => width;}
+    public int Height { get => height;}
+
     (int Left, int Top) cursorWritter;
 
+    public (int Left, int Top) CursorWritter { get => cursorWritter;}
+
     public Caja(int x, int y, int width, int height){
+        this.x = x;
+        this.y = y;
+        this.width =width;
+        this.height = height; 
         Console.SetCursorPosition(x,y);
         Console.WriteLine("╔"+new string('═',width-2)+"╗");
         for(int i=0; i < height-2;i++)

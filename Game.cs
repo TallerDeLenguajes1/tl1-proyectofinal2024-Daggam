@@ -10,7 +10,7 @@ static class Game{
     static GameStates estadoActual;
 
 
-    public static void MenuState(){
+    static void menuState(){
         const string titulo = @"
 ██████╗ ██████╗  █████╗  ██████╗  ██████╗ ███╗   ██╗    ███████╗██╗███╗   ███╗
 ██╔══██╗██╔══██╗██╔══██╗██╔════╝ ██╔═══██╗████╗  ██║    ██╔════╝██║████╗ ████║
@@ -90,7 +90,53 @@ static class Game{
 
     }
     static void quitState(){
+        //26 = (105 - 52)/2
+        Caja cajaEmergente = new Caja(26,4,52,6);
+        string msj = "¿Estás seguro que quieres salir?";
+        Console.SetCursorPosition(cajaEmergente.X,cajaEmergente.Y+1);
+        Text.WriteCenter(msj,cajaEmergente.Width);
+        Console.SetCursorPosition(cajaEmergente.X+1,cajaEmergente.Y + cajaEmergente.Height-2);
+        Text.WriteCenter("Sí",cajaEmergente.Width/2);
+        Console.CursorLeft = cajaEmergente.X+cajaEmergente.Width/2;
+        Text.WriteCenter("No",cajaEmergente.Width/2);
 
+        bool updateOpciones=true;
+        bool salir=true;
+        (int x1,int x2) cursorPositions = (x1: cajaEmergente.X + cajaEmergente.Width/4 - 2,
+                                           x2: cajaEmergente.X + 3*cajaEmergente.Width/4 - 3);
+        while (true)
+        {
+            if(updateOpciones){
+                if(salir){
+                    Console.CursorLeft = cursorPositions.x1;
+                    Console.Write("■");
+                    Console.CursorLeft = cursorPositions.x2;
+                    Console.Write("*");
+                }else{
+                    Console.CursorLeft = cursorPositions.x1;
+                    Console.Write("*");
+                    Console.CursorLeft = cursorPositions.x2;
+                    Console.Write("■");
+                }
+                updateOpciones=false;
+            }
+
+            ConsoleKey k = Console.ReadKey().Key;
+            if(k == ConsoleKey.LeftArrow){
+                salir=true;
+                updateOpciones=true;
+            }else if(k == ConsoleKey.RightArrow){
+                salir=false;
+                updateOpciones=true;
+            }else if(k == ConsoleKey.Enter)
+            {
+                break;
+            }
+        }
+
+        if(!salir){
+            cambiarEstado(GameStates.Menu);
+        }
     }
     public static void GameInit(int xres, int yres)
     {
@@ -107,7 +153,7 @@ static class Game{
         //Funcion de salida.
         switch(nuevoEstado){
             case GameStates.Menu:
-                MenuState();
+                menuState();
                 break;
             case GameStates.Game:
                 gameState();
@@ -122,3 +168,4 @@ static class Game{
         estadoActual = nuevoEstado;
     }
 }
+
