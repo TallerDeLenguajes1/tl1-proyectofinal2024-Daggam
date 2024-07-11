@@ -79,12 +79,7 @@ static class Game{
     }
 
     static void gameState(){
-        Text.WriteCenter("Hola buenos días");
-        Console.SetCursorPosition(0,0);
-        Text.Start("Buenos días a todos");
-        Text.Start("\n¿Como estas, todo bien?");
-        Thread.Sleep(500);
-        Text.borrarSeccion(0,0,30,1);
+        Caja cajita = new Caja(0,0,48,4);
         while (true)
         {
             

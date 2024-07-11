@@ -30,6 +30,20 @@ static class Text{
       }  
     }
 }
-class Box{
+class Caja{
+    int x,y,width,height;
+    (int Left, int Top) cursorWritter;
 
+    public Caja(int x, int y, int width, int height){
+        Console.SetCursorPosition(x,y);
+        Console.WriteLine("╔"+new string('═',width-2)+"╗");
+        for(int i=0; i < height-2;i++)
+        {
+            Console.CursorLeft = x;
+            Console.WriteLine("║" + new string(' ',width-2)+"║");
+        }
+        Console.CursorLeft = x;
+        Console.WriteLine("╚"+new string('═',width-2)+"╝");
+        cursorWritter = (Left: x+2,Top:y+1);
+    }
 }
