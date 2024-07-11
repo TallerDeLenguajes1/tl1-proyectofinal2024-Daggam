@@ -1,2 +1,5 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using GameNamespace;
+
+//Configuración inicial.
+(int x, int y) gameRes = (105,18);
+Game.GameInit(gameRes.x,gameRes.y);
