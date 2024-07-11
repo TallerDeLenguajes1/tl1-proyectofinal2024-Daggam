@@ -1,0 +1,25 @@
+{
+    "nombre": "Goku Inicio",
+    "salud": 50000,
+    "ataque": 5000,
+    "defensa":5000,
+    "agresividad":10,
+    "velocidadCarga":100,
+    "tecnicas":[
+        {
+            "nombre":"Kamehameha",
+            "cantidadKiNecesaria":600,
+            "ataque":4000
+        },
+        {
+            "nombre":"Ataque Kaio-Ken",
+            "cantidadKiNecesaria":800,
+            "ataque":8000
+        },
+        {
+            "nombre":"Bomba de energía",
+            "cantidadKiNecesaria":500,
+            "ataque":14000
+        }
+    ]
+}
