@@ -6,7 +6,8 @@ using GuerreroNamespace;
 
 static class Game{
     enum GameStates{
-        Menu,Game,Info,Quit
+        Menu,Game,Info,Quit,
+        Seleccionar_personaje
     }
     //Definicion de variables
     static GameStates estadoActual;
@@ -79,13 +80,16 @@ static class Game{
         //Esto funciona por como está dispuesto
         cambiarEstado((GameStates) (opcion+1));
     }
-
+    
     static void gameState(){
-        Battle batalla = new Battle();
+        //Battle batalla = new Battle();
+        cambiarEstado(GameStates.Seleccionar_personaje);
     }
+    
     static void infoState(){
 
     }
+    
     static void quitState(){
         //26 = (105 - 52)/2
         Caja cajaEmergente = new Caja(26,4,52,6);
@@ -135,6 +139,16 @@ static class Game{
             cambiarEstado(GameStates.Menu);
         }
     }
+    
+    static void seleccionarPersonajeState(){
+        Caja cajaSeleccionadora = new Caja(10,1,85,10);
+        Text.WriteCenter("Selecciona un personaje",Console.WindowWidth);
+        while (true)
+        {
+            
+        }
+    }
+    
     public static void GameInit(int xres, int yres)
     {
         Console.CursorVisible = false;
@@ -161,6 +175,9 @@ static class Game{
             case GameStates.Quit:
                 quitState();
                 break;
+            case GameStates.Seleccionar_personaje:
+                seleccionarPersonajeState();
+                break;
         }        
         estadoActual = nuevoEstado;
     }
@@ -170,7 +187,7 @@ class Battle{
     Guerrero jugador;
     Guerrero enemigo;
 
-    Caja caja_Batalla;
+    Caja caja_batalla;
     enum BattleStates{
         Init, Golpear, Ataques_ki, Cargar_ki, Turno_enemigo
     }
@@ -184,9 +201,11 @@ class Battle{
     }
     public void initState(){
         //SE INICIALIZA LA UI | Barra: ▓ Foreground ; ▒ Background
-        caja_Batalla = new Caja(17,1,70,9);
-        Console.SetCursorPosition(0,17);
-        Console.Write("");
+        caja_batalla = new Caja(17,1,70,9);
+        Console.SetCursorPosition(3,12);
+        //Se tiene que modificar pq depende de la vida del pj
+        Console.Write(new string('▓',25));
+        
         while (true)
         {
             
