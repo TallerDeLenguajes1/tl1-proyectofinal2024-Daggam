@@ -2,6 +2,8 @@ namespace GameNamespace;
 
 using System.Text;
 using ToolNamespace;
+using GuerreroNamespace;
+
 static class Game{
     enum GameStates{
         Menu,Game,Info,Quit
@@ -79,12 +81,7 @@ static class Game{
     }
 
     static void gameState(){
-        Caja cajita = new Caja(0,0,48,10);
-        cajita.Escribir("¡Buenos días, país!");
-        while (true)
-        {
-            
-        }
+        Battle batalla = new Battle();
     }
     static void infoState(){
 
@@ -169,3 +166,37 @@ static class Game{
     }
 }
 
+class Battle{
+    Guerrero jugador;
+    Guerrero enemigo;
+
+    Caja caja_Batalla;
+    enum BattleStates{
+        Init, Golpear, Ataques_ki, Cargar_ki, Turno_enemigo
+    }
+
+
+    public Battle(){
+        //Por ahora los defino nomás.
+        jugador = new Guerrero();
+        enemigo = new Guerrero();
+        cambiarEstado(BattleStates.Init);
+    }
+    public void initState(){
+        //SE INICIALIZA LA UI | Barra: ▓ Foreground ; ▒ Background
+        caja_Batalla = new Caja(17,1,70,9);
+        Console.SetCursorPosition(0,17);
+        Console.Write("");
+        while (true)
+        {
+            
+        }
+    }
+    void cambiarEstado(BattleStates nuevoEstado){
+        switch(nuevoEstado){
+            case BattleStates.Init:
+                initState();
+                break;
+        }
+    }
+}
