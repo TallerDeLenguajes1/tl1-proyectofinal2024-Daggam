@@ -1,25 +1,25 @@
 {
-    "nombre": "Goku Inicio",
+    "nombre": "Androide 18",
     "salud": 50000,
-    "ataque": 5000,
+    "ataque": 300,
     "defensa":5000,
     "agresividad":10,
     "velocidadCarga":100,
     "tecnicas":[
         {
-            "nombre":"Kamehameha",
-            "cantidadKiNecesaria":600,
-            "ataque":4000
+            "nombre":"Bala infinita",
+            "cantidadKiNecesaria":2,
+            "ataque":6500
         },
         {
-            "nombre":"Ataque Kaio-Ken",
-            "cantidadKiNecesaria":800,
-            "ataque":8000
+            "nombre":"Sádica 18",
+            "cantidadKiNecesaria":4,
+            "ataque":7200
         },
         {
-            "nombre":"Bomba de energía",
-            "cantidadKiNecesaria":500,
-            "ataque":14000
+            "nombre":"Combinación Mortal",
+            "cantidadKiNecesaria":5,
+            "ataque":13000
         }
     ]
 }

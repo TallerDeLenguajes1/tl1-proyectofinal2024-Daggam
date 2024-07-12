@@ -1,25 +1,25 @@
 {
-    "nombre": "Goku Inicio",
+    "nombre": "Androide 17",
     "salud": 50000,
-    "ataque": 5000,
+    "ataque": 280,
     "defensa":5000,
     "agresividad":10,
     "velocidadCarga":100,
     "tecnicas":[
         {
-            "nombre":"Kamehameha",
-            "cantidadKiNecesaria":600,
-            "ataque":4000
+            "nombre":"Bola de poder máximo",
+            "cantidadKiNecesaria":3,
+            "ataque":5500
         },
         {
-            "nombre":"Ataque Kaio-Ken",
-            "cantidadKiNecesaria":800,
-            "ataque":8000
+            "nombre":"Destello fotónico",
+            "cantidadKiNecesaria":2,
+            "ataque":5000
         },
         {
-            "nombre":"Bomba de energía",
-            "cantidadKiNecesaria":500,
-            "ataque":14000
+            "nombre":"Danza sádica",
+            "cantidadKiNecesaria":5,
+            "ataque":13000
         }
     ]
 }

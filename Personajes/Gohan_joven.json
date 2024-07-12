@@ -1,25 +1,25 @@
 {
-    "nombre": "Goku Inicio",
+    "nombre": "Gohan (Joven)",
     "salud": 50000,
-    "ataque": 5000,
+    "ataque": 240,
     "defensa":5000,
     "agresividad":10,
     "velocidadCarga":100,
     "tecnicas":[
         {
-            "nombre":"Kamehameha",
-            "cantidadKiNecesaria":600,
-            "ataque":4000
+            "nombre":"Súper Masenko",
+            "cantidadKiNecesaria":3,
+            "ataque":6450
         },
         {
-            "nombre":"Ataque Kaio-Ken",
-            "cantidadKiNecesaria":800,
-            "ataque":8000
+            "nombre":"Estilo Escuela Tortuga",
+            "cantidadKiNecesaria":4,
+            "ataque":7000
         },
         {
-            "nombre":"Bomba de energía",
-            "cantidadKiNecesaria":500,
-            "ataque":14000
+            "nombre":"Súper Kamehameha",
+            "cantidadKiNecesaria":5,
+            "ataque":12720
         }
     ]
 }

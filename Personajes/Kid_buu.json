@@ -1,25 +1,25 @@
 {
-    "nombre": "Goku Inicio",
+    "nombre": "Buu (Forma Pura)",
     "salud": 50000,
-    "ataque": 5000,
+    "ataque": 240,
     "defensa":5000,
     "agresividad":10,
     "velocidadCarga":100,
     "tecnicas":[
         {
-            "nombre":"Kamehameha",
-            "cantidadKiNecesaria":600,
-            "ataque":4000
+            "nombre":"Super Kamehameha",
+            "cantidadKiNecesaria":3,
+            "ataque":7260
         },
         {
-            "nombre":"Ataque Kaio-Ken",
-            "cantidadKiNecesaria":800,
+            "nombre":"Combinación mística",
+            "cantidadKiNecesaria":4,
             "ataque":8000
         },
         {
-            "nombre":"Bomba de energía",
-            "cantidadKiNecesaria":500,
-            "ataque":14000
+            "nombre":"Explosión planetaria",
+            "cantidadKiNecesaria":5,
+            "ataque":12840
         }
     ]
 }

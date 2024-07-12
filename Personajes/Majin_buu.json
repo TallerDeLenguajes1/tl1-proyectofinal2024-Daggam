@@ -1,25 +1,25 @@
 {
-    "nombre": "Goku Inicio",
+    "nombre": "Majin Buu",
     "salud": 50000,
-    "ataque": 5000,
+    "ataque": 320,
     "defensa":5000,
     "agresividad":10,
     "velocidadCarga":100,
     "tecnicas":[
         {
-            "nombre":"Kamehameha",
-            "cantidadKiNecesaria":600,
-            "ataque":4000
+            "nombre":"Aliento de llamas",
+            "cantidadKiNecesaria":3,
+            "ataque":6480
         },
         {
-            "nombre":"Ataque Kaio-Ken",
-            "cantidadKiNecesaria":800,
-            "ataque":8000
+            "nombre":"Súper Kamehameha",
+            "cantidadKiNecesaria":2,
+            "ataque":7020
         },
         {
-            "nombre":"Bomba de energía",
-            "cantidadKiNecesaria":500,
-            "ataque":14000
+            "nombre":"Explosión furiosa",
+            "cantidadKiNecesaria":5,
+            "ataque":12750
         }
     ]
 }

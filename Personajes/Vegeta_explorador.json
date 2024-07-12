@@ -1,25 +1,25 @@
 {
-    "nombre": "Goku Inicio",
+    "nombre": "Vegeta (con explorador)",
     "salud": 50000,
-    "ataque": 5000,
+    "ataque": 280,
     "defensa":5000,
     "agresividad":10,
     "velocidadCarga":100,
     "tecnicas":[
         {
-            "nombre":"Kamehameha",
-            "cantidadKiNecesaria":600,
-            "ataque":4000
+            "nombre":"Cañon Galick",
+            "cantidadKiNecesaria":3,
+            "ataque":6440
         },
         {
-            "nombre":"Ataque Kaio-Ken",
-            "cantidadKiNecesaria":800,
-            "ataque":8000
+            "nombre":"Cañón Garlic final",
+            "cantidadKiNecesaria":4,
+            "ataque":7000
         },
         {
-            "nombre":"Bomba de energía",
-            "cantidadKiNecesaria":500,
-            "ataque":14000
+            "nombre":"Fuegos artific. sucios",
+            "cantidadKiNecesaria":4,
+            "ataque":12000
         }
     ]
 }

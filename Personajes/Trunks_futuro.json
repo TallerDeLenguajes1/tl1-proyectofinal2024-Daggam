@@ -1,25 +1,25 @@
 {
-    "nombre": "Goku Inicio",
+    "nombre": "Trunks (Espada)",
     "salud": 50000,
-    "ataque": 5000,
+    "ataque": 300,
     "defensa":5000,
     "agresividad":10,
     "velocidadCarga":100,
     "tecnicas":[
         {
-            "nombre":"Kamehameha",
-            "cantidadKiNecesaria":600,
-            "ataque":4000
+            "nombre":"Destrozo final",
+            "cantidadKiNecesaria":3,
+            "ataque":6440
         },
         {
-            "nombre":"Ataque Kaio-Ken",
-            "cantidadKiNecesaria":800,
-            "ataque":8000
+            "nombre":"Tormenta ardiente",
+            "cantidadKiNecesaria":2,
+            "ataque":5000
         },
         {
-            "nombre":"Bomba de energía",
-            "cantidadKiNecesaria":500,
-            "ataque":14000
+            "nombre":"Tajo de espada de luz",
+            "cantidadKiNecesaria":5,
+            "ataque":12500
         }
     ]
 }

@@ -1,25 +1,25 @@
 {
-    "nombre": "Goku Inicio",
+    "nombre": "Gohan (Niño)",
     "salud": 50000,
-    "ataque": 5000,
+    "ataque": 240,
     "defensa":5000,
     "agresividad":10,
     "velocidadCarga":100,
     "tecnicas":[
         {
-            "nombre":"Kamehameha",
-            "cantidadKiNecesaria":600,
-            "ataque":4000
+            "nombre":"Masenko",
+            "cantidadKiNecesaria":3,
+            "ataque":6160
         },
         {
-            "nombre":"Ataque Kaio-Ken",
-            "cantidadKiNecesaria":800,
-            "ataque":8000
+            "nombre":"Gekiretsu Madan",
+            "cantidadKiNecesaria":2,
+            "ataque":5600
         },
         {
-            "nombre":"Bomba de energía",
-            "cantidadKiNecesaria":500,
-            "ataque":14000
+            "nombre":"Bakuretsu Ranma",
+            "cantidadKiNecesaria":5,
+            "ataque":12510
         }
     ]
 }

@@ -1,25 +1,25 @@
 {
-    "nombre": "Goku Inicio",
+    "nombre": "Mr. Satan",
     "salud": 50000,
-    "ataque": 5000,
+    "ataque": 230,
     "defensa":5000,
     "agresividad":10,
     "velocidadCarga":100,
     "tecnicas":[
         {
-            "nombre":"Kamehameha",
-            "cantidadKiNecesaria":600,
+            "nombre":"Súper puño dinámico",
+            "cantidadKiNecesaria":4,
+            "ataque":5000
+        },
+        {
+            "nombre":"Bomba regalo",
+            "cantidadKiNecesaria":3,
             "ataque":4000
         },
         {
-            "nombre":"Ataque Kaio-Ken",
-            "cantidadKiNecesaria":800,
-            "ataque":8000
-        },
-        {
-            "nombre":"Bomba de energía",
-            "cantidadKiNecesaria":500,
-            "ataque":14000
+            "nombre":"¡Llega el señor Bu!",
+            "cantidadKiNecesaria":5,
+            "ataque":12000
         }
     ]
 }
