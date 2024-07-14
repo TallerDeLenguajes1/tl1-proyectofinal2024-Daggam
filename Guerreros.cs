@@ -4,9 +4,10 @@ class Guerrero{
     int planetaID;
     string nombre;
     int salud;
+    int maxSalud;
     int ataque;
     int defensa;
-    int ki;
+    float ki;
     int agresividad;
     int velocidadCarga;
     bool sobreCarga;

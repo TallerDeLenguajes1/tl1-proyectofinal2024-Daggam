@@ -14,6 +14,7 @@ static class Game{
     static GameStates estadoActual;
     static (ConsoleColor bg, ConsoleColor fg) consoleColor = (bg: ConsoleColor.Black, fg: ConsoleColor.DarkCyan);
 
+    static List<Guerrero> allWarriors;
     static void menuState(){
         const string titulo = @"
 ██████╗ ██████╗  █████╗  ██████╗  ██████╗ ███╗   ██╗    ███████╗██╗███╗   ███╗
@@ -63,7 +64,7 @@ static class Game{
                 }
                 updateMenu=false;
             }
-            k = Console.ReadKey().Key;
+            k = Console.ReadKey(true).Key;
             switch(k){
                 case ConsoleKey.DownArrow:
                     opcion++;
@@ -123,7 +124,7 @@ static class Game{
                 updateOpciones=false;
             }
 
-            ConsoleKey k = Console.ReadKey().Key;
+            ConsoleKey k = Console.ReadKey(true).Key;
             if(k == ConsoleKey.LeftArrow){
                 salir=true;
                 updateOpciones=true;
@@ -188,7 +189,7 @@ static class Game{
                 updateSelectores=false;
             }
 
-            ConsoleKey k = Console.ReadKey().Key;
+            ConsoleKey k = Console.ReadKey(true).Key;
             opciones.anterior = opciones.actual;
             switch(k){
                 case ConsoleKey.RightArrow:
@@ -212,7 +213,6 @@ static class Game{
         }
         //Podría agregar un estado para que confirme su personaje
         //Busqueda de personaje.
-        File.GetAttributes
     }
     
     public static void GameInit(int xres, int yres)
