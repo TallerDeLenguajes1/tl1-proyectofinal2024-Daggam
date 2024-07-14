@@ -20,7 +20,7 @@ static class Text{
     }
     public static void WriteCenter(string text,int width){
         int espacios = (width-text.Length)/2;
-        Console.CursorLeft += espacios;
+        Console.CursorLeft = espacios;
         Console.Write(text);
     }
     public static void borrarSeccion(int x, int y, int width, int height){

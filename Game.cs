@@ -3,6 +3,7 @@ namespace GameNamespace;
 using System.Text;
 using ToolNamespace;
 using GuerreroNamespace;
+using System.Text.Json;
 
 static class Game{
     enum GameStates{
@@ -11,7 +12,7 @@ static class Game{
     }
     //Definicion de variables
     static GameStates estadoActual;
-
+    static (ConsoleColor bg, ConsoleColor fg) consoleColor = (bg: ConsoleColor.Black, fg: ConsoleColor.DarkCyan);
 
     static void menuState(){
         const string titulo = @"
@@ -141,12 +142,77 @@ static class Game{
     }
     
     static void seleccionarPersonajeState(){
-        Caja cajaSeleccionadora = new Caja(10,1,85,10);
+        //Me trae todos los nombres de los personajes.
+        List<string> nombrePersonajes = new List<string>(); 
+        foreach (string filepath in Directory.EnumerateFiles("Personajes","*.json"))
+        {
+            string jsonInfo = File.ReadAllText(filepath);
+            using(JsonDocument doc = JsonDocument.Parse(jsonInfo)){
+                var root = doc.RootElement;
+                string name = root.GetProperty("nombre").GetString();
+                nombrePersonajes.Add(name);
+            }
+        }
+        Caja cajaSeleccionadora = new Caja(2,1,101,11);
         Text.WriteCenter("Selecciona un personaje",Console.WindowWidth);
+        (int x, int y) cursorPos = cajaSeleccionadora.CursorWritter;
+
+        for (int i = 1; i <= 20; i++)
+        {
+            Console.SetCursorPosition(cursorPos.x,cursorPos.y);
+            Console.WriteLine(nombrePersonajes[i-1]);
+            if(i%5==0){
+                cursorPos.x +=26;
+                cursorPos.y = cajaSeleccionadora.CursorWritter.Top;
+            }else{
+                cursorPos.y+=2;   
+            }
+        }
+
+        (int anterior,int actual) opciones= (0,0);
+        bool updateSelectores = true;
         while (true)
         {
-            
+            if(updateSelectores){
+                Console.CursorLeft = cajaSeleccionadora.CursorWritter.Left + (opciones.anterior/5)*26;
+                Console.CursorTop = cajaSeleccionadora.CursorWritter.Top + (opciones.anterior%5)*2;
+                Console.Write(nombrePersonajes[opciones.anterior]);
+                
+                Console.CursorLeft = cajaSeleccionadora.CursorWritter.Left + (opciones.actual/5)*26;
+                Console.CursorTop = cajaSeleccionadora.CursorWritter.Top + (opciones.actual%5)*2;
+                Console.BackgroundColor = ConsoleColor.White;
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write(nombrePersonajes[opciones.actual]);
+                Console.BackgroundColor = consoleColor.bg;
+                Console.ForegroundColor = consoleColor.fg;
+                updateSelectores=false;
+            }
+
+            ConsoleKey k = Console.ReadKey().Key;
+            opciones.anterior = opciones.actual;
+            switch(k){
+                case ConsoleKey.RightArrow:
+                    opciones.actual = (opciones.actual > 14) ? opciones.actual-15:opciones.actual+5;
+                    break;
+                case ConsoleKey.LeftArrow:
+                    opciones.actual = (opciones.actual<5) ? opciones.actual+15:opciones.actual-5;
+                    break;
+                case ConsoleKey.DownArrow:
+                    opciones.actual = (opciones.actual%5 == 4) ? opciones.actual-4:opciones.actual+1;
+                    break;
+                case ConsoleKey.UpArrow:
+                    opciones.actual = (opciones.actual%5 == 0) ? opciones.actual+4:opciones.actual-1;;
+                    break;
+
+            }
+            if(k==ConsoleKey.Enter){
+                break;
+            }
+            updateSelectores=true;
         }
+        //Podría agregar un estado para que confirme su personaje
+        //Busqueda de personaje.
+        File.GetAttributes
     }
     
     public static void GameInit(int xres, int yres)
@@ -154,6 +220,8 @@ static class Game{
         Console.CursorVisible = false;
         Console.SetWindowSize(xres,yres);
         Console.OutputEncoding = Encoding.UTF8;
+        Console.BackgroundColor = consoleColor.bg;
+        Console.ForegroundColor = consoleColor.fg;
         //Meter una introducción para dar a conocer los controles.
         cambiarEstado(GameStates.Menu);
     }
