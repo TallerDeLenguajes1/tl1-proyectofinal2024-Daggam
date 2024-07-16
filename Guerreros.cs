@@ -76,7 +76,7 @@ public class Tecnica
 }
 
 public class Guerrero{
-    GuerreroInfo information;
+    public GuerreroInfo information;
     int salud;
     float ki;
     bool sobreCarga;

@@ -7,14 +7,15 @@ using System.Text.Json;
 
 static class Game{
     enum GameStates{
-        Menu,Game,Info,Quit,
-        Seleccionar_personaje
+        Menu,Seleccionar_personaje,Info,Quit,
+        Battle
     }
     //Definicion de variables
     static GameStates estadoActual;
     static (ConsoleColor bg, ConsoleColor fg) consoleColor = (bg: ConsoleColor.Black, fg: ConsoleColor.DarkCyan);
 
     static List<GuerreroInfo> allWarriors = new List<GuerreroInfo>();
+    static Guerrero jugador;
     static void menuState(){
         const string titulo = @"
 ██████╗ ██████╗  █████╗  ██████╗  ██████╗ ███╗   ██╗    ███████╗██╗███╗   ███╗
@@ -83,9 +84,9 @@ static class Game{
         cambiarEstado((GameStates) (opcion+1));
     }
     
-    static void gameState(){
-        //Battle batalla = new Battle();
-        cambiarEstado(GameStates.Seleccionar_personaje);
+    static void battleState(){
+        Battle batalla = new Battle();
+        
     }
     
     static void infoState(){
@@ -143,17 +144,6 @@ static class Game{
     }
     
     static void seleccionarPersonajeState(){
-        //Me trae todos los nombres de los personajes.
-        // List<string> nombrePersonajes = new List<string>(); 
-        // foreach (string filepath in Directory.EnumerateFiles("Personajes","*.json"))
-        // {
-        //     string jsonInfo = File.ReadAllText(filepath);
-        //     using(JsonDocument doc = JsonDocument.Parse(jsonInfo)){
-        //         var root = doc.RootElement;
-        //         string name = root.GetProperty("nombre").GetString();
-        //         nombrePersonajes.Add(name);
-        //     }
-        // }
         Caja cajaSeleccionadora = new Caja(2,1,101,11);
         Text.WriteCenter("Selecciona un personaje",Console.WindowWidth);
         (int x, int y) cursorPos = cajaSeleccionadora.CursorWritter;
@@ -213,6 +203,9 @@ static class Game{
         }
         //Podría agregar un estado para que confirme su personaje
         //Busqueda de personaje.
+        jugador = new Guerrero(allWarriors[opciones.actual]);
+        cambiarEstado(GameStates.Battle);
+
     }
     
     public static void GameInit(int xres, int yres)
@@ -241,8 +234,8 @@ static class Game{
             case GameStates.Menu:
                 menuState();
                 break;
-            case GameStates.Game:
-                gameState();
+            case GameStates.Seleccionar_personaje:
+                seleccionarPersonajeState();
                 break;
             case GameStates.Info:
                 infoState();
@@ -250,8 +243,8 @@ static class Game{
             case GameStates.Quit:
                 quitState();
                 break;
-            case GameStates.Seleccionar_personaje:
-                seleccionarPersonajeState();
+            case GameStates.Battle:
+                battleState();
                 break;
         }        
         estadoActual = nuevoEstado;
