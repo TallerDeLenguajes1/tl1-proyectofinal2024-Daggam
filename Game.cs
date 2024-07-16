@@ -4,6 +4,7 @@ using System.Text;
 using ToolNamespace;
 using GuerreroNamespace;
 using System.Text.Json;
+using System.Runtime.CompilerServices;
 
 static class Game{
     enum GameStates{
@@ -85,7 +86,8 @@ static class Game{
     }
     
     static void battleState(){
-        Battle batalla = new Battle();
+        Guerrero enemigo = new Guerrero(allWarriors[0]);
+        Battle batalla = new Battle(jugador,enemigo);
         
     }
     
@@ -252,27 +254,55 @@ static class Game{
 }
 
 class Battle{
-    GuerreroInfo jugador;
-    GuerreroInfo enemigo;
+    Guerrero jugador;
+    Guerrero enemigo;
 
+    BattleStates estado_actual;
     Caja caja_batalla;
     enum BattleStates{
-        Init, Golpear, Ataques_ki, Cargar_ki, Turno_enemigo
+        Init,Turno_jugador, Golpear, Ataques_ki, Cargar_ki, Turno_enemigo
     }
 
 
-    public Battle(){
+    public Battle(Guerrero jugador, Guerrero enemigo){
         //Por ahora los defino nomás.
-        jugador = new GuerreroInfo();
-        enemigo = new GuerreroInfo();
+        this.jugador = jugador;
+        this.enemigo = enemigo;
         cambiarEstado(BattleStates.Init);
     }
     public void initState(){
         //SE INICIALIZA LA UI | Barra: ▓ Foreground ; ▒ Background
         caja_batalla = new Caja(17,1,70,9);
+        //VIDA
+        jugador.Salud /= 4 ; 
+        int barraWidth = 25;
+        float jugadorBarra = (float) jugador.Salud/jugador.Information.salud_max * barraWidth; 
+        float enemigoBarra = (float) jugador.Salud/jugador.Information.salud_max * barraWidth; 
         Console.SetCursorPosition(3,12);
-        //Se tiene que modificar pq depende de la vida del pj
+        Console.Write(new string('▓',(int) Math.Ceiling(jugadorBarra)) + new string('▒',barraWidth - (int) Math.Ceiling(jugadorBarra) ));
+        Console.CursorLeft = Console.WindowWidth-3-25;
         Console.Write(new string('▓',25));
+
+        //KI
+        Console.SetCursorPosition(3,13);
+        Console.Write("■ ■ ■ ■ ■");
+        Console.CursorLeft = Console.WindowWidth-3-25;
+        Console.Write("■ ■ ■ ■ ■");
+
+
+
+        Console.SetCursorPosition(3,14);
+        Text.WriteCenter("(Vos)",25);
+        Console.CursorLeft = Console.WindowWidth-3-25;
+        Text.WriteCenter("(CPU)",25);
+
+        Console.SetCursorPosition(3,15);
+        Text.WriteCenter(jugador.Information.nombre,25);
+        Console.CursorLeft = Console.WindowWidth-3-25;
+        Text.WriteCenter(enemigo.Information.nombre,25);
+
+        Console.SetCursorPosition(caja_batalla.CursorWritter.Left+1+2,caja_batalla.CursorWritter.Top+1);
+        Console.WriteLine("Golpear"+new string(' ',20-2)+"Técnicas" + new string(' ',20-2) + "Cargar ki");
         
         while (true)
         {
@@ -280,10 +310,22 @@ class Battle{
         }
     }
     void cambiarEstado(BattleStates nuevoEstado){
+        estado_actual = nuevoEstado;
         switch(nuevoEstado){
             case BattleStates.Init:
                 initState();
                 break;
         }
+    }
+
+    void updateVida(Guerrero w){
+        int barraWidth = 25;
+        float wBarra = (float) w.Salud/w.Information.salud_max * barraWidth; 
+        if(w.Equals(jugador)){
+            Console.SetCursorPosition(3,12);
+        }else if(w.Equals(enemigo)){
+            Console.SetCursorPosition(Console.WindowWidth - barraWidth - 3,12);
+        }
+        Console.Write(new string('▓',(int) Math.Ceiling(wBarra)) + new string('▒',barraWidth - (int) Math.Ceiling(wBarra)));
     }
 }

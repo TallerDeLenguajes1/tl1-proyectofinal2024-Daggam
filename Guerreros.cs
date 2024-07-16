@@ -76,7 +76,7 @@ public class Tecnica
 }
 
 public class Guerrero{
-    public GuerreroInfo information;
+    GuerreroInfo information;
     int salud;
     float ki;
     bool sobreCarga;
@@ -85,4 +85,7 @@ public class Guerrero{
         information = wbase;
         salud = information.salud_max;
     }
+
+    public int Salud { get => salud; set => salud = value; }
+    public GuerreroInfo Information {get => information; set => information = value;}
 }
