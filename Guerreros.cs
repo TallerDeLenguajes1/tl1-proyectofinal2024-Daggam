@@ -88,4 +88,5 @@ public class Guerrero{
 
     public int Salud { get => salud; set => salud = value; }
     public GuerreroInfo Information {get => information; set => information = value;}
+    public float Ki { get => ki; set => ki = value; }
 }

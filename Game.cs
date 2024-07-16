@@ -13,7 +13,7 @@ static class Game{
     }
     //Definicion de variables
     static GameStates estadoActual;
-    static (ConsoleColor bg, ConsoleColor fg) consoleColor = (bg: ConsoleColor.Black, fg: ConsoleColor.DarkCyan);
+    static public (ConsoleColor bg, ConsoleColor fg) consoleColor = (bg: ConsoleColor.Black, fg: ConsoleColor.DarkCyan);
 
     static List<GuerreroInfo> allWarriors = new List<GuerreroInfo>();
     static Guerrero jugador;
@@ -259,6 +259,8 @@ class Battle{
 
     BattleStates estado_actual;
     Caja caja_batalla;
+
+    int barraSaludWidth = 25;
     enum BattleStates{
         Init,Turno_jugador, Golpear, Ataques_ki, Cargar_ki, Turno_enemigo
     }
@@ -268,6 +270,7 @@ class Battle{
         //Por ahora los defino nomás.
         this.jugador = jugador;
         this.enemigo = enemigo;
+        
         cambiarEstado(BattleStates.Init);
     }
     public void initState(){
@@ -275,21 +278,13 @@ class Battle{
         caja_batalla = new Caja(17,1,70,9);
         //VIDA
         jugador.Salud /= 4 ; 
-        int barraWidth = 25;
-        float jugadorBarra = (float) jugador.Salud/jugador.Information.salud_max * barraWidth; 
-        float enemigoBarra = (float) jugador.Salud/jugador.Information.salud_max * barraWidth; 
-        Console.SetCursorPosition(3,12);
-        Console.Write(new string('▓',(int) Math.Ceiling(jugadorBarra)) + new string('▒',barraWidth - (int) Math.Ceiling(jugadorBarra) ));
-        Console.CursorLeft = Console.WindowWidth-3-25;
-        Console.Write(new string('▓',25));
+        updateVida(jugador);
+        updateVida(enemigo);
 
         //KI
-        Console.SetCursorPosition(3,13);
-        Console.Write("■ ■ ■ ■ ■");
-        Console.CursorLeft = Console.WindowWidth-3-25;
-        Console.Write("■ ■ ■ ■ ■");
-
-
+        // jugador.Ki =2;
+        updateKi(jugador);
+        updateKi(enemigo);
 
         Console.SetCursorPosition(3,14);
         Text.WriteCenter("(Vos)",25);
@@ -318,14 +313,34 @@ class Battle{
         }
     }
 
+    //FUNCIONES DE ACTUALIZACIÓN DE UI.
     void updateVida(Guerrero w){
-        int barraWidth = 25;
-        float wBarra = (float) w.Salud/w.Information.salud_max * barraWidth; 
+        float wBarra = (float) w.Salud/w.Information.salud_max * barraSaludWidth; 
         if(w.Equals(jugador)){
             Console.SetCursorPosition(3,12);
         }else if(w.Equals(enemigo)){
-            Console.SetCursorPosition(Console.WindowWidth - barraWidth - 3,12);
+            Console.SetCursorPosition(Console.WindowWidth - barraSaludWidth - 3,12);
         }
-        Console.Write(new string('▓',(int) Math.Ceiling(wBarra)) + new string('▒',barraWidth - (int) Math.Ceiling(wBarra)));
+        Console.Write(new string('▓',(int) Math.Ceiling(wBarra)) + new string('▒',barraSaludWidth - (int) Math.Ceiling(wBarra)));
+    }
+    void updateKi(Guerrero w){
+        if(w.Equals(jugador)){
+            Console.SetCursorPosition(3,13);
+        }else if(w.Equals(enemigo)){
+            Console.SetCursorPosition(Console.WindowWidth - barraSaludWidth - 3,13);
+        }
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        for (int i = 0; i < (int) w.Ki; i++)
+        {
+            Console.Write("■");
+            Console.CursorLeft +=1;
+        }
+        Console.ForegroundColor = Game.consoleColor.fg;
+
+        for (int i = 0; i < (5-w.Ki); i++)
+        {
+            Console.Write("■");
+            Console.CursorLeft +=1;
+        }
     }
 }
