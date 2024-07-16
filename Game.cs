@@ -14,7 +14,7 @@ static class Game{
     static GameStates estadoActual;
     static (ConsoleColor bg, ConsoleColor fg) consoleColor = (bg: ConsoleColor.Black, fg: ConsoleColor.DarkCyan);
 
-    static List<Guerrero> allWarriors;
+    static List<GuerreroInfo> allWarriors = new List<GuerreroInfo>();
     static void menuState(){
         const string titulo = @"
 ██████╗ ██████╗  █████╗  ██████╗  ██████╗ ███╗   ██╗    ███████╗██╗███╗   ███╗
@@ -222,8 +222,15 @@ static class Game{
         Console.OutputEncoding = Encoding.UTF8;
         Console.BackgroundColor = consoleColor.bg;
         Console.ForegroundColor = consoleColor.fg;
+        //CARGAMOS LOS GUERREROS
+        foreach (string filepath in Directory.EnumerateFiles("Personajes","*.json")){
+            string contenido = File.ReadAllText(filepath);
+            GuerreroInfo w = JsonSerializer.Deserialize<GuerreroInfo>(contenido);
+            allWarriors.Add(w);
+        }
         //Meter una introducción para dar a conocer los controles.
         cambiarEstado(GameStates.Menu);
+        
     }
 
     static void cambiarEstado(GameStates nuevoEstado){
@@ -252,8 +259,8 @@ static class Game{
 }
 
 class Battle{
-    Guerrero jugador;
-    Guerrero enemigo;
+    GuerreroInfo jugador;
+    GuerreroInfo enemigo;
 
     Caja caja_batalla;
     enum BattleStates{
@@ -263,8 +270,8 @@ class Battle{
 
     public Battle(){
         //Por ahora los defino nomás.
-        jugador = new Guerrero();
-        enemigo = new Guerrero();
+        jugador = new GuerreroInfo();
+        enemigo = new GuerreroInfo();
         cambiarEstado(BattleStates.Init);
     }
     public void initState(){

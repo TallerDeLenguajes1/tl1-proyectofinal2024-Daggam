@@ -1,24 +1,25 @@
 {
+    "planeta_id":2,
     "nombre": "Gohan",
-    "salud": 50000,
+    "salud_max": 60000,
     "ataque": 300,
-    "defensa":5000,
+    "defensa":12,
     "agresividad":10,
-    "velocidadCarga":100,
+    "velocidad_carga":110,
     "tecnicas":[
         {
             "nombre":"Masenko",
-            "cantidadKiNecesaria":3,
+            "cantidad_ki_necesaria":3,
             "ataque":6650
         },
         {
             "nombre":"Ráfaga volley al máximo",
-            "cantidadKiNecesaria":2,
+            "cantidad_ki_necesaria":2,
             "ataque":4720
         },
         {
             "nombre":"Súper kamehameha",
-            "cantidadKiNecesaria":5,
+            "cantidad_ki_necesaria":5,
             "ataque":12640
         }
     ]

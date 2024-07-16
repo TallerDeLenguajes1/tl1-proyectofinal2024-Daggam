@@ -1,24 +1,25 @@
 {
+    "planeta_id":3,
     "nombre": "Goku (Inicio)",
-    "salud": 50000,
+    "salud_max": 50000,
     "ataque": 300,
-    "defensa":5000,
+    "defensa":10,
     "agresividad":10,
-    "velocidadCarga":100,
+    "velocidad_carga":100,
     "tecnicas":[
         {
             "nombre":"Kamehameha",
-            "cantidadKiNecesaria":3,
+            "cantidad_ki_necesaria":3,
             "ataque":6720
         },
         {
             "nombre":"Ataque Kaio-Ken",
-            "cantidadKiNecesaria":4,
+            "cantidad_ki_necesaria":4,
             "ataque":7000
         },
         {
             "nombre":"Genkidama",
-            "cantidadKiNecesaria":5,
+            "cantidad_ki_necesaria":5,
             "ataque":12630
         }
     ]

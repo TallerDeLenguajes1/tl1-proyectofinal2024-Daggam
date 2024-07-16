@@ -1,24 +1,25 @@
 {
+    "planeta_id":2,
     "nombre": "Krillin",
-    "salud": 50000,
+    "salud_max": 48000,
     "ataque": 280,
-    "defensa":5000,
+    "defensa":7,
     "agresividad":10,
-    "velocidadCarga":100,
+    "velocidad_carga":100,
     "tecnicas":[
         {
             "nombre":"Kamehameha",
-            "cantidadKiNecesaria":3,
+            "cantidad_ki_necesaria":3,
             "ataque":6720
         },
         {
             "nombre":"Onda de energía expansiva",
-            "cantidadKiNecesaria": 2,
+            "cantidad_ki_necesaria": 2,
             "ataque":2720
         },
         {
             "nombre":"Kienzan",
-            "cantidadKiNecesaria":5,
+            "cantidad_ki_necesaria":5,
             "ataque":12120
         }
     ]

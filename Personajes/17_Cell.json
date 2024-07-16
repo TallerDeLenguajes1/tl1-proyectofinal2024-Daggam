@@ -1,24 +1,25 @@
 {
+    "planeta_id":2,
     "nombre": "Cell (1era forma)",
-    "salud": 50000,
+    "salud_max": 55000,
     "ataque": 300,
-    "defensa":5000,
+    "defensa":13,
     "agresividad":10,
-    "velocidadCarga":100,
+    "velocidad_carga":110,
     "tecnicas":[
         {
             "nombre":"Kamehameha",
-            "cantidadKiNecesaria":3,
+            "cantidad_ki_necesaria":3,
             "ataque":9720
         },
         {
             "nombre":"Cañon de haz especial",
-            "cantidadKiNecesaria":2,
+            "cantidad_ki_necesaria":2,
             "ataque":7110
         },
         {
             "nombre":"Sumidero de vida Célula",
-            "cantidadKiNecesaria":5,
+            "cantidad_ki_necesaria":5,
             "ataque":10240
         }
     ]

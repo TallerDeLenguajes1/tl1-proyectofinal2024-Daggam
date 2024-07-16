@@ -1,24 +1,25 @@
 {
+    "planeta_id":2,
     "nombre": "Trunks (Espada)",
-    "salud": 50000,
+    "salud_max": 55000,
     "ataque": 300,
-    "defensa":5000,
+    "defensa":12,
     "agresividad":10,
-    "velocidadCarga":100,
+    "velocidad_carga":110,
     "tecnicas":[
         {
             "nombre":"Destrozo final",
-            "cantidadKiNecesaria":3,
+            "cantidad_ki_necesaria":3,
             "ataque":6440
         },
         {
             "nombre":"Tormenta ardiente",
-            "cantidadKiNecesaria":2,
+            "cantidad_ki_necesaria":2,
             "ataque":5000
         },
         {
             "nombre":"Tajo de espada de luz",
-            "cantidadKiNecesaria":5,
+            "cantidad_ki_necesaria":5,
             "ataque":12500
         }
     ]

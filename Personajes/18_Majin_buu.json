@@ -1,24 +1,25 @@
 {
+    "planeta_id":2,
     "nombre": "Majin Buu",
-    "salud": 50000,
+    "salud_max": 60000,
     "ataque": 320,
-    "defensa":5000,
+    "defensa":15,
     "agresividad":10,
-    "velocidadCarga":100,
+    "velocidad_carga":130,
     "tecnicas":[
         {
             "nombre":"Aliento de llamas",
-            "cantidadKiNecesaria":3,
+            "cantidad_ki_necesaria":3,
             "ataque":6480
         },
         {
             "nombre":"Súper Kamehameha",
-            "cantidadKiNecesaria":2,
+            "cantidad_ki_necesaria":2,
             "ataque":7020
         },
         {
             "nombre":"Explosión furiosa",
-            "cantidadKiNecesaria":5,
+            "cantidad_ki_necesaria":5,
             "ataque":12750
         }
     ]

@@ -1,24 +1,25 @@
 {
+    "planeta_id":2,
     "nombre": "Androide 17",
-    "salud": 50000,
+    "salud_max": 52000,
     "ataque": 280,
-    "defensa":5000,
+    "defensa":12,
     "agresividad":10,
-    "velocidadCarga":100,
+    "velocidad_carga":110,
     "tecnicas":[
         {
             "nombre":"Bola de poder máximo",
-            "cantidadKiNecesaria":3,
+            "cantidad_ki_necesaria":3,
             "ataque":5500
         },
         {
             "nombre":"Destello fotónico",
-            "cantidadKiNecesaria":2,
+            "cantidad_ki_necesaria":2,
             "ataque":5000
         },
         {
             "nombre":"Danza sádica",
-            "cantidadKiNecesaria":5,
+            "cantidad_ki_necesaria":5,
             "ataque":13000
         }
     ]
