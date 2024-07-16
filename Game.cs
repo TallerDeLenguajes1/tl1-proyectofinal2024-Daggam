@@ -350,7 +350,63 @@ class Battle{
     }
     
     void golpearState(){
+        int golpesDados = 0;
+        int damage = 0;
+        bool interrumpir=false;
+        // Thread teclaHilo = new Thread(()=>{
 
+        // });
+        
+        //Limpiamos la pantalla con las opciones.
+        Console.SetCursorPosition(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top+1);
+        Console.Write(new string(' ',caja_batalla.Width-3));
+
+        caja_batalla.Escribir("Decides atacar al enemigo...\n¡Atacas con una ráfaga de golpes! [Presiona repetidamente Z]");
+        Console.SetCursorPosition(28,12);
+        Text.WriteCenter("GOLPES DADOS:",49);
+        // Console.SetCursorPosition(28,13);
+        // Text.WriteCenter("0",49);
+        Console.SetCursorPosition(28,14);
+        Text.WriteCenter("DAÑO RECIBIDO:",49);
+        // Console.SetCursorPosition(28,15);
+        // Text.WriteCenter("0",49);
+        
+        Timer timer = new Timer( _ => interrumpir=true,null,100000,Timeout.Infinite);
+        
+        bool teclaPresionada=false;
+        while(!interrumpir){
+            if(Console.KeyAvailable){
+                ConsoleKey k = Console.ReadKey(true).Key;
+                if(k == ConsoleKey.Z && !teclaPresionada){
+                    golpesDados++;
+                    damage += jugador.Information.ataque - enemigo.Information.defensa;
+                    enemigo.Salud -= jugador.Information.ataque - enemigo.Information.defensa;
+                    //ACTUALIZAMOS UI
+                    Console.SetCursorPosition(28,13);
+                    Text.WriteCenter(golpesDados.ToString(),49);
+                    Console.SetCursorPosition(28,15);
+                    Text.WriteCenter(damage.ToString(),49);
+                    updateVida(enemigo);
+                    teclaPresionada=true;
+                    // Thread.Sleep(500);
+                }else if(k!=ConsoleKey.Z){
+                }
+            }else
+            {
+                if(teclaPresionada==true)
+                    teclaPresionada=false;
+            }
+
+            // if(actualizarUI){
+            // }
+            // if(timerGolpes>0){
+            //     timerGolpes--;
+            // }
+        }
+        while (true)
+        {
+            
+        }
     }
 
     void cambiarEstado(BattleStates nuevoEstado){
@@ -399,4 +455,7 @@ class Battle{
             Console.CursorLeft +=1;
         }
     }
+
+    //FUNCIONES AUXILIARES CREADAS PARA LOS 
+
 }
