@@ -265,7 +265,6 @@ class Battle{
         Init,Turno_jugador, Golpear, Ataques_ki, Cargar_ki, Turno_enemigo
     }
 
-
     public Battle(Guerrero jugador, Guerrero enemigo){
         //Por ahora los defino nomás.
         this.jugador = jugador;
@@ -273,6 +272,8 @@ class Battle{
         
         cambiarEstado(BattleStates.Init);
     }
+    
+    // ESTADOS
     public void initState(){
         //SE INICIALIZA LA UI | Barra: ▓ Foreground ; ▒ Background
         caja_batalla = new Caja(17,1,70,9);
@@ -287,21 +288,44 @@ class Battle{
         updateKi(enemigo);
 
         Console.SetCursorPosition(3,14);
-        Text.WriteCenter("(Vos)",25);
-        Console.CursorLeft = Console.WindowWidth-3-25;
-        Text.WriteCenter("(CPU)",25);
+        Text.WriteCenter("(Vos)",barraSaludWidth);
+        Console.CursorLeft = Console.WindowWidth-barraSaludWidth-3;
+        Text.WriteCenter("(CPU)",barraSaludWidth);
 
         Console.SetCursorPosition(3,15);
-        Text.WriteCenter(jugador.Information.nombre,25);
-        Console.CursorLeft = Console.WindowWidth-3-25;
-        Text.WriteCenter(enemigo.Information.nombre,25);
+        Text.WriteCenter(jugador.Information.nombre,barraSaludWidth);
+        Console.CursorLeft = Console.WindowWidth-barraSaludWidth-3;
+        Text.WriteCenter(enemigo.Information.nombre,barraSaludWidth);
 
-        Console.SetCursorPosition(caja_batalla.CursorWritter.Left+1+2,caja_batalla.CursorWritter.Top+1);
-        Console.WriteLine("Golpear"+new string(' ',20-2)+"Técnicas" + new string(' ',20-2) + "Cargar ki");
-        
+        cambiarEstado(BattleStates.Turno_jugador);
+    }
+    
+    void turnoJugadorState(){
+        Console.SetCursorPosition(caja_batalla.CursorWritter.Left+3,caja_batalla.CursorWritter.Top+1);
+        Console.Write("Golpear"+new string(' ',18)+"Técnicas" + new string(' ',18) + "Cargar ki");
+        int opciones = 0;
+        bool updateOpciones = true;
         while (true)
         {
-            
+            if(updateOpciones){
+                switch(opciones){
+                    case 0:
+                        Console.CursorLeft = caja_batalla.CursorWritter.Left+1;
+                        Console.Write("■");
+                        
+                        break;
+                }
+            }
+            ConsoleKey k = Console.ReadKey(true).Key;
+            if(k == ConsoleKey.LeftArrow){
+                opciones = (opciones <= 0) ? 2:opciones-1;
+                updateOpciones=true;
+            }else if(k== ConsoleKey.RightArrow){
+                opciones = (opciones >= 2) ? 0:opciones+1;
+                updateOpciones=true;
+            }else if(k == ConsoleKey.Enter){
+                break;
+            }
         }
     }
     void cambiarEstado(BattleStates nuevoEstado){
@@ -310,8 +334,12 @@ class Battle{
             case BattleStates.Init:
                 initState();
                 break;
+            case BattleStates.Turno_jugador:
+                turnoJugadorState();
+                break;
         }
     }
+
 
     //FUNCIONES DE ACTUALIZACIÓN DE UI.
     void updateVida(Guerrero w){
