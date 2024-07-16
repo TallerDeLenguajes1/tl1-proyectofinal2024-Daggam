@@ -80,4 +80,9 @@ public class Guerrero{
     int salud;
     float ki;
     bool sobreCarga;
+
+    public Guerrero(GuerreroInfo wbase){
+        information = wbase;
+        salud = information.salud_max;
+    }
 }

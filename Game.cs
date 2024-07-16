@@ -144,16 +144,16 @@ static class Game{
     
     static void seleccionarPersonajeState(){
         //Me trae todos los nombres de los personajes.
-        List<string> nombrePersonajes = new List<string>(); 
-        foreach (string filepath in Directory.EnumerateFiles("Personajes","*.json"))
-        {
-            string jsonInfo = File.ReadAllText(filepath);
-            using(JsonDocument doc = JsonDocument.Parse(jsonInfo)){
-                var root = doc.RootElement;
-                string name = root.GetProperty("nombre").GetString();
-                nombrePersonajes.Add(name);
-            }
-        }
+        // List<string> nombrePersonajes = new List<string>(); 
+        // foreach (string filepath in Directory.EnumerateFiles("Personajes","*.json"))
+        // {
+        //     string jsonInfo = File.ReadAllText(filepath);
+        //     using(JsonDocument doc = JsonDocument.Parse(jsonInfo)){
+        //         var root = doc.RootElement;
+        //         string name = root.GetProperty("nombre").GetString();
+        //         nombrePersonajes.Add(name);
+        //     }
+        // }
         Caja cajaSeleccionadora = new Caja(2,1,101,11);
         Text.WriteCenter("Selecciona un personaje",Console.WindowWidth);
         (int x, int y) cursorPos = cajaSeleccionadora.CursorWritter;
@@ -161,7 +161,7 @@ static class Game{
         for (int i = 1; i <= 20; i++)
         {
             Console.SetCursorPosition(cursorPos.x,cursorPos.y);
-            Console.WriteLine(nombrePersonajes[i-1]);
+            Console.WriteLine(allWarriors[i-1].nombre);
             if(i%5==0){
                 cursorPos.x +=26;
                 cursorPos.y = cajaSeleccionadora.CursorWritter.Top;
@@ -177,13 +177,13 @@ static class Game{
             if(updateSelectores){
                 Console.CursorLeft = cajaSeleccionadora.CursorWritter.Left + (opciones.anterior/5)*26;
                 Console.CursorTop = cajaSeleccionadora.CursorWritter.Top + (opciones.anterior%5)*2;
-                Console.Write(nombrePersonajes[opciones.anterior]);
+                Console.Write(allWarriors[opciones.anterior].nombre);
                 
                 Console.CursorLeft = cajaSeleccionadora.CursorWritter.Left + (opciones.actual/5)*26;
                 Console.CursorTop = cajaSeleccionadora.CursorWritter.Top + (opciones.actual%5)*2;
                 Console.BackgroundColor = ConsoleColor.White;
                 Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write(nombrePersonajes[opciones.actual]);
+                Console.Write(allWarriors[opciones.actual].nombre);
                 Console.BackgroundColor = consoleColor.bg;
                 Console.ForegroundColor = consoleColor.fg;
                 updateSelectores=false;
