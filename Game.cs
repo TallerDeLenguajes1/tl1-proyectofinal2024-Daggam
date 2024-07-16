@@ -262,7 +262,7 @@ class Battle{
 
     int barraSaludWidth = 25;
     enum BattleStates{
-        Init,Turno_jugador, Golpear, Ataques_ki, Cargar_ki, Turno_enemigo
+        Init,Turno_jugador,Turno_enemigo, Golpear, Ataques_ki, Cargar_ki 
     }
 
     public Battle(Guerrero jugador, Guerrero enemigo){
@@ -299,7 +299,6 @@ class Battle{
 
         cambiarEstado(BattleStates.Turno_jugador);
     }
-    
     void turnoJugadorState(){
         Console.SetCursorPosition(caja_batalla.CursorWritter.Left+3,caja_batalla.CursorWritter.Top+1);
         Console.Write("Golpear"+new string(' ',18)+"Técnicas" + new string(' ',18) + "Cargar ki");
@@ -312,9 +311,29 @@ class Battle{
                     case 0:
                         Console.CursorLeft = caja_batalla.CursorWritter.Left+1;
                         Console.Write("■");
-                        
+                        Console.CursorLeft += 24;
+                        Console.Write(" ");
+                        Console.CursorLeft += 25;
+                        Console.Write(" ");
+                        break;
+                    case 1:
+                        Console.CursorLeft = caja_batalla.CursorWritter.Left+1;
+                        Console.Write(" ");
+                        Console.CursorLeft += 24;
+                        Console.Write("■");
+                        Console.CursorLeft += 25;
+                        Console.Write(" ");
+                        break;
+                    case 2:
+                        Console.CursorLeft = caja_batalla.CursorWritter.Left+1;
+                        Console.Write(" ");
+                        Console.CursorLeft += 24;
+                        Console.Write(" ");
+                        Console.CursorLeft += 25;
+                        Console.Write("■");
                         break;
                 }
+                updateOpciones=false;
             }
             ConsoleKey k = Console.ReadKey(true).Key;
             if(k == ConsoleKey.LeftArrow){
@@ -327,7 +346,13 @@ class Battle{
                 break;
             }
         }
+        cambiarEstado((BattleStates) opciones+3);
     }
+    
+    void golpearState(){
+
+    }
+
     void cambiarEstado(BattleStates nuevoEstado){
         estado_actual = nuevoEstado;
         switch(nuevoEstado){
@@ -336,6 +361,9 @@ class Battle{
                 break;
             case BattleStates.Turno_jugador:
                 turnoJugadorState();
+                break;
+            case BattleStates.Golpear:
+                golpearState();
                 break;
         }
     }
