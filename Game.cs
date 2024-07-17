@@ -262,7 +262,7 @@ class Battle{
 
     int barraSaludWidth = 25;
     enum BattleStates{
-        Init,Turno_jugador,Turno_enemigo, Golpear, Ataques_ki, Cargar_ki 
+        Init,Turno_jugador,Turno_enemigo, Golpear, Tecnicas, Cargar_ki 
     }
 
     public Battle(Guerrero jugador, Guerrero enemigo){
@@ -346,17 +346,20 @@ class Battle{
                 break;
             }
         }
+        //Limpiamos la pantalla con las opciones.
+        
+        Console.CursorLeft = caja_batalla.CursorWritter.Left;
+        Console.Write(new string(' ',caja_batalla.Width-3));
         cambiarEstado((BattleStates) opciones+3);
     }
     
+
     void golpearState(){
         int golpesDados = 0;
         int damage = 0;
         bool interrumpir=false;
         Random rand = new Random();
-        //Limpiamos la pantalla con las opciones.
-        Console.SetCursorPosition(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top+1);
-        Console.Write(new string(' ',caja_batalla.Width-3));
+
 
         caja_batalla.Escribir("Decides atacar al enemigo...\n¡Atacas con una ráfaga de golpes! [Presiona repetidamente Z y X]");
         Console.SetCursorPosition(28,12);
@@ -401,6 +404,70 @@ class Battle{
         
     }
 
+    void tecnicasState(){
+        int opciones = 0;
+        bool updateOpciones = true;
+        // Console.CursorLeft = caja_batalla.CursorWritter.Left;
+        Console.SetCursorPosition(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top);
+        Console.Write(string.Format("{0,-35}{1,30}","Técnicas","Cantidad de ki"));
+        Console.SetCursorPosition(caja_batalla.CursorWritter.Left+3,caja_batalla.CursorWritter.Top+2);
+        for (int i = 0; i <= 2; i++)
+        {
+            Console.Write("{0,-56}{1}",jugador.Information.tecnicas[i].nombre,jugador.Information.tecnicas[i].cantidad_ki_necesaria);
+            Console.SetCursorPosition(caja_batalla.CursorWritter.Left+3,Console.CursorTop+2);
+        }
+        Console.SetCursorPosition(28,12);
+        Text.WriteCenter("PRESIONA [X] PARA REGRESAR",49);
+        while (true)
+        {
+            if(updateOpciones){
+                switch(opciones){
+                    case 0:
+                        Console.SetCursorPosition(caja_batalla.CursorWritter.Left+1,caja_batalla.CursorWritter.Top+2);
+                        Console.Write("■");
+                        Console.SetCursorPosition(caja_batalla.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write(" ");
+                        Console.SetCursorPosition(caja_batalla.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write(" ");
+                    break;
+                    case 1:
+                        Console.SetCursorPosition(caja_batalla.CursorWritter.Left+1,caja_batalla.CursorWritter.Top+2);
+                        Console.Write(" ");
+                        Console.SetCursorPosition(caja_batalla.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write("■");
+                        Console.SetCursorPosition(caja_batalla.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write(" ");
+                    break;
+                    case 2:
+                        Console.SetCursorPosition(caja_batalla.CursorWritter.Left+1,caja_batalla.CursorWritter.Top+2);
+                        Console.Write(" ");
+                        Console.SetCursorPosition(caja_batalla.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write(" ");
+                        Console.SetCursorPosition(caja_batalla.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write("■");
+                    break;
+                }
+                updateOpciones=false;
+            }
+
+            ConsoleKey k = Console.ReadKey(true).Key;
+            if(k == ConsoleKey.DownArrow){
+                opciones = (opciones<2) ? opciones+1:0; 
+                updateOpciones=true;
+            }else if(k==ConsoleKey.UpArrow){
+                opciones = (opciones>0) ? opciones-1:2;
+                updateOpciones=true;
+            }else if(k==ConsoleKey.X){
+                break;
+            }
+        }
+        //LIMPIO TODO ANTES DE SALIR
+        Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
+        Text.borrarSeccion(28,12,49,4);
+     
+        cambiarEstado(BattleStates.Turno_jugador);
+    }
+
     void cambiarEstado(BattleStates nuevoEstado){
         estado_actual = nuevoEstado;
         switch(nuevoEstado){
@@ -413,7 +480,9 @@ class Battle{
             case BattleStates.Golpear:
                 golpearState();
                 break;
-
+            case BattleStates.Tecnicas:
+                tecnicasState();
+                break;
             case BattleStates.Turno_enemigo:
                 break;
         }
