@@ -353,60 +353,52 @@ class Battle{
         int golpesDados = 0;
         int damage = 0;
         bool interrumpir=false;
-        // Thread teclaHilo = new Thread(()=>{
-
-        // });
-        
+        Random rand = new Random();
         //Limpiamos la pantalla con las opciones.
         Console.SetCursorPosition(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top+1);
         Console.Write(new string(' ',caja_batalla.Width-3));
 
-        caja_batalla.Escribir("Decides atacar al enemigo...\n¡Atacas con una ráfaga de golpes! [Presiona repetidamente Z]");
+        caja_batalla.Escribir("Decides atacar al enemigo...\n¡Atacas con una ráfaga de golpes! [Presiona repetidamente Z y X]");
         Console.SetCursorPosition(28,12);
         Text.WriteCenter("GOLPES DADOS:",49);
-        // Console.SetCursorPosition(28,13);
-        // Text.WriteCenter("0",49);
         Console.SetCursorPosition(28,14);
         Text.WriteCenter("DAÑO RECIBIDO:",49);
-        // Console.SetCursorPosition(28,15);
-        // Text.WriteCenter("0",49);
+
+        int numeroInterrupcion = rand.Next(enemigo.Information.agresividad*100,enemigo.Information.agresividad*250);
+        Timer timerInterrumpir = new Timer( _ => interrumpir=true,null,numeroInterrupcion,Timeout.Infinite);
         
-        Timer timer = new Timer( _ => interrumpir=true,null,100000,Timeout.Infinite);
-        
-        bool teclaPresionada=false;
+        bool apretarZ=true;
+        bool actualizarUI=true;
         while(!interrumpir){
             if(Console.KeyAvailable){
                 ConsoleKey k = Console.ReadKey(true).Key;
-                if(k == ConsoleKey.Z && !teclaPresionada){
+                if((k == ConsoleKey.Z && apretarZ) || (k== ConsoleKey.X && !apretarZ)){
                     golpesDados++;
                     damage += jugador.Information.ataque - enemigo.Information.defensa;
                     enemigo.Salud -= jugador.Information.ataque - enemigo.Information.defensa;
                     //ACTUALIZAMOS UI
-                    Console.SetCursorPosition(28,13);
-                    Text.WriteCenter(golpesDados.ToString(),49);
-                    Console.SetCursorPosition(28,15);
-                    Text.WriteCenter(damage.ToString(),49);
-                    updateVida(enemigo);
-                    teclaPresionada=true;
-                    // Thread.Sleep(500);
-                }else if(k!=ConsoleKey.Z){
+                    actualizarUI=true;
+                    apretarZ=!apretarZ;
                 }
-            }else
-            {
-                if(teclaPresionada==true)
-                    teclaPresionada=false;
             }
 
-            // if(actualizarUI){
-            // }
-            // if(timerGolpes>0){
-            //     timerGolpes--;
-            // }
+            if(actualizarUI){
+                Console.SetCursorPosition(28,13);
+                Text.WriteCenter(golpesDados.ToString(),49);
+                Console.SetCursorPosition(28,15);
+                Text.WriteCenter(damage.ToString(),49);
+                updateVida(enemigo);
+                actualizarUI=false;
+             }
         }
-        while (true)
-        {
-            
-        }
+        //Limpiar e informar.
+        string[] textos = {"¡El enemigo logra escapar!","¡El enemigo te mando a volar!"}; 
+        caja_batalla.Escribir(textos[rand.Next(textos.Length)]+"\n\n",0,4);
+        Console.Write("Presiona [ENTER] para continuar.");
+        while(Console.ReadKey(true).Key != ConsoleKey.Enter);
+        Console.Clear();
+        cambiarEstado(BattleStates.Turno_enemigo);
+        
     }
 
     void cambiarEstado(BattleStates nuevoEstado){
@@ -420,6 +412,9 @@ class Battle{
                 break;
             case BattleStates.Golpear:
                 golpearState();
+                break;
+
+            case BattleStates.Turno_enemigo:
                 break;
         }
     }

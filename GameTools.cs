@@ -59,8 +59,8 @@ class Caja{
         Console.WriteLine("╚"+new string('═',width-2)+"╝");
         cursorWritter = (Left: x+2,Top:y+1);
     }
-    public void Escribir(string text, int speed=25){
-        Console.SetCursorPosition(cursorWritter.Left,cursorWritter.Top);
+    public void Escribir(string text, int xlocal=0,int ylocal=0,int speed=25){
+        Console.SetCursorPosition(cursorWritter.Left + xlocal,cursorWritter.Top + ylocal);
         Text.Start(text,speed);
     }
 }
