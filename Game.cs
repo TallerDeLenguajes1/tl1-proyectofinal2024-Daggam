@@ -5,6 +5,7 @@ using ToolNamespace;
 using GuerreroNamespace;
 using System.Text.Json;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 static class Game{
     enum GameStates{
@@ -278,12 +279,11 @@ class Battle{
         //SE INICIALIZA LA UI | Barra: ▓ Foreground ; ▒ Background
         caja_batalla = new Caja(17,1,70,9);
         //VIDA
-        jugador.Salud /= 4 ; 
         updateVida(jugador);
         updateVida(enemigo);
 
         //KI
-        // jugador.Ki =2;
+        jugador.Ki =4;
         updateKi(jugador);
         updateKi(enemigo);
 
@@ -457,15 +457,46 @@ class Battle{
             }else if(k==ConsoleKey.UpArrow){
                 opciones = (opciones>0) ? opciones-1:2;
                 updateOpciones=true;
+            }else if(k==ConsoleKey.Enter){
+                 if(jugador.Ki >= jugador.Information.tecnicas[opciones].cantidad_ki_necesaria){
+                    break;
+                 }else{
+                    Console.SetCursorPosition(28,13);
+                    Text.WriteCenter("NO TIENES SUFICIENTE KI PARA USAR ESTA TECNICA",49);
+                 }
             }else if(k==ConsoleKey.X){
+                opciones=-1;
                 break;
             }
         }
         //LIMPIO TODO ANTES DE SALIR
         Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
         Text.borrarSeccion(28,12,49,4);
-     
-        cambiarEstado(BattleStates.Turno_jugador);
+        if(opciones!=-1){
+            jugador.Ki -= jugador.Information.tecnicas[opciones].cantidad_ki_necesaria;
+            caja_batalla.Escribir($"¡Has utilizado la técnica {jugador.Information.tecnicas[opciones].nombre}!");
+            enemigo.Salud -= jugador.Information.tecnicas[opciones].ataque;
+            updateVida(enemigo);
+            Console.SetCursorPosition(28,12);
+            Text.WriteCenter("DAÑO GENERADO:",49);
+            int damageAnim = 0;
+            while(damageAnim != jugador.Information.tecnicas[opciones].ataque){
+                damageAnim = Math.Min(damageAnim+100,jugador.Information.tecnicas[opciones].ataque);
+                Console.SetCursorPosition(28,13);
+                Text.WriteCenter(damageAnim.ToString(),49);
+                Thread.Sleep(50);
+            }
+            Console.SetCursorPosition(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top+6);
+            Console.Write("Presiona [ENTER] para continuar.");
+            
+            while(Console.ReadKey(true).Key != ConsoleKey.Enter);
+            // Limpiamos todos
+            Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
+            Text.borrarSeccion(28,12,49,4);
+            cambiarEstado(BattleStates.Turno_enemigo);
+        }else{
+            cambiarEstado(BattleStates.Turno_jugador);
+        }
     }
 
     void cambiarEstado(BattleStates nuevoEstado){
