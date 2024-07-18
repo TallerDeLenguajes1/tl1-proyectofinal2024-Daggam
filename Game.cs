@@ -270,11 +270,11 @@ class Battle{
         this.jugador = jugador;
         this.enemigo = enemigo;
         
-        cambiarEstado(BattleStates.Init);
+        iniciarMaquina(BattleStates.Init);
     }
     
     // ESTADOS
-    public void initState(){
+    BattleStates initState(){
         //SE INICIALIZA LA UI | Barra: ▓ Foreground ; ▒ Background
         caja_batalla = new Caja(17,1,70,9);
         //VIDA
@@ -296,9 +296,9 @@ class Battle{
         Console.CursorLeft = Console.WindowWidth-barraSaludWidth-3;
         Text.WriteCenter(enemigo.Information.nombre,barraSaludWidth);
 
-        cambiarEstado(BattleStates.Turno_jugador);
+        return BattleStates.Turno_jugador;
     }
-    void turnoJugadorState(){
+    BattleStates turnoJugadorState(){
         Console.SetCursorPosition(caja_batalla.CursorWritter.Left+3,caja_batalla.CursorWritter.Top+1);
         Console.Write("Golpear"+new string(' ',18)+"Técnicas" + new string(' ',18) + "Cargar ki");
         int opciones = 0;
@@ -349,10 +349,10 @@ class Battle{
         
         Console.CursorLeft = caja_batalla.CursorWritter.Left;
         Console.Write(new string(' ',caja_batalla.Width-3));
-        cambiarEstado((BattleStates) opciones+3);
+        return (BattleStates) opciones+3;
     }
     
-    void golpearState(){
+    BattleStates golpearState(){
         int golpesDados = 0;
         int damage = 0;
         bool interrumpir=false;
@@ -397,13 +397,14 @@ class Battle{
         timerInterrumpir.Dispose();
         string[] textos = {"¡El enemigo logra escapar!","¡El enemigo te mando a volar!"}; 
         caja_batalla.Escribir(textos[rand.Next(textos.Length)]+"\n\n",0,4);
+        Thread.Sleep(1000);
+        while(Console.KeyAvailable) Console.ReadKey(true); //Limpio el buffer.
         Console.Write("Presiona [ENTER] para continuar.");
         while(Console.ReadKey(true).Key != ConsoleKey.Enter);
-        cambiarEstado(BattleStates.Turno_enemigo);
-        
+        return BattleStates.Turno_enemigo;
     }
 
-    void tecnicasState(){
+    BattleStates tecnicasState(){
         int opciones = 0;
         bool updateOpciones = true;
         // Console.CursorLeft = caja_batalla.CursorWritter.Left;
@@ -486,16 +487,18 @@ class Battle{
                 Text.WriteCenter(damageAnim.ToString(),49);
                 Thread.Sleep(50);
             }
+            Thread.Sleep(1000);
+            while(Console.KeyAvailable) Console.ReadKey(true); //Limpio el buffer.
             Console.SetCursorPosition(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top+6);
             Console.Write("Presiona [ENTER] para continuar.");
             while(Console.ReadKey(true).Key != ConsoleKey.Enter);
-            cambiarEstado(BattleStates.Turno_enemigo);
+            return BattleStates.Turno_enemigo;
         }else{
-            cambiarEstado(BattleStates.Turno_jugador);
+            return BattleStates.Turno_jugador;
         }
     }
 
-    void cargarKiState(){
+    BattleStates cargarKiState(){
         caja_batalla.Escribir("Tratas de concentrarte...\nManten [C] para cargar ki.");
         
         Random rnd = new Random();
@@ -520,17 +523,25 @@ class Battle{
                 Text.WriteCenter(jugador.Ki.ToString("N2"),49);
                 actualizarNumero=false;
             }
+            if(jugador.Ki == 5) break;
+            
         }
         timerInterrupcion.Dispose();
-        string[] textos = {"¡El enemigo te mando a volar!","¡El enemigo lanza una ráfaga de aire!","¡El enemigo interrumpe tu carga!"}; 
-        caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
+        if(interrumpir){
+            string[] textos = {"¡El enemigo te mando a volar!","¡El enemigo lanza una ráfaga de aire!","¡El enemigo interrumpe tu carga!"}; 
+            caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
+        }else{
+            caja_batalla.Escribir("¡Alcanzaste tu máximo poder!\n\n",0,4);
+        }
+        Thread.Sleep(1000);
+        while(Console.KeyAvailable) Console.ReadKey(true); //Limpio el buffer.
         Console.Write("Presiona [ENTER] para continuar.");
         while(Console.ReadKey(true).Key != ConsoleKey.Enter);
-        cambiarEstado(BattleStates.Turno_enemigo);
+        return BattleStates.Turno_enemigo;
     }
 
 
-    void turnoEnemigoState(){
+    BattleStates turnoEnemigoState(){
         caja_batalla.Escribir("Ahora es el turno del enemigo.");
         Thread.Sleep(1000);
         Random rnd = new Random();
@@ -655,41 +666,46 @@ class Battle{
         string[] textos = {"Puedes contraatacar...","Tienes tiempo para actuar..."};
         caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
         Thread.Sleep(1000);
+        while(Console.KeyAvailable) Console.ReadKey(true); //Limpio el buffer.
         Console.Write("Presiona [ENTER] para continuar.");
         while(Console.ReadKey(true).Key != ConsoleKey.Enter);
         // Limpiamos todo
         Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
         Text.borrarSeccion(28,12,49,4);
-        cambiarEstado(BattleStates.Turno_jugador);
+        return BattleStates.Turno_jugador;
     }
-    void cambiarEstado(BattleStates nuevoEstado){
-        estado_actual = nuevoEstado;
-        switch(nuevoEstado){
+
+    void iniciarMaquina(BattleStates estadoInicial){
+        //SE INICIALIZA LA UI | Barra: ▓ Foreground ; ▒ Background
+        estado_actual = estadoInicial;
+        bool salir=false;
+        while(!salir){
+            switch (estado_actual){
             case BattleStates.Init:
-                initState();
+                estado_actual = initState();
                 break;
             case BattleStates.Turno_jugador:
-                turnoJugadorState();
+                estado_actual = turnoJugadorState();
                 break;
             case BattleStates.Golpear:
-                golpearState();
+                estado_actual = golpearState();
                 break;
             case BattleStates.Tecnicas:
-                tecnicasState();
+                estado_actual = tecnicasState();
                 break;
             case BattleStates.Cargar_ki:
-                cargarKiState();
+                estado_actual = cargarKiState();
                 break;
             case BattleStates.Turno_enemigo:
                 // Limpiamos todo
                 Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
                 Text.borrarSeccion(28,12,49,4);
-                turnoEnemigoState();
+                estado_actual = turnoEnemigoState();
                 break;
+            }
         }
     }
-
-
+    
     //FUNCIONES DE ACTUALIZACIÓN DE UI.
     void updateVida(Guerrero w){
         float wBarra = (float) w.Salud/w.Information.salud_max * barraSaludWidth; 
@@ -720,7 +736,5 @@ class Battle{
             Console.CursorLeft +=1;
         }
     }
-
-    //FUNCIONES AUXILIARES CREADAS PARA LOS 
 
 }
