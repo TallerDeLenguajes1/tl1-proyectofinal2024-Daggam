@@ -525,11 +525,8 @@ class Battle{
         caja_batalla.Escribir("Ahora es el turno del enemigo.");
         Thread.Sleep(1000);
         Random rnd = new Random();
-        int acciones = rnd.Next(2);//rnd.Next(0,2); // Atacar,usar una tecnica,cargar Ki
-        // enemigo.Ki = 5;
+        int acciones = 1;//rnd.Next(2); // Atacar, (Ki_para_tecnica) ? tecnica:cargar_ki.
         updateKi(enemigo);
-        //Condiciones iniciales
-
         //Usar una tecnica
         if(acciones==1){
             List<Tecnica> tecnicasDisponibles = new List<Tecnica>();
@@ -557,18 +554,8 @@ class Battle{
                 }
                 jugador.Salud = Math.Max(jugador.Salud-tecnicaElegida.ataque,0);
                 updateVida(jugador);
-                Thread.Sleep(1000);
-                //Agregar condición cuando tiene salud menor o igual a 0
-                string[] textos = {"Puedes contraatacar...","Tienes tiempo para actuar..."};
-                caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
-                Console.Write("Presiona [ENTER] para continuar.");
-                while(Console.ReadKey(true).Key != ConsoleKey.Enter);
-                // Limpiamos todo
-                Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
-                Text.borrarSeccion(28,12,49,4);
-                cambiarEstado(BattleStates.Turno_jugador);
-            }else{
-                caja_batalla.Escribir("El enemigo decide cargar su ki...\nPuedes interrumpirlo cuando aparezca la leyenda [Z] [X] ó [C].",0,1);
+            }else{ //CARGAR KI
+                caja_batalla.Escribir("El enemigo decide cargar su ki...\n\nPuedes interrumpirlo cuando aparezca la leyenda [Z] [X] ó [C].",0,2);
                 Thread.Sleep(1000);
                 Console.SetCursorPosition(28,12);
                 Text.WriteCenter("CANTIDAD DE KI:",49);
@@ -578,6 +565,8 @@ class Battle{
                 string consoleText = "";
                 bool actualizarTecla=false;
                 bool puedeInterrumpir=false;
+                
+                //Reloj
                 System.Timers.Timer reloj = new System.Timers.Timer(rnd.Next(jugador.Information.agresividad*50,jugador.Information.agresividad*100));
                 reloj.Elapsed += (sender,e) =>{
                     System.Timers.Timer t = (System.Timers.Timer) sender;
@@ -632,20 +621,8 @@ class Battle{
                 Console.SetCursorPosition(28,14);
                 Text.WriteCenter(new string(' ',3),49);
                 caja_batalla.Escribir(consoleText);
-                Thread.Sleep(1500);
-                string[] textos = {"Puedes contraatacar...","Tienes tiempo para actuar..."};
-                caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
-                Thread.Sleep(1000);
-                Console.Write("Presiona [ENTER] para continuar.");
-                while(Console.ReadKey(true).Key != ConsoleKey.Enter);
-                // Limpiamos todo
-                Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
-                Text.borrarSeccion(28,12,49,4);
-                cambiarEstado(BattleStates.Turno_jugador);
             }
-        }
-        
-        if(acciones==0){
+        }else if(acciones == 0){ //ESTADO ATAQUE
             //Luego podría agregar una interrupción por parte del jugador.
             int cantidadGolpes = rnd.Next(20,30);
             caja_batalla.Escribir("¡El enemigo va atacar con una ráfaga de golpes!",0,1);
@@ -661,17 +638,19 @@ class Battle{
                 Text.WriteCenter(totalDamage.ToString(),49);
                 Thread.Sleep(50);
             }
-            Thread.Sleep(1000);
-            //Agregar condición cuando tiene salud menor o igual a 0
-            string[] textos = {"Puedes contraatacar...","Tienes tiempo para actuar..."};
-            caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
-            Console.Write("Presiona [ENTER] para continuar.");
-            while(Console.ReadKey(true).Key != ConsoleKey.Enter);
-            // Limpiamos todo
-            Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
-            Text.borrarSeccion(28,12,49,4);
-            cambiarEstado(BattleStates.Turno_jugador);
         }
+
+        //Agregar condición cuando tiene salud menor o igual a 0
+        Thread.Sleep(1500);
+        string[] textos = {"Puedes contraatacar...","Tienes tiempo para actuar..."};
+        caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
+        Thread.Sleep(1000);
+        Console.Write("Presiona [ENTER] para continuar.");
+        while(Console.ReadKey(true).Key != ConsoleKey.Enter);
+        // Limpiamos todo
+        Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
+        Text.borrarSeccion(28,12,49,4);
+        cambiarEstado(BattleStates.Turno_jugador);
     }
     void cambiarEstado(BattleStates nuevoEstado){
         estado_actual = nuevoEstado;
