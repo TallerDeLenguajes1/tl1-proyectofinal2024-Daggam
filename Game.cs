@@ -497,19 +497,28 @@ class Battle{
 
     void cargarKiState(){
         caja_batalla.Escribir("Tratas de concentrarte...\nManten [C] para cargar ki.");
+        
         Random rnd = new Random();
+        int dueTimeInterrumpir = rnd.Next(15000/enemigo.Information.agresividad,30000/enemigo.Information.agresividad);
         bool interrumpir=false;
-        int dueTimeInterrumpir = rnd.Next(enemigo.Information.agresividad*100,enemigo.Information.agresividad*250);
+        bool actualizarNumero=true;
         Timer timerInterrupcion = new Timer( _=>interrumpir=true,null,dueTimeInterrumpir,Timeout.Infinite);
+        
         Console.SetCursorPosition(28,12);
         Text.WriteCenter("CANTIDAD DE KI:",49);
         while(!interrumpir){
-            ConsoleKey k = Console.ReadKey(true).Key;
-            if(k == ConsoleKey.C){
-                jugador.Ki = Math.Min(jugador.Ki + jugador.Information.velocidad_carga/3500,5);
-                updateKi(jugador);
+            if(Console.KeyAvailable){
+                ConsoleKey k = Console.ReadKey(true).Key;
+                if(k == ConsoleKey.C){
+                    jugador.Ki = Math.Min(jugador.Ki + jugador.Information.velocidad_carga*0.00035f,5);
+                    updateKi(jugador);
+                    actualizarNumero=true;
+                }
+            }
+            if(actualizarNumero){
                 Console.SetCursorPosition(28,13);
                 Text.WriteCenter(jugador.Ki.ToString("N2"),49);
+                actualizarNumero=false;
             }
         }
         timerInterrupcion.Dispose();
