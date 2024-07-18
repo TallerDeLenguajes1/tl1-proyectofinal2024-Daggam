@@ -57,7 +57,7 @@ public class GuerreroInfo
     public int agresividad { get; set; }
 
     [JsonPropertyName("velocidad_carga")]
-    public int velocidad_carga { get; set; }
+    public float velocidad_carga { get; set; }
 
     [JsonPropertyName("tecnicas")]
     public List<Tecnica> tecnicas { get; set; }

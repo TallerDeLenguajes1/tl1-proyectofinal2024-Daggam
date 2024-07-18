@@ -6,6 +6,7 @@ using GuerreroNamespace;
 using System.Text.Json;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
 
 static class Game{
     enum GameStates{
@@ -283,7 +284,7 @@ class Battle{
         updateVida(enemigo);
 
         //KI
-        jugador.Ki =4;
+        //jugador.Ki =4;
         updateKi(jugador);
         updateKi(enemigo);
 
@@ -353,7 +354,6 @@ class Battle{
         cambiarEstado((BattleStates) opciones+3);
     }
     
-
     void golpearState(){
         int golpesDados = 0;
         int damage = 0;
@@ -365,7 +365,7 @@ class Battle{
         Console.SetCursorPosition(28,12);
         Text.WriteCenter("GOLPES DADOS:",49);
         Console.SetCursorPosition(28,14);
-        Text.WriteCenter("DAÑO RECIBIDO:",49);
+        Text.WriteCenter("DAÑO GENERADO:",49);
 
         int numeroInterrupcion = rand.Next(enemigo.Information.agresividad*100,enemigo.Information.agresividad*250);
         Timer timerInterrumpir = new Timer( _ => interrumpir=true,null,numeroInterrupcion,Timeout.Infinite);
@@ -395,6 +395,7 @@ class Battle{
              }
         }
         //Limpiar e informar.
+        timerInterrumpir.Dispose();
         string[] textos = {"¡El enemigo logra escapar!","¡El enemigo te mando a volar!"}; 
         caja_batalla.Escribir(textos[rand.Next(textos.Length)]+"\n\n",0,4);
         Console.Write("Presiona [ENTER] para continuar.");
@@ -474,6 +475,7 @@ class Battle{
         Text.borrarSeccion(28,12,49,4);
         if(opciones!=-1){
             jugador.Ki -= jugador.Information.tecnicas[opciones].cantidad_ki_necesaria;
+            updateKi(jugador);
             caja_batalla.Escribir($"¡Has utilizado la técnica {jugador.Information.tecnicas[opciones].nombre}!");
             enemigo.Salud -= jugador.Information.tecnicas[opciones].ataque;
             updateVida(enemigo);
@@ -499,6 +501,29 @@ class Battle{
         }
     }
 
+    void cargarKi(){
+        caja_batalla.Escribir("Tratas de concentrarte...\nManten [C] para cargar ki.");
+        Random rnd = new Random();
+        bool interrumpir=false;
+        int dueTimeInterrumpir = rnd.Next(enemigo.Information.agresividad*100,enemigo.Information.agresividad*250);
+        Timer timerInterrupcion = new Timer( _=>interrumpir=true,null,dueTimeInterrumpir,Timeout.Infinite);
+        
+        while(!interrumpir){
+            ConsoleKey k = Console.ReadKey(true).Key;
+            if(k == ConsoleKey.C){
+                jugador.Ki = Math.Min(jugador.Ki + jugador.Information.velocidad_carga/3500,5);
+                updateKi(jugador);
+            }
+        }
+        timerInterrupcion.Dispose();
+        string[] textos = {"¡El enemigo te mando a volar!","¡El enemigo lanza una ráfaga de aire!","¡El enemigo interrumpe tu carga!"}; 
+        caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
+        Console.Write("Presiona [ENTER] para continuar.");
+        while(Console.ReadKey(true).Key != ConsoleKey.Enter);
+        Console.Clear();
+        cambiarEstado(BattleStates.Turno_enemigo);
+    }
+
     void cambiarEstado(BattleStates nuevoEstado){
         estado_actual = nuevoEstado;
         switch(nuevoEstado){
@@ -513,6 +538,9 @@ class Battle{
                 break;
             case BattleStates.Tecnicas:
                 tecnicasState();
+                break;
+            case BattleStates.Cargar_ki:
+                cargarKi();
                 break;
             case BattleStates.Turno_enemigo:
                 break;
