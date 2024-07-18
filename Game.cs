@@ -490,11 +490,7 @@ class Battle{
             }
             Console.SetCursorPosition(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top+6);
             Console.Write("Presiona [ENTER] para continuar.");
-            
             while(Console.ReadKey(true).Key != ConsoleKey.Enter);
-            // Limpiamos todos
-            Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
-            Text.borrarSeccion(28,12,49,4);
             cambiarEstado(BattleStates.Turno_enemigo);
         }else{
             cambiarEstado(BattleStates.Turno_jugador);
@@ -552,6 +548,9 @@ class Battle{
                 cargarKiState();
                 break;
             case BattleStates.Turno_enemigo:
+                // Limpiamos todo
+                Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
+                Text.borrarSeccion(28,12,49,4);
                 turnoEnemigoState();
                 break;
         }
