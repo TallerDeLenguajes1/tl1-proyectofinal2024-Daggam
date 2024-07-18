@@ -262,7 +262,8 @@ class Battle{
 
     int barraSaludWidth = 25;
     enum BattleStates{
-        Init,Turno_jugador,Turno_enemigo, Golpear, Tecnicas, Cargar_ki 
+        Init,Turno_jugador,Turno_enemigo, Golpear, Tecnicas, Cargar_ki,
+        enemigoDerrotado,jugadorDerrotado
     }
 
     public Battle(Guerrero jugador, Guerrero enemigo){
@@ -273,7 +274,7 @@ class Battle{
         iniciarMaquina(BattleStates.Init);
     }
     
-    // ESTADOS
+    // ESTADOS DEL JUGADOR
     BattleStates initState(){
         //SE INICIALIZA LA UI | Barra: ▓ Foreground ; ▒ Background
         caja_batalla = new Caja(17,1,70,9);
@@ -298,6 +299,7 @@ class Battle{
 
         return BattleStates.Turno_jugador;
     }
+
     BattleStates turnoJugadorState(){
         Console.SetCursorPosition(caja_batalla.CursorWritter.Left+3,caja_batalla.CursorWritter.Top+1);
         Console.Write("Golpear"+new string(' ',18)+"Técnicas" + new string(' ',18) + "Cargar ki");
@@ -345,19 +347,15 @@ class Battle{
                 break;
             }
         }
-        //Limpiamos la pantalla con las opciones.
         
         Console.CursorLeft = caja_batalla.CursorWritter.Left;
         Console.Write(new string(' ',caja_batalla.Width-3));
         return (BattleStates) opciones+3;
     }
-    
-    BattleStates golpearState(){
-        int golpesDados = 0;
-        int damage = 0;
-        bool interrumpir=false;
-        Random rand = new Random();
 
+    BattleStates golpearState(){
+        
+        Random rand = new Random();
 
         caja_batalla.Escribir("Decides atacar al enemigo...\n¡Atacas con una ráfaga de golpes! [Presiona repetidamente Z y X]");
         Console.SetCursorPosition(28,12);
@@ -365,6 +363,9 @@ class Battle{
         Console.SetCursorPosition(28,14);
         Text.WriteCenter("DAÑO GENERADO:",49);
 
+        int golpesDados = 0;
+        int damageUI = 0;
+        bool interrumpir=false;
         int numeroInterrupcion = rand.Next(enemigo.Information.agresividad*100,enemigo.Information.agresividad*250);
         Timer timerInterrumpir = new Timer( _ => interrumpir=true,null,numeroInterrupcion,Timeout.Infinite);
         
@@ -376,8 +377,8 @@ class Battle{
                 ConsoleKey k = Console.ReadKey(true).Key;
                 if((k == ConsoleKey.Z && apretarZ) || (k== ConsoleKey.X && !apretarZ)){
                     golpesDados++;
-                    damage += jugador.Information.ataque - enemigo.Information.defensa;
-                    enemigo.Salud -= jugador.Information.ataque - enemigo.Information.defensa;
+                    damageUI += jugador.Information.ataque - enemigo.Information.defensa;
+                    enemigo.Salud = Math.Max(enemigo.Salud - (jugador.Information.ataque - enemigo.Information.defensa),0);
                     //ACTUALIZAMOS UI
                     actualizarUI=true;
                     apretarZ=!apretarZ;
@@ -388,20 +389,24 @@ class Battle{
                 Console.SetCursorPosition(28,13);
                 Text.WriteCenter(golpesDados.ToString(),49);
                 Console.SetCursorPosition(28,15);
-                Text.WriteCenter(damage.ToString(),49);
+                Text.WriteCenter(damageUI.ToString(),49);
                 updateVida(enemigo);
                 actualizarUI=false;
              }
         }
-        //Limpiar e informar.
+        
         timerInterrumpir.Dispose();
-        string[] textos = {"¡El enemigo logra escapar!","¡El enemigo te mando a volar!"}; 
-        caja_batalla.Escribir(textos[rand.Next(textos.Length)]+"\n\n",0,4);
-        Thread.Sleep(1000);
-        while(Console.KeyAvailable) Console.ReadKey(true); //Limpio el buffer.
-        Console.Write("Presiona [ENTER] para continuar.");
-        while(Console.ReadKey(true).Key != ConsoleKey.Enter);
-        return BattleStates.Turno_enemigo;
+        if(enemigo.Salud > 0){
+            string[] textos = {"¡El enemigo logra escapar!","¡El enemigo te mando a volar!"}; 
+            caja_batalla.Escribir(textos[rand.Next(textos.Length)]+"\n\n",0,4);
+            Thread.Sleep(1000);
+            while(Console.KeyAvailable) Console.ReadKey(true); //Limpio el buffer.
+            Console.Write("Presiona [ENTER] para continuar.");
+            while(Console.ReadKey(true).Key != ConsoleKey.Enter);
+            return BattleStates.Turno_enemigo;
+        }else{
+            return BattleStates.enemigoDerrotado;
+        }
     }
 
     BattleStates tecnicasState(){
@@ -476,7 +481,7 @@ class Battle{
             jugador.Ki -= jugador.Information.tecnicas[opciones].cantidad_ki_necesaria;
             updateKi(jugador);
             caja_batalla.Escribir($"¡Has utilizado la técnica {jugador.Information.tecnicas[opciones].nombre}!");
-            enemigo.Salud -= jugador.Information.tecnicas[opciones].ataque;
+            enemigo.Salud = Math.Max(enemigo.Salud - jugador.Information.tecnicas[opciones].ataque,0);
             updateVida(enemigo);
             Console.SetCursorPosition(28,12);
             Text.WriteCenter("DAÑO GENERADO:",49);
@@ -492,7 +497,11 @@ class Battle{
             Console.SetCursorPosition(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top+6);
             Console.Write("Presiona [ENTER] para continuar.");
             while(Console.ReadKey(true).Key != ConsoleKey.Enter);
-            return BattleStates.Turno_enemigo;
+            if(enemigo.Salud>0){
+                return BattleStates.Turno_enemigo;
+            }else{
+                return BattleStates.enemigoDerrotado;
+            }
         }else{
             return BattleStates.Turno_jugador;
         }
@@ -540,7 +549,7 @@ class Battle{
         return BattleStates.Turno_enemigo;
     }
 
-
+    //ESTADOS DEL ENEMIGO
     BattleStates turnoEnemigoState(){
         caja_batalla.Escribir("Ahora es el turno del enemigo.");
         Thread.Sleep(1000);
@@ -661,20 +670,31 @@ class Battle{
             }
         }
 
-        //Agregar condición cuando tiene salud menor o igual a 0
-        Thread.Sleep(1500);
-        string[] textos = {"Puedes contraatacar...","Tienes tiempo para actuar..."};
-        caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
-        Thread.Sleep(1000);
-        while(Console.KeyAvailable) Console.ReadKey(true); //Limpio el buffer.
-        Console.Write("Presiona [ENTER] para continuar.");
-        while(Console.ReadKey(true).Key != ConsoleKey.Enter);
-        // Limpiamos todo
-        Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
-        Text.borrarSeccion(28,12,49,4);
-        return BattleStates.Turno_jugador;
+        if(jugador.Salud > 0){
+            Thread.Sleep(1500);
+            string[] textos = {"Puedes contraatacar...","Tienes tiempo para actuar..."};
+            caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
+            Thread.Sleep(1000);
+            while(Console.KeyAvailable) Console.ReadKey(true); //Limpio el buffer.
+            Console.Write("Presiona [ENTER] para continuar.");
+            while(Console.ReadKey(true).Key != ConsoleKey.Enter);
+            // Limpiamos todo
+            Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
+            Text.borrarSeccion(28,12,49,4);
+            return BattleStates.Turno_jugador;
+        }else{
+            return BattleStates.jugadorDerrotado;
+        }
     }
 
+    //ESTADOS DE VICTORIA Y DERROTA.
+    BattleStates enemigoDerrotado(){
+        return BattleStates.Init;
+    }
+
+    BattleStates jugadorDerrotado(){
+        return BattleStates.Init;
+    }
     void iniciarMaquina(BattleStates estadoInicial){
         //SE INICIALIZA LA UI | Barra: ▓ Foreground ; ▒ Background
         estado_actual = estadoInicial;
@@ -701,6 +721,12 @@ class Battle{
                 Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
                 Text.borrarSeccion(28,12,49,4);
                 estado_actual = turnoEnemigoState();
+                break;
+            case BattleStates.enemigoDerrotado:
+                estado_actual = enemigoDerrotado();
+                break;
+            case BattleStates.jugadorDerrotado:
+                estado_actual = jugadorDerrotado();
                 break;
             }
         }
