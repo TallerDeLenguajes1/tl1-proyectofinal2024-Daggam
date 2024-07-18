@@ -4,10 +4,7 @@ using System.Text;
 using ToolNamespace;
 using GuerreroNamespace;
 using System.Text.Json;
-using System.Runtime.CompilerServices;
-using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.VisualBasic;
+
 
 static class Game{
     enum GameStates{
@@ -528,8 +525,8 @@ class Battle{
         caja_batalla.Escribir("Ahora es el turno del enemigo.");
         Thread.Sleep(1000);
         Random rnd = new Random();
-        int acciones = 0;//rnd.Next(0,2); // Atacar,usar una tecnica,cargar Ki
-        enemigo.Ki = 5;
+        int acciones = rnd.Next(2);//rnd.Next(0,2); // Atacar,usar una tecnica,cargar Ki
+        // enemigo.Ki = 5;
         updateKi(enemigo);
         //Condiciones iniciales
 
@@ -571,12 +568,86 @@ class Battle{
                 Text.borrarSeccion(28,12,49,4);
                 cambiarEstado(BattleStates.Turno_jugador);
             }else{
-                acciones = 2;//Si no tiene ki para ninguna técnica, que vaya a cargar
+                caja_batalla.Escribir("El enemigo decide cargar su ki...\nPuedes interrumpirlo cuando aparezca la leyenda [Z] [X] ó [C].",0,1);
+                Thread.Sleep(1000);
+                Console.SetCursorPosition(28,12);
+                Text.WriteCenter("CANTIDAD DE KI:",49);
+
+                ConsoleKey[] teclasDisponibles = {ConsoleKey.Z,ConsoleKey.X,ConsoleKey.C};
+                ConsoleKey randomKey = teclasDisponibles[0];
+                string consoleText = "";
+                bool actualizarTecla=false;
+                bool puedeInterrumpir=false;
+                System.Timers.Timer reloj = new System.Timers.Timer(rnd.Next(jugador.Information.agresividad*50,jugador.Information.agresividad*100));
+                reloj.Elapsed += (sender,e) =>{
+                    System.Timers.Timer t = (System.Timers.Timer) sender;
+                    puedeInterrumpir=!puedeInterrumpir;
+                    actualizarTecla=true;
+
+                    if(puedeInterrumpir){
+                        t.Interval = 400; //respuesta humana
+                    }else{
+                        t.Interval = rnd.Next(5000/jugador.Information.agresividad,10000/jugador.Information.agresividad);
+                    }
+                };
+                reloj.AutoReset = true;
+                reloj.Enabled=true;
+
+                while (true)
+                {
+                    enemigo.Ki = Math.Min(enemigo.Ki + enemigo.Information.velocidad_carga*0.0000035f,5);
+                    updateKi(enemigo);
+                    Console.SetCursorPosition(28,13);
+                    Text.WriteCenter(enemigo.Ki.ToString("N2"),49);
+                    if(enemigo.Ki == 5)
+                    {
+                        consoleText = "No pudiste interrumpir la carga.";
+                        break;
+                    }
+                    if (actualizarTecla)
+                    {
+                        Console.SetCursorPosition(28,14);
+                        if(puedeInterrumpir){
+                            randomKey = teclasDisponibles[rnd.Next(teclasDisponibles.Length)];
+                            Text.WriteCenter($"[{randomKey}]",49);
+                        }else{
+                            Text.WriteCenter(new string(' ',3),49);
+                        }
+                        actualizarTecla=false;
+                    }
+                    if(puedeInterrumpir && Console.KeyAvailable){
+                        var k = Console.ReadKey(true).Key;
+                        if(k == randomKey){
+                            consoleText = "¡Interrumpes la carga del enemigo con una ráfaga de aire!";
+                            break;
+                        }
+                    }else if(Console.KeyAvailable){
+                            Console.ReadKey(true);
+                    }
+                }
+                //LIBERAMOS EL RELOJ.
+                reloj.Dispose();
+                //Borramos y mostramos el mensaje
+                Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
+                Console.SetCursorPosition(28,14);
+                Text.WriteCenter(new string(' ',3),49);
+                caja_batalla.Escribir(consoleText);
+                Thread.Sleep(1500);
+                string[] textos = {"Puedes contraatacar...","Tienes tiempo para actuar..."};
+                caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
+                Thread.Sleep(1000);
+                Console.Write("Presiona [ENTER] para continuar.");
+                while(Console.ReadKey(true).Key != ConsoleKey.Enter);
+                // Limpiamos todo
+                Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
+                Text.borrarSeccion(28,12,49,4);
+                cambiarEstado(BattleStates.Turno_jugador);
             }
         }
         
         if(acciones==0){
-            int cantidadGolpes = rnd.Next(20,50);
+            //Luego podría agregar una interrupción por parte del jugador.
+            int cantidadGolpes = rnd.Next(20,30);
             caja_batalla.Escribir("¡El enemigo va atacar con una ráfaga de golpes!",0,1);
             int totalDamage = 0;
             Console.SetCursorPosition(28,12);
@@ -600,21 +671,6 @@ class Battle{
             Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
             Text.borrarSeccion(28,12,49,4);
             cambiarEstado(BattleStates.Turno_jugador);
-        }
-        switch (acciones)
-        {
-            case 0:
-            break;
-            // case 1:
-            //     caja_batalla.Escribir("¡El enemigo va atacar con una técnica!",0,1);
-            // break;
-            case 1:
-                caja_batalla.Escribir("¡El enemigo va cargar su ki!",0,1);
-            break;
-        }
-        while (true)
-        {
-            
         }
     }
     void cambiarEstado(BattleStates nuevoEstado){
