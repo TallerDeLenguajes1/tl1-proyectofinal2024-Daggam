@@ -372,6 +372,7 @@ class Battle{
         
         bool apretarZ=true;
         bool actualizarUI=true;
+
         while(!interrumpir){
             if(Console.KeyAvailable){
                 ConsoleKey k = Console.ReadKey(true).Key;

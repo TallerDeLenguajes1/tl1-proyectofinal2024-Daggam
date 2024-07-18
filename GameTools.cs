@@ -17,6 +17,11 @@ static class Text{
             }
             Thread.Sleep(speed);
         }
+
+        //Limpio el buffer, por si se cola alguna entrada.
+        while(Console.KeyAvailable){
+            Console.ReadKey(true);
+        }
     }
     public static void WriteCenter(string text,int width){
         int espacios = (width-text.Length)/2;
