@@ -401,7 +401,6 @@ class Battle{
         caja_batalla.Escribir(textos[rand.Next(textos.Length)]+"\n\n",0,4);
         Console.Write("Presiona [ENTER] para continuar.");
         while(Console.ReadKey(true).Key != ConsoleKey.Enter);
-        Console.Clear();
         cambiarEstado(BattleStates.Turno_enemigo);
         
     }
@@ -502,18 +501,21 @@ class Battle{
         }
     }
 
-    void cargarKi(){
+    void cargarKiState(){
         caja_batalla.Escribir("Tratas de concentrarte...\nManten [C] para cargar ki.");
         Random rnd = new Random();
         bool interrumpir=false;
         int dueTimeInterrumpir = rnd.Next(enemigo.Information.agresividad*100,enemigo.Information.agresividad*250);
         Timer timerInterrupcion = new Timer( _=>interrumpir=true,null,dueTimeInterrumpir,Timeout.Infinite);
-        
+        Console.SetCursorPosition(28,12);
+        Text.WriteCenter("CANTIDAD DE KI:",49);
         while(!interrumpir){
             ConsoleKey k = Console.ReadKey(true).Key;
             if(k == ConsoleKey.C){
                 jugador.Ki = Math.Min(jugador.Ki + jugador.Information.velocidad_carga/3500,5);
                 updateKi(jugador);
+                Console.SetCursorPosition(28,13);
+                Text.WriteCenter(jugador.Ki.ToString("N2"),49);
             }
         }
         timerInterrupcion.Dispose();
@@ -521,10 +523,16 @@ class Battle{
         caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
         Console.Write("Presiona [ENTER] para continuar.");
         while(Console.ReadKey(true).Key != ConsoleKey.Enter);
-        Console.Clear();
         cambiarEstado(BattleStates.Turno_enemigo);
     }
 
+
+    void turnoEnemigoState(){
+        while (true)
+        {
+            
+        }
+    }
     void cambiarEstado(BattleStates nuevoEstado){
         estado_actual = nuevoEstado;
         switch(nuevoEstado){
@@ -541,9 +549,10 @@ class Battle{
                 tecnicasState();
                 break;
             case BattleStates.Cargar_ki:
-                cargarKi();
+                cargarKiState();
                 break;
             case BattleStates.Turno_enemigo:
+                turnoEnemigoState();
                 break;
         }
     }
