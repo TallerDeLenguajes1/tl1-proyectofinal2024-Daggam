@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.VisualBasic;
 
 static class Game{
     enum GameStates{
@@ -524,6 +525,67 @@ class Battle{
 
 
     void turnoEnemigoState(){
+        caja_batalla.Escribir("Ahora es el turno del enemigo.");
+        Thread.Sleep(1000);
+        Random rnd = new Random();
+        int acciones = 1;//rnd.Next(0,2); // Atacar,usar una tecnica,cargar Ki
+        enemigo.Ki = 5;
+        updateKi(enemigo);
+        //Condiciones iniciales
+
+
+        if(acciones==2){
+            List<Tecnica> tecnicasDisponibles = new List<Tecnica>();
+            foreach(var tecnica in enemigo.Information.tecnicas){
+                if(enemigo.Ki >= tecnica.cantidad_ki_necesaria){
+                    tecnicasDisponibles.Add(tecnica);
+                }
+            }
+
+            if(tecnicasDisponibles.Count != 0){
+                var tecnicaElegida = tecnicasDisponibles[rnd.Next(tecnicasDisponibles.Count)];
+                enemigo.Ki -= tecnicaElegida.cantidad_ki_necesaria;
+                updateKi(enemigo) ;
+                caja_batalla.Escribir($"¡El enemigo utiliza la tecnica {tecnicaElegida.nombre}!",0,1);
+                float totalTecnicaDamage = (float) tecnicaElegida.ataque/100;
+                float tecnicaDamage = 0; 
+                Console.SetCursorPosition(28,12);
+                Text.WriteCenter("DAÑO RECIBIDO:",49);
+                for (int i = 0; i < 100; i++)
+                {
+                    tecnicaDamage+=totalTecnicaDamage;
+                    Console.SetCursorPosition(28,13);
+                    Text.WriteCenter(tecnicaDamage.ToString("0"),49);
+                    Thread.Sleep(25);
+                }
+                jugador.Salud = Math.Max(jugador.Salud-tecnicaElegida.ataque,0);
+                updateVida(jugador);
+                Thread.Sleep(1000);
+                //Agregar condición cuando tiene salud menor o igual a 0
+                string[] textos = {"Puedes contraatacar...","Tienes tiempo para actuar..."};
+                caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
+                Console.Write("Presiona [ENTER] para continuar.");
+                while(Console.ReadKey(true).Key != ConsoleKey.Enter);
+                // Limpiamos todo
+                Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
+                Text.borrarSeccion(28,12,49,4);
+                cambiarEstado(BattleStates.Turno_jugador);
+            }else{
+                acciones = 3;//Si no tiene ki para ninguna técnica, que vaya a cargar
+            }
+        }
+        switch (acciones)
+        {
+            case 0:
+                caja_batalla.Escribir("¡El enemigo va atacar con una ráfaga de golpes!",0,1);
+            break;
+            // case 1:
+            //     caja_batalla.Escribir("¡El enemigo va atacar con una técnica!",0,1);
+            // break;
+            case 1:
+                caja_batalla.Escribir("¡El enemigo va cargar su ki!",0,1);
+            break;
+        }
         while (true)
         {
             
