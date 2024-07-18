@@ -525,7 +525,7 @@ class Battle{
         caja_batalla.Escribir("Ahora es el turno del enemigo.");
         Thread.Sleep(1000);
         Random rnd = new Random();
-        int acciones = 1;//rnd.Next(2); // Atacar, (Ki_para_tecnica) ? tecnica:cargar_ki.
+        int acciones = rnd.Next(2); // Atacar, (Ki_para_tecnica) ? tecnica:cargar_ki.
         updateKi(enemigo);
         //Usar una tecnica
         if(acciones==1){
@@ -622,7 +622,8 @@ class Battle{
                 Text.WriteCenter(new string(' ',3),49);
                 caja_batalla.Escribir(consoleText);
             }
-        }else if(acciones == 0){ //ESTADO ATAQUE
+        }else 
+        if(acciones == 0){ //ESTADO ATAQUE
             //Luego podría agregar una interrupción por parte del jugador.
             int cantidadGolpes = rnd.Next(20,30);
             caja_batalla.Escribir("¡El enemigo va atacar con una ráfaga de golpes!",0,1);
