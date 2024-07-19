@@ -399,10 +399,6 @@ class Battle{
         if(enemigo.Salud > 0){
             string[] textos = {"¡El enemigo logra escapar!","¡El enemigo te mando a volar!"}; 
             caja_batalla.Escribir(textos[rand.Next(textos.Length)]+"\n\n",0,4);
-            Thread.Sleep(1000);
-            while(Console.KeyAvailable) Console.ReadKey(true); //Limpio el buffer.
-            Console.Write("Presiona [ENTER] para continuar.");
-            while(Console.ReadKey(true).Key != ConsoleKey.Enter);
             return BattleStates.Turno_enemigo;
         }else{
             return BattleStates.enemigoDerrotado;
@@ -492,11 +488,6 @@ class Battle{
                 Text.WriteCenter(damageAnim.ToString(),49);
                 Thread.Sleep(50);
             }
-            Thread.Sleep(1000);
-            while(Console.KeyAvailable) Console.ReadKey(true); //Limpio el buffer.
-            Console.SetCursorPosition(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top+6);
-            Console.Write("Presiona [ENTER] para continuar.");
-            while(Console.ReadKey(true).Key != ConsoleKey.Enter);
             if(enemigo.Salud>0){
                 return BattleStates.Turno_enemigo;
             }else{
@@ -542,10 +533,6 @@ class Battle{
         }else{
             caja_batalla.Escribir("¡Alcanzaste tu máximo poder!\n\n",0,4);
         }
-        Thread.Sleep(1000);
-        while(Console.KeyAvailable) Console.ReadKey(true); //Limpio el buffer.
-        Console.Write("Presiona [ENTER] para continuar.");
-        while(Console.ReadKey(true).Key != ConsoleKey.Enter);
         return BattleStates.Turno_enemigo;
     }
 
@@ -674,13 +661,6 @@ class Battle{
             Thread.Sleep(1500);
             string[] textos = {"Puedes contraatacar...","Tienes tiempo para actuar..."};
             caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
-            Thread.Sleep(1000);
-            while(Console.KeyAvailable) Console.ReadKey(true); //Limpio el buffer.
-            Console.Write("Presiona [ENTER] para continuar.");
-            while(Console.ReadKey(true).Key != ConsoleKey.Enter);
-            // Limpiamos todo
-            Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
-            Text.borrarSeccion(28,12,49,4);
             return BattleStates.Turno_jugador;
         }else{
             return BattleStates.jugadorDerrotado;
@@ -689,6 +669,8 @@ class Battle{
 
     //ESTADOS DE VICTORIA Y DERROTA.
     BattleStates enemigoDerrotado(){
+        Console.Clear();
+        
         return BattleStates.Init;
     }
 
@@ -697,9 +679,12 @@ class Battle{
     }
     void iniciarMaquina(BattleStates estadoInicial){
         //SE INICIALIZA LA UI | Barra: ▓ Foreground ; ▒ Background
+        BattleStates estado_previo;
         estado_actual = estadoInicial;
         bool salir=false;
         while(!salir){
+            estado_previo = estado_actual;
+            //Funciones de entrada
             switch (estado_actual){
             case BattleStates.Init:
                 estado_actual = initState();
@@ -717,16 +702,31 @@ class Battle{
                 estado_actual = cargarKiState();
                 break;
             case BattleStates.Turno_enemigo:
-                // Limpiamos todo
-                Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
-                Text.borrarSeccion(28,12,49,4);
                 estado_actual = turnoEnemigoState();
                 break;
             case BattleStates.enemigoDerrotado:
+                
+                while(Console.ReadKey(true).Key != ConsoleKey.Enter);
                 estado_actual = enemigoDerrotado();
                 break;
             case BattleStates.jugadorDerrotado:
                 estado_actual = jugadorDerrotado();
+                break;
+            }
+
+            //Funciones de salida
+            switch(estado_previo){
+                case BattleStates.Golpear: case BattleStates.Tecnicas:
+                case BattleStates.Cargar_ki: case BattleStates.Turno_enemigo:
+                    if(estado_actual == BattleStates.Turno_enemigo || (estado_actual== BattleStates.Turno_jugador && estado_previo==BattleStates.Turno_enemigo)){
+                        Thread.Sleep(1000);
+                        while(Console.KeyAvailable) Console.ReadKey(true); //Limpio el buffer.
+                        Console.SetCursorPosition(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top+6);
+                        Console.Write("Presiona [ENTER] para continuar.");
+                        while(Console.ReadKey(true).Key != ConsoleKey.Enter);
+                        Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
+                        Text.borrarSeccion(28,12,49,4);
+                    }
                 break;
             }
         }
