@@ -4,7 +4,7 @@ using System.Text;
 using ToolNamespace;
 using GuerreroNamespace;
 using System.Text.Json;
-
+using System.Reflection.Metadata;
 
 static class Game{
     enum GameStates{
@@ -263,7 +263,7 @@ class Battle{
     int barraSaludWidth = 25;
     enum BattleStates{
         Init,Turno_jugador,Turno_enemigo, Golpear, Tecnicas, Cargar_ki,
-        enemigoDerrotado,jugadorDerrotado
+        Enemigo_derrotado,Jugador_derrotado
     }
 
     public Battle(Guerrero jugador, Guerrero enemigo){
@@ -394,14 +394,16 @@ class Battle{
                 actualizarUI=false;
              }
         }
-        
+        enemigo.Salud = 0;
         timerInterrumpir.Dispose();
+        string[] textos = {"¡El enemigo logra escapar!","¡El enemigo te mando a volar!",
+                            "El enemigo no soporto los golpes...","El ki del enemigo se desvanece..."};
         if(enemigo.Salud > 0){
-            string[] textos = {"¡El enemigo logra escapar!","¡El enemigo te mando a volar!"}; 
-            caja_batalla.Escribir(textos[rand.Next(textos.Length)]+"\n\n",0,4);
+            caja_batalla.Escribir(textos[rand.Next(0,2)],0,4);
             return BattleStates.Turno_enemigo;
         }else{
-            return BattleStates.enemigoDerrotado;
+            caja_batalla.Escribir(textos[rand.Next(2,4)],0,4);
+            return BattleStates.Enemigo_derrotado;
         }
     }
 
@@ -491,7 +493,7 @@ class Battle{
             if(enemigo.Salud>0){
                 return BattleStates.Turno_enemigo;
             }else{
-                return BattleStates.enemigoDerrotado;
+                return BattleStates.Enemigo_derrotado;
             }
         }else{
             return BattleStates.Turno_jugador;
@@ -663,14 +665,26 @@ class Battle{
             caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
             return BattleStates.Turno_jugador;
         }else{
-            return BattleStates.jugadorDerrotado;
+            return BattleStates.Jugador_derrotado;
         }
     }
 
     //ESTADOS DE VICTORIA Y DERROTA.
     BattleStates enemigoDerrotado(){
-        Console.Clear();
-        
+        // Console.Clear();
+
+        caja_batalla.Escribir("¡GANASTE EL COMBATE!",23,3);
+        while(Console.ReadKey(true).Key != ConsoleKey.Enter);
+        Console.SetCursorPosition(0,0);
+        for (int i = 0; i < 18; i++)
+        {
+            Console.Write(new string(' ',104)+"\n");
+            Thread.Sleep(20);
+        }
+        while (true)
+        {
+            
+        }
         return BattleStates.Init;
     }
 
@@ -684,7 +698,7 @@ class Battle{
         bool salir=false;
         while(!salir){
             estado_previo = estado_actual;
-            //Funciones de entrada
+            //CAMBIO DE ESTADO
             switch (estado_actual){
             case BattleStates.Init:
                 estado_actual = initState();
@@ -704,29 +718,27 @@ class Battle{
             case BattleStates.Turno_enemigo:
                 estado_actual = turnoEnemigoState();
                 break;
-            case BattleStates.enemigoDerrotado:
-                
-                while(Console.ReadKey(true).Key != ConsoleKey.Enter);
+            case BattleStates.Enemigo_derrotado:
                 estado_actual = enemigoDerrotado();
+                salir = true;
                 break;
-            case BattleStates.jugadorDerrotado:
+            case BattleStates.Jugador_derrotado:
                 estado_actual = jugadorDerrotado();
                 break;
             }
 
             //Funciones de salida
-            switch(estado_previo){
-                case BattleStates.Golpear: case BattleStates.Tecnicas:
-                case BattleStates.Cargar_ki: case BattleStates.Turno_enemigo:
-                    if(estado_actual == BattleStates.Turno_enemigo || (estado_actual== BattleStates.Turno_jugador && estado_previo==BattleStates.Turno_enemigo)){
-                        Thread.Sleep(1000);
-                        while(Console.KeyAvailable) Console.ReadKey(true); //Limpio el buffer.
-                        Console.SetCursorPosition(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top+6);
-                        Console.Write("Presiona [ENTER] para continuar.");
-                        while(Console.ReadKey(true).Key != ConsoleKey.Enter);
-                        Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
-                        Text.borrarSeccion(28,12,49,4);
-                    }
+            switch(estado_actual){
+                case BattleStates.Turno_enemigo:case BattleStates.Turno_jugador:case BattleStates.Enemigo_derrotado:
+                    if(estado_previo != BattleStates.Turno_enemigo && (estado_actual == BattleStates.Turno_jugador) ) break;
+                    Thread.Sleep(1000);
+                    while(Console.KeyAvailable) Console.ReadKey(true); //Limpio el buffer.
+                    Console.SetCursorPosition(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top+6);
+                    Console.Write("Presiona [ENTER] para continuar.");
+                    while(Console.ReadKey(true).Key != ConsoleKey.Enter);
+                    Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
+                    Text.borrarSeccion(28,12,49,4);
+                    
                 break;
             }
         }
