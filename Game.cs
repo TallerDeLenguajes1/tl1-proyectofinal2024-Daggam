@@ -661,12 +661,15 @@ class Battle{
             }
         }
 
+        Thread.Sleep(1500);
+        jugador.Salud = 0;
+        string[] textos = {"Puedes contraatacar...","Tienes tiempo para actuar...",
+                            "Tu cuerpo comienza a desvanecerse...","Ya no puedes seguir resistiendo..."};
         if(jugador.Salud > 0){
-            Thread.Sleep(1500);
-            string[] textos = {"Puedes contraatacar...","Tienes tiempo para actuar..."};
-            caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
+            caja_batalla.Escribir(textos[rnd.Next(0,2)]+"\n\n",0,4);
             return BattleStates.Turno_jugador;
         }else{
+            caja_batalla.Escribir(textos[rnd.Next(2,4)]+"\n\n",0,4);
             return BattleStates.Jugador_derrotado;
         }
     }
@@ -689,6 +692,18 @@ class Battle{
     }
 
     BattleStates jugadorDerrotado(){
+        caja_batalla.Escribir("PERDISTE EL COMBATE...",23,3);
+        while(Console.ReadKey(true).Key != ConsoleKey.Enter);
+        Console.SetCursorPosition(0,0);
+        for (int i = 0; i < 18; i++)
+        {
+            Console.Write(new string(' ',104)+"\n");
+            Thread.Sleep(20);
+        }
+        while (true)
+        {
+            
+        }
         return BattleStates.Init;
     }
     void iniciarMaquina(BattleStates estadoInicial){
@@ -729,7 +744,7 @@ class Battle{
 
             //Funciones de salida
             switch(estado_actual){
-                case BattleStates.Turno_enemigo:case BattleStates.Turno_jugador:case BattleStates.Enemigo_derrotado:
+                case BattleStates.Turno_enemigo:case BattleStates.Turno_jugador:case BattleStates.Enemigo_derrotado:case BattleStates.Jugador_derrotado:
                     if(estado_previo != BattleStates.Turno_enemigo && (estado_actual == BattleStates.Turno_jugador) ) break;
                     Thread.Sleep(1000);
                     while(Console.KeyAvailable) Console.ReadKey(true); //Limpio el buffer.
