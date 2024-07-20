@@ -106,64 +106,7 @@ static class Game{
         return (GameStates) (opcion+1);
     }
     
-    static GameStates battleState(){
-        Guerrero enemigo = new Guerrero(allWarriors[0]); //No los modifica de manera directa
-        var proximo_estado = Battle.Start(jugador,enemigo); //El jugador es pasado como referencia
-        //El jugador podría no ser pasado como referencia y utilizar Game.jugador (haciendolo publico)
-        //Y solamente pasar el enemigo como nuevo parametro
-        return proximo_estado;
-    }
-    
-    static GameStates infoState(){
-        return GameStates.Menu;
-    }
-    
-    static GameStates quitState(){
-        //26 = (105 - 52)/2
-        Caja cajaEmergente = new Caja(26,4,52,6);
-        string msj = "¿Estás seguro que quieres salir?";
-        Console.SetCursorPosition(cajaEmergente.X,cajaEmergente.Y+1);
-        Text.WriteCenter(msj,cajaEmergente.Width);
-        Console.SetCursorPosition(cajaEmergente.X+1,cajaEmergente.Y + cajaEmergente.Height-2);
-        Text.WriteCenter("Sí",cajaEmergente.Width/2);
-        Console.CursorLeft = cajaEmergente.X+cajaEmergente.Width/2;
-        Text.WriteCenter("No",cajaEmergente.Width/2);
-
-        bool updateOpciones=true;
-        bool salir=true;
-        (int x1,int x2) cursorPositions = (x1: cajaEmergente.X + cajaEmergente.Width/4 - 2,
-                                           x2: cajaEmergente.X + 3*cajaEmergente.Width/4 - 3);
-        while (true)
-        {
-            if(updateOpciones){
-                if(salir){
-                    Console.CursorLeft = cursorPositions.x1;
-                    Console.Write("■");
-                    Console.CursorLeft = cursorPositions.x2;
-                    Console.Write("*");
-                }else{
-                    Console.CursorLeft = cursorPositions.x1;
-                    Console.Write("*");
-                    Console.CursorLeft = cursorPositions.x2;
-                    Console.Write("■");
-                }
-                updateOpciones=false;
-            }
-
-            ConsoleKey k = Console.ReadKey(true).Key;
-            if(k == ConsoleKey.LeftArrow){
-                salir=true;
-                updateOpciones=true;
-            }else if(k == ConsoleKey.RightArrow){
-                salir=false;
-                updateOpciones=true;
-            }else if(k == ConsoleKey.Enter) break;
-        }
-
-        return (salir) ? GameStates.Salir_juego: GameStates.Menu;
-    
-    }
-    
+    //Estados de los menús.
     static GameStates seleccionarPersonajeState(){
         Caja cajaSeleccionadora = new Caja(2,1,101,11);
         Text.WriteCenter("Selecciona un personaje",Console.WindowWidth);
@@ -228,7 +171,100 @@ static class Game{
 
         return GameStates.Battle;
     }
+    static GameStates infoState(){
+        return GameStates.Menu;
+    }
+    static GameStates quitState(){
+        //26 = (105 - 52)/2
+        Caja cajaEmergente = new Caja(26,4,52,6);
+        string msj = "¿Estás seguro que quieres salir?";
+        Console.SetCursorPosition(cajaEmergente.X,cajaEmergente.Y+1);
+        Text.WriteCenter(msj,cajaEmergente.Width);
+        Console.SetCursorPosition(cajaEmergente.X+1,cajaEmergente.Y + cajaEmergente.Height-2);
+        Text.WriteCenter("Sí",cajaEmergente.Width/2);
+        Console.CursorLeft = cajaEmergente.X+cajaEmergente.Width/2;
+        Text.WriteCenter("No",cajaEmergente.Width/2);
+
+        bool updateOpciones=true;
+        bool salir=true;
+        (int x1,int x2) cursorPositions = (x1: cajaEmergente.X + cajaEmergente.Width/4 - 2,
+                                           x2: cajaEmergente.X + 3*cajaEmergente.Width/4 - 3);
+        while (true)
+        {
+            if(updateOpciones){
+                if(salir){
+                    Console.CursorLeft = cursorPositions.x1;
+                    Console.Write("■");
+                    Console.CursorLeft = cursorPositions.x2;
+                    Console.Write("*");
+                }else{
+                    Console.CursorLeft = cursorPositions.x1;
+                    Console.Write("*");
+                    Console.CursorLeft = cursorPositions.x2;
+                    Console.Write("■");
+                }
+                updateOpciones=false;
+            }
+
+            ConsoleKey k = Console.ReadKey(true).Key;
+            if(k == ConsoleKey.LeftArrow){
+                salir=true;
+                updateOpciones=true;
+            }else if(k == ConsoleKey.RightArrow){
+                salir=false;
+                updateOpciones=true;
+            }else if(k == ConsoleKey.Enter) break;
+        }
+
+        return (salir) ? GameStates.Salir_juego: GameStates.Menu;
     
+    }
+    
+    //Estado de batalla
+    static GameStates battleState(){
+        Guerrero enemigo = new Guerrero(allWarriors[0]); //No los modifica de manera directa
+        var proximo_estado = Battle.Start(jugador,enemigo); //El jugador es pasado como referencia
+        //El jugador podría no ser pasado como referencia y utilizar Game.jugador (haciendolo publico)
+        //Y solamente pasar el enemigo como nuevo parametro
+        return proximo_estado;
+    }
+    
+    //Estado de gameover.
+    static GameStates gameOverState(){
+        Thread.Sleep(1000);
+        Console.SetCursorPosition(0,8);
+        Text.WriteCenter("Perdiste.",105);
+        Thread.Sleep(1000);
+        Console.SetCursorPosition(0,9);
+        Text.WriteCenter("¿Deseas continuar?",105);
+        Thread.Sleep(500);
+        
+        bool continuar = true;
+        bool updateOpciones = true;
+        while (true)
+        {
+            if(updateOpciones){
+                Console.SetCursorPosition(0,12);
+                if(continuar){
+                    Text.WriteCenter(String.Format("{0,-20}{1}","■ Sí","  No"),105);
+                }else{
+                    Text.WriteCenter(String.Format("{0,-20}{1}","  Sí","■ No"),105);
+                }
+                updateOpciones=false;
+            }
+
+            ConsoleKey k = Console.ReadKey(true).Key;
+            if(k==ConsoleKey.RightArrow){
+                updateOpciones=true;
+                continuar = false;
+            }else if(k==ConsoleKey.LeftArrow){
+                updateOpciones=true;
+                continuar=true;
+            }else if(k==ConsoleKey.Enter) break;
+        }
+
+        return (continuar) ? GameStates.Seleccionar_personaje:GameStates.Salir_juego;
+    }
     static void iniciarMaquina(GameStates nuevoEstado){
         bool salir=false;
         estadoActual = nuevoEstado;
@@ -249,6 +285,9 @@ static class Game{
                     break;
                 case GameStates.Battle:
                     estadoActual = battleState();
+                    break;
+                case GameStates.Game_over:
+                    estadoActual = gameOverState();
                     break;
                 case GameStates.Salir_juego:
                     salir=true;
