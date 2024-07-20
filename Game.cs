@@ -9,7 +9,8 @@ using System.Text.Json;
 enum GameStates{
     Menu,Seleccionar_personaje,Info,Quit,
     Battle,
-    Game_over
+    Game_over,
+    Salir_juego
 }
 static class Game{
     //Definicion de variables
@@ -18,7 +19,26 @@ static class Game{
 
     static List<GuerreroInfo> allWarriors = new List<GuerreroInfo>();
     static Guerrero jugador;
-    static void menuState(){
+
+    public static void GameInit(int xres, int yres)
+    {
+        Console.CursorVisible = false;
+        Console.SetWindowSize(xres,yres);
+        Console.OutputEncoding = Encoding.UTF8;
+        Console.BackgroundColor = consoleColor.bg;
+        Console.ForegroundColor = consoleColor.fg;
+        //CARGAMOS LOS GUERREROS
+        foreach (string filepath in Directory.EnumerateFiles("Personajes","*.json")){
+            string contenido = File.ReadAllText(filepath);
+            GuerreroInfo w = JsonSerializer.Deserialize<GuerreroInfo>(contenido);
+            allWarriors.Add(w);
+        }
+        //Meter una introducción para dar a conocer los controles.
+        iniciarMaquina(GameStates.Menu);
+        
+    }
+
+    static GameStates menuState(){
         const string titulo = @"
 ██████╗ ██████╗  █████╗  ██████╗  ██████╗ ███╗   ██╗    ███████╗██╗███╗   ███╗
 ██╔══██╗██╔══██╗██╔══██╗██╔════╝ ██╔═══██╗████╗  ██║    ██╔════╝██║████╗ ████║
@@ -83,22 +103,22 @@ static class Game{
 
         //Dependiendo de la opcion, elegimos el próximo estado.
         //Esto funciona por como está dispuesto
-        cambiarEstado((GameStates) (opcion+1));
+        return (GameStates) (opcion+1);
     }
     
-    static void battleState(){
+    static GameStates battleState(){
         Guerrero enemigo = new Guerrero(allWarriors[0]); //No los modifica de manera directa
         var proximo_estado = Battle.Start(jugador,enemigo); //El jugador es pasado como referencia
         //El jugador podría no ser pasado como referencia y utilizar Game.jugador (haciendolo publico)
         //Y solamente pasar el enemigo como nuevo parametro
-        cambiarEstado(proximo_estado);
+        return proximo_estado;
     }
     
-    static void infoState(){
-
+    static GameStates infoState(){
+        return GameStates.Menu;
     }
     
-    static void quitState(){
+    static GameStates quitState(){
         //26 = (105 - 52)/2
         Caja cajaEmergente = new Caja(26,4,52,6);
         string msj = "¿Estás seguro que quieres salir?";
@@ -137,18 +157,14 @@ static class Game{
             }else if(k == ConsoleKey.RightArrow){
                 salir=false;
                 updateOpciones=true;
-            }else if(k == ConsoleKey.Enter)
-            {
-                break;
-            }
+            }else if(k == ConsoleKey.Enter) break;
         }
 
-        if(!salir){
-            cambiarEstado(GameStates.Menu);
-        }
+        return (salir) ? GameStates.Salir_juego: GameStates.Menu;
+    
     }
     
-    static void seleccionarPersonajeState(){
+    static GameStates seleccionarPersonajeState(){
         Caja cajaSeleccionadora = new Caja(2,1,101,11);
         Text.WriteCenter("Selecciona un personaje",Console.WindowWidth);
         (int x, int y) cursorPos = cajaSeleccionadora.CursorWritter;
@@ -209,49 +225,36 @@ static class Game{
         //Podría agregar un estado para que confirme su personaje
         //Busqueda de personaje.
         jugador = new Guerrero(allWarriors[opciones.actual]);
-        cambiarEstado(GameStates.Battle);
 
+        return GameStates.Battle;
     }
     
-    public static void GameInit(int xres, int yres)
-    {
-        Console.CursorVisible = false;
-        Console.SetWindowSize(xres,yres);
-        Console.OutputEncoding = Encoding.UTF8;
-        Console.BackgroundColor = consoleColor.bg;
-        Console.ForegroundColor = consoleColor.fg;
-        //CARGAMOS LOS GUERREROS
-        foreach (string filepath in Directory.EnumerateFiles("Personajes","*.json")){
-            string contenido = File.ReadAllText(filepath);
-            GuerreroInfo w = JsonSerializer.Deserialize<GuerreroInfo>(contenido);
-            allWarriors.Add(w);
-        }
-        //Meter una introducción para dar a conocer los controles.
-        cambiarEstado(GameStates.Menu);
-        
-    }
-
-    static void cambiarEstado(GameStates nuevoEstado){
-        Console.Clear();
-        //Función de entrada.
-        //Funcion de salida.
-        switch(nuevoEstado){
-            case GameStates.Menu:
-                menuState();
-                break;
-            case GameStates.Seleccionar_personaje:
-                seleccionarPersonajeState();
-                break;
-            case GameStates.Info:
-                infoState();
-                break;
-            case GameStates.Quit:
-                quitState();
-                break;
-            case GameStates.Battle:
-                battleState();
-                break;
-        }        
+    static void iniciarMaquina(GameStates nuevoEstado){
+        bool salir=false;
         estadoActual = nuevoEstado;
+        while(!salir){
+            Console.Clear();
+            switch(estadoActual){
+                case GameStates.Menu:
+                    estadoActual = menuState();
+                    break;
+                case GameStates.Seleccionar_personaje:
+                    estadoActual = seleccionarPersonajeState();
+                    break;
+                case GameStates.Info:
+                    estadoActual = infoState();
+                    break;
+                case GameStates.Quit:
+                    estadoActual = quitState();
+                    break;
+                case GameStates.Battle:
+                    estadoActual = battleState();
+                    break;
+                case GameStates.Salir_juego:
+                    salir=true;
+                    break;
+            }        
+
+        }
     }
 }
