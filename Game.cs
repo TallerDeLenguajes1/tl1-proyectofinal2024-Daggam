@@ -283,7 +283,7 @@ class Battle{
         updateVida(enemigo);
 
         //KI
-        //jugador.Ki =4;
+        jugador.Ki =4;
         updateKi(jugador);
         updateKi(enemigo);
 
@@ -394,7 +394,6 @@ class Battle{
                 actualizarUI=false;
              }
         }
-        enemigo.Salud = 0;
         timerInterrumpir.Dispose();
         string[] textos = {"¡El enemigo logra escapar!","¡El enemigo te mando a volar!",
                             "El enemigo no soporto los golpes...","El ki del enemigo se desvanece..."};
@@ -493,6 +492,9 @@ class Battle{
             if(enemigo.Salud>0){
                 return BattleStates.Turno_enemigo;
             }else{
+                Random rnd = new Random();
+                string[] textos = {"El enemigo no soporto los golpes...","El ki del enemigo se desvanece..."};
+                caja_batalla.Escribir(textos[rnd.Next(textos.Length)],0,4);
                 return BattleStates.Enemigo_derrotado;
             }
         }else{
@@ -671,8 +673,6 @@ class Battle{
 
     //ESTADOS DE VICTORIA Y DERROTA.
     BattleStates enemigoDerrotado(){
-        // Console.Clear();
-
         caja_batalla.Escribir("¡GANASTE EL COMBATE!",23,3);
         while(Console.ReadKey(true).Key != ConsoleKey.Enter);
         Console.SetCursorPosition(0,0);
