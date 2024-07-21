@@ -90,3 +90,7 @@ public class Guerrero{
     public GuerreroInfo Information {get => information; set => information = value;}
     public float Ki { get => ki; set => ki = value; }
 }
+
+//PODRIA CREAR DOS CLASES: UNA PARA BATALLA Y OTRA PARA ENTRENAMIENTO
+//LA DE ENTRENAMIENTO TENDRÍA QUE MODIFICAR EL GUERRERO INFO Y ADEMÁS TENDRÍA SALUD,NIVEL, TODAS LAS CARACTERISTICAS BASES ADICIONALES. Por ej: Defensa_base + defensa_entrenamiento; ESTOS SON ASPECTOS PERMANENTES (tal vez fatiga...)
+//BATALLA TENDRÁ ASPECTOS QUE SON DESCARTABLES QUE SOLAMENTE IMPORTAN A LA HORA DE LA BATALLA.

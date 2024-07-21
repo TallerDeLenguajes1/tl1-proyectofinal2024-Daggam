@@ -10,7 +10,7 @@ using System.Text.Json.Serialization;
 
 enum GameStates{
     Menu,Seleccionar_personaje,Info,Quit,
-    Battle,
+    Battle,Entrenamiento,
     Game_over,
     Salir_juego
 }
@@ -190,7 +190,7 @@ static class Game{
         //Podría agregar un estado para que confirme su personaje
         //Busqueda de personaje.
         jugador = new Guerrero(getGuerreroInfo(allWarriorsPaths[opciones.actual]));
-        return GameStates.Battle;
+        return GameStates.Entrenamiento;
     }
     static GameStates infoState(){
         return GameStates.Menu;
@@ -250,6 +250,16 @@ static class Game{
         return proximo_estado;
     }
     
+    //Estado de entrenamiento
+    static GameStates entrenamientoState(){
+
+        while (true)
+        {
+            
+        }
+        return GameStates.Battle;
+    }
+
     //Estado de gameover.
     static GameStates gameOverState(){
         Thread.Sleep(1000);
@@ -307,6 +317,9 @@ static class Game{
                     break;
                 case GameStates.Battle:
                     estadoActual = battleState();
+                    break;
+                case GameStates.Entrenamiento:
+                    estadoActual = entrenamientoState();
                     break;
                 case GameStates.Game_over:
                     estadoActual = gameOverState();
