@@ -24,6 +24,8 @@ static class Game{
     static List<Planeta> allPlanets;
     static Guerrero jugador;
 
+    public static List<Planeta> AllPlanets { get => allPlanets;}
+
     public static async Task GameInit(int xres, int yres)
     {
         Console.CursorVisible = false;
@@ -181,8 +183,6 @@ static class Game{
         //Podría agregar un estado para que confirme su personaje
         //Busqueda de personaje.
         jugador = new Guerrero(allWarriors[opciones.actual]);
-        jugador.Information.ataque=0;
-
         return GameStates.Battle;
     }
     static GameStates infoState(){
@@ -236,8 +236,6 @@ static class Game{
     
     //Estado de batalla
     static GameStates battleState(){
-        //Elegimos 5 planetas de la API.
-        
         Guerrero enemigo = new Guerrero(allWarriors[0]); //No los modifica de manera directa
         var proximo_estado = Battle.Start(jugador,enemigo); //El jugador es pasado como referencia
         //El jugador podría no ser pasado como referencia y utilizar Game.jugador (haciendolo publico)
@@ -314,7 +312,7 @@ static class Game{
         }
     }
 
-    //FUNCION QUE ME RETORNA UN DICCIONARIO CON 
+    //Funcion que me retorna una lista de planetas para consumir una API Web.
     static async Task<List<Planeta>> getPlanetsAsync(){
         var url = "https://dragonball-api.com/api/planets?page=1&limit=5"; //Obtenemos los primeros 5 planetas.
         try{

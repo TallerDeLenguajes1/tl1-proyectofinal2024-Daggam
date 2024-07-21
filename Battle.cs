@@ -30,24 +30,47 @@ static class Battle{
     static BattleStates initState(){
         //SE INICIALIZA LA UI | Barra: ▓ Foreground ; ▒ Background
         caja_batalla = new Caja(17,1,70,9);
-        //VIDA
-        updateVida(jugador);
-        updateVida(enemigo);
+        Random rnd = new Random();
+        caja_batalla.Escribir("¡Un nuevo combate está por comenzar!",17);
+        Thread.Sleep(1500);
+        Planeta planetaElegido = Game.AllPlanets[rnd.Next(Game.AllPlanets.Count)];
+        string textoPlaneta = "El planeta donde pelearán será: " + planetaElegido.name;
+        caja_batalla.Escribir(textoPlaneta,(caja_batalla.Width-textoPlaneta.Length)/2,1);
+        Thread.Sleep(1500);
+        //Ponemos ventajas y desventajas... (Como comenzar el turno, o más agresividad..)
 
-        //KI
+
+        //INTRODUCCION AL JUGADOR
+        caja_batalla.Escribir("Por un lado... ",0,3);
+        Thread.Sleep(1000);
         updateKi(jugador);
-        updateKi(enemigo);
-
+        updateVida(jugador);
         Console.SetCursorPosition(3,14);
         Text.WriteCenter("(Vos)",barraSaludWidth);
-        Console.CursorLeft = Console.WindowWidth-barraSaludWidth-3;
-        Text.WriteCenter("(CPU)",barraSaludWidth);
-
         Console.SetCursorPosition(3,15);
         Text.WriteCenter(jugador.Information.nombre,barraSaludWidth);
-        Console.CursorLeft = Console.WindowWidth-barraSaludWidth-3;
-        Text.WriteCenter(enemigo.Information.nombre,barraSaludWidth);
+        caja_batalla.Escribir("¡Tenemos a nuestro protagonista!",15,3);
+        Thread.Sleep(1500);
 
+
+        //INTRODUCCIÓN AL ENEMIGO...
+        caja_batalla.Escribir("Por otro... ",0,5);
+        Thread.Sleep(1000);
+        updateKi(enemigo);
+        updateVida(enemigo);
+        Console.SetCursorPosition(Console.WindowWidth-barraSaludWidth-3,14);
+        Text.WriteCenter("(CPU)",barraSaludWidth);
+        Console.SetCursorPosition(Console.WindowWidth-barraSaludWidth-3,15);
+        Text.WriteCenter(enemigo.Information.nombre,barraSaludWidth);
+        caja_batalla.Escribir("¡A su contrincante!",12,5);
+        Thread.Sleep(3000);
+        Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
+
+
+        caja_batalla.Escribir("¡QUE COMIENCE EL COMBATE!",22,3);
+        Thread.Sleep(3000);
+        Console.SetCursorPosition(Console.CursorLeft-25,Console.CursorTop);
+        Console.Write(new string(' ',25));
         return BattleStates.Turno_jugador;
     }
 
