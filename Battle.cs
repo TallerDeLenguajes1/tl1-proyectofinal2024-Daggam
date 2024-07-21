@@ -31,17 +31,17 @@ static class Battle{
         //SE INICIALIZA LA UI | Barra: ▓ Foreground ; ▒ Background
         caja_batalla = new Caja(17,1,70,9);
         Random rnd = new Random();
-        caja_batalla.Escribir("¡Un nuevo combate está por comenzar!",17);
+        caja_batalla.EscribirAnim("¡Un nuevo combate está por comenzar!",17);
         Thread.Sleep(1500);
         Planeta planetaElegido = Game.AllPlanets[rnd.Next(Game.AllPlanets.Count)];
         string textoPlaneta = "El planeta donde pelearán será: " + planetaElegido.name;
-        caja_batalla.Escribir(textoPlaneta,(caja_batalla.Width-textoPlaneta.Length)/2,1);
+        caja_batalla.EscribirAnim(textoPlaneta,(caja_batalla.Width-textoPlaneta.Length)/2,1);
         Thread.Sleep(1500);
         //Ponemos ventajas y desventajas... (Como comenzar el turno, o más agresividad..)
 
 
         //INTRODUCCION AL JUGADOR
-        caja_batalla.Escribir("Por un lado... ",0,3);
+        caja_batalla.EscribirAnim("Por un lado... ",0,3);
         Thread.Sleep(1000);
         updateKi(jugador);
         updateVida(jugador);
@@ -49,12 +49,12 @@ static class Battle{
         Text.WriteCenter("(Vos)",barraSaludWidth);
         Console.SetCursorPosition(3,15);
         Text.WriteCenter(jugador.Information.nombre,barraSaludWidth);
-        caja_batalla.Escribir("¡Tenemos a nuestro protagonista!",15,3);
+        caja_batalla.EscribirAnim("¡Tenemos a nuestro protagonista!",15,3);
         Thread.Sleep(1500);
 
 
         //INTRODUCCIÓN AL ENEMIGO...
-        caja_batalla.Escribir("Por otro... ",0,5);
+        caja_batalla.EscribirAnim("Por otro... ",0,5);
         Thread.Sleep(1000);
         updateKi(enemigo);
         updateVida(enemigo);
@@ -62,12 +62,12 @@ static class Battle{
         Text.WriteCenter("(CPU)",barraSaludWidth);
         Console.SetCursorPosition(Console.WindowWidth-barraSaludWidth-3,15);
         Text.WriteCenter(enemigo.Information.nombre,barraSaludWidth);
-        caja_batalla.Escribir("¡A su contrincante!",12,5);
+        caja_batalla.EscribirAnim("¡A su contrincante!",12,5);
         Thread.Sleep(3000);
         Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
 
 
-        caja_batalla.Escribir("¡QUE COMIENCE EL COMBATE!",22,3);
+        caja_batalla.EscribirAnim("¡QUE COMIENCE EL COMBATE!",22,3);
         Thread.Sleep(3000);
         Console.SetCursorPosition(Console.CursorLeft-25,Console.CursorTop);
         Console.Write(new string(' ',25));
@@ -131,7 +131,7 @@ static class Battle{
         
         Random rand = new Random();
 
-        caja_batalla.Escribir("Decides atacar al enemigo...\n¡Atacas con una ráfaga de golpes! [Presiona repetidamente Z y X]");
+        caja_batalla.EscribirAnim("Decides atacar al enemigo...\n¡Atacas con una ráfaga de golpes! [Presiona repetidamente Z y X]");
         Console.SetCursorPosition(28,12);
         Text.WriteCenter("GOLPES DADOS:",49);
         Console.SetCursorPosition(28,14);
@@ -172,10 +172,10 @@ static class Battle{
         string[] textos = {"¡El enemigo logra escapar!","¡El enemigo te mando a volar!",
                             "El enemigo no soporto los golpes...","El ki del enemigo se desvanece..."};
         if(enemigo.Salud > 0){
-            caja_batalla.Escribir(textos[rand.Next(0,2)],0,4);
+            caja_batalla.EscribirAnim(textos[rand.Next(0,2)],0,4);
             return BattleStates.Turno_enemigo;
         }else{
-            caja_batalla.Escribir(textos[rand.Next(2,4)],0,4);
+            caja_batalla.EscribirAnim(textos[rand.Next(2,4)],0,4);
             return BattleStates.Enemigo_derrotado;
         }
     }
@@ -251,7 +251,7 @@ static class Battle{
         if(opciones!=-1){
             jugador.Ki -= jugador.Information.tecnicas[opciones].cantidad_ki_necesaria;
             updateKi(jugador);
-            caja_batalla.Escribir($"¡Has utilizado la técnica {jugador.Information.tecnicas[opciones].nombre}!");
+            caja_batalla.EscribirAnim($"¡Has utilizado la técnica {jugador.Information.tecnicas[opciones].nombre}!");
             enemigo.Salud = Math.Max(enemigo.Salud - jugador.Information.tecnicas[opciones].ataque,0);
             updateVida(enemigo);
             Console.SetCursorPosition(28,12);
@@ -268,7 +268,7 @@ static class Battle{
             }else{
                 Random rnd = new Random();
                 string[] textos = {"El enemigo no pudo contener tu ataque...","El ki del enemigo se desvanece..."};
-                caja_batalla.Escribir(textos[rnd.Next(textos.Length)],0,4);
+                caja_batalla.EscribirAnim(textos[rnd.Next(textos.Length)],0,4);
                 return BattleStates.Enemigo_derrotado;
             }
         }else{
@@ -277,7 +277,7 @@ static class Battle{
     }
 
     static BattleStates cargarKiState(){
-        caja_batalla.Escribir("Tratas de concentrarte...\nManten [C] para cargar ki.");
+        caja_batalla.EscribirAnim("Tratas de concentrarte...\nManten [C] para cargar ki.");
         
         Random rnd = new Random();
         int dueTimeInterrumpir = rnd.Next(15000/enemigo.Information.agresividad,30000/enemigo.Information.agresividad);
@@ -307,16 +307,16 @@ static class Battle{
         timerInterrupcion.Dispose();
         if(interrumpir){
             string[] textos = {"¡El enemigo te mando a volar!","¡El enemigo lanza una ráfaga de aire!","¡El enemigo interrumpe tu carga!"}; 
-            caja_batalla.Escribir(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
+            caja_batalla.EscribirAnim(textos[rnd.Next(textos.Length)]+"\n\n",0,4);
         }else{
-            caja_batalla.Escribir("¡Alcanzaste tu máximo poder!\n\n",0,4);
+            caja_batalla.EscribirAnim("¡Alcanzaste tu máximo poder!\n\n",0,4);
         }
         return BattleStates.Turno_enemigo;
     }
 
     //ESTADOS DEL ENEMIGO
     static BattleStates turnoEnemigoState(){
-        caja_batalla.Escribir("Ahora es el turno del enemigo.");
+        caja_batalla.EscribirAnim("Ahora es el turno del enemigo.");
         Thread.Sleep(1000);
         Random rnd = new Random();
         int acciones = rnd.Next(2); // Atacar, (Ki_para_tecnica) ? tecnica:cargar_ki.
@@ -334,7 +334,7 @@ static class Battle{
                 var tecnicaElegida = tecnicasDisponibles[rnd.Next(tecnicasDisponibles.Count)];
                 enemigo.Ki -= tecnicaElegida.cantidad_ki_necesaria;
                 updateKi(enemigo) ;
-                caja_batalla.Escribir($"¡El enemigo utiliza la tecnica {tecnicaElegida.nombre}!",0,1);
+                caja_batalla.EscribirAnim($"¡El enemigo utiliza la tecnica {tecnicaElegida.nombre}!",0,1);
                 float totalTecnicaDamage = (float) tecnicaElegida.ataque/100;
                 float tecnicaDamage = 0; 
                 Console.SetCursorPosition(28,12);
@@ -349,7 +349,7 @@ static class Battle{
                 jugador.Salud = Math.Max(jugador.Salud-tecnicaElegida.ataque,0);
                 updateVida(jugador);
             }else{ //CARGAR KI
-                caja_batalla.Escribir("El enemigo decide cargar su ki...\n\nPuedes interrumpirlo cuando aparezca la leyenda [Z] [X] ó [C].",0,2);
+                caja_batalla.EscribirAnim("El enemigo decide cargar su ki...\n\nPuedes interrumpirlo cuando aparezca la leyenda [Z] [X] ó [C].",0,2);
                 Thread.Sleep(1000);
                 Console.SetCursorPosition(28,12);
                 Text.WriteCenter("CANTIDAD DE KI:",49);
@@ -414,13 +414,13 @@ static class Battle{
                 Text.borrarSeccion(caja_batalla.CursorWritter.Left,caja_batalla.CursorWritter.Top,70-3,9-3);
                 Console.SetCursorPosition(28,14);
                 Text.WriteCenter(new string(' ',3),49);
-                caja_batalla.Escribir(consoleText);
+                caja_batalla.EscribirAnim(consoleText);
             }
         }else 
         if(acciones == 0){ //ESTADO ATAQUE
             //Luego podría agregar una interrupción por parte del jugador.
             int cantidadGolpes = rnd.Next(20,30);
-            caja_batalla.Escribir("¡El enemigo va atacar con una ráfaga de golpes!",0,1);
+            caja_batalla.EscribirAnim("¡El enemigo va atacar con una ráfaga de golpes!",0,1);
             int totalDamage = 0;
             Console.SetCursorPosition(28,12);
             Text.WriteCenter("DAÑO RECIBIDO:",49);
@@ -438,10 +438,10 @@ static class Battle{
         string[] textos = {"Puedes contraatacar...","Tienes tiempo para actuar...",
                             "Tu cuerpo comienza a desvanecerse...","Ya no puedes seguir resistiendo..."};
         if(jugador.Salud > 0){
-            caja_batalla.Escribir(textos[rnd.Next(0,2)]+"\n\n",0,4);
+            caja_batalla.EscribirAnim(textos[rnd.Next(0,2)]+"\n\n",0,4);
             return BattleStates.Turno_jugador;
         }else{
-            caja_batalla.Escribir(textos[rnd.Next(2,4)]+"\n\n",0,4);
+            caja_batalla.EscribirAnim(textos[rnd.Next(2,4)]+"\n\n",0,4);
             return BattleStates.Jugador_derrotado;
         }
     }
@@ -459,7 +459,7 @@ static class Battle{
             estado_salida = GameStates.Battle; //En una segunda batalla, en caso de 'escapar', iria a cualquier otro estado y no se quedaria con el estado de la anterior
         }
 
-        caja_batalla.Escribir(texto,(caja_batalla.Width - texto.Length)/2 -3,3);
+        caja_batalla.EscribirAnim(texto,(caja_batalla.Width - texto.Length)/2 -3,3);
         while(Console.ReadKey(true).Key != ConsoleKey.Enter);
         Console.SetCursorPosition(0,0);
         for (int i = 0; i < 18; i++)

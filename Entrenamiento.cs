@@ -12,6 +12,7 @@ enum EntrenamientoStates
 }
 
 static class Entrenamiento{
+    static EntrenamientoStates estado_actual;
     static Guerrero jugador;
     static Caja sideCaja;
     static Caja mainCaja;
@@ -33,6 +34,91 @@ static class Entrenamiento{
         Console.Write(string.Format("{0,-35}{1,35}","Ataque: 000","Defensa: 000"));
         Console.SetCursorPosition(21,16);
         Console.Write(string.Format("{0,-35}{1,35}","Agresividad: 000","Velocidad de carga: 000"));
+        iniciarMaquina(EntrenamientoStates.Menu);
+    }
+    
+    static EntrenamientoStates menuState(){
+        Console.SetCursorPosition(sideCaja.CursorWritter.Left+3,sideCaja.CursorWritter.Top+3);
+        Console.Write("Entrenar");
+        Console.SetCursorPosition(sideCaja.CursorWritter.Left+3,Console.CursorTop+2);
+        Console.Write("Explorar");
+        Console.SetCursorPosition(sideCaja.CursorWritter.Left+3,Console.CursorTop+2);
+        Console.Write("Dormir");
+        Console.SetCursorPosition(sideCaja.CursorWritter.Left+3,Console.CursorTop+2);
+        Console.Write("Comer");
+
+        bool actualizaMenu = true;
+        int opciones = 0;
+        while (true)
+        {
+            if(actualizaMenu){
+                switch (opciones)
+                {
+                    case 0:
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,sideCaja.CursorWritter.Top+3);
+                        Console.Write("■");
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write(" ");                        
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write(" ");                        
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write(" ");
+
+                        mainCaja.Escribir("Hola\ncomo");
+                        break;
+                    case 1:
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,sideCaja.CursorWritter.Top+3);
+                        Console.Write(" ");                        
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write("■");
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write(" ");                        
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write(" ");
+                        break;
+                    case 2:
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,sideCaja.CursorWritter.Top+3);
+                        Console.Write(" ");                        
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write(" ");                        
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write("■");
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write(" ");
+                        break;
+                    case 3:
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,sideCaja.CursorWritter.Top+3);
+                        Console.Write(" ");                        
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write(" ");                        
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write(" ");
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
+                        Console.Write("■");
+                        break;
+                }
+                actualizaMenu=false;
+            }
+            ConsoleKey k = Console.ReadKey(true).Key;
+            if(k == ConsoleKey.DownArrow){
+                opciones = (opciones>=3) ? 0:opciones+1;
+                actualizaMenu=true;
+            }else if(k == ConsoleKey.UpArrow){
+                opciones = (opciones<=0) ? 3:opciones-1;
+                actualizaMenu=true;
+            }
+        }
+    }
+    static void iniciarMaquina(EntrenamientoStates nuevo_estado){
+        estado_actual = nuevo_estado;
+        bool salir = false;
+        while(!salir){
+            switch(estado_actual){
+                case EntrenamientoStates.Menu:
+                    estado_actual = menuState();
+                    break;
+            }
+        }
     }
     static void updateVida(){
         float cocienteSalud = (float) jugador.Salud/jugador.Information.salud_max * 25;
@@ -42,4 +128,6 @@ static class Entrenamiento{
         Console.Write(line);
         
     }
+
+
 }

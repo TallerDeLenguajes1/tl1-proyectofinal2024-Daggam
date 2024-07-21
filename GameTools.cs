@@ -64,8 +64,16 @@ class Caja{
         Console.WriteLine("╚"+new string('═',width-2)+"╝");
         cursorWritter = (Left: x+2,Top:y+1);
     }
-    public void Escribir(string text, int xlocal=0,int ylocal=0,int speed=25){
+    public void EscribirAnim(string text, int xlocal=0,int ylocal=0,int speed=25){
         Console.SetCursorPosition(cursorWritter.Left + xlocal,cursorWritter.Top + ylocal);
         Text.Start(text,speed);
+    }
+    public void Escribir(string text,int xlocal=0,int ylocal=0){
+        string[] sub = text.Split('\n');
+        Console.SetCursorPosition(cursorWritter.Left + xlocal,cursorWritter.Top + ylocal);
+        foreach(string s in sub){
+            Console.Write(s);
+            Console.SetCursorPosition(cursorWritter.Left + xlocal,Console.CursorTop+1);
+        };
     }
 }
