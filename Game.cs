@@ -5,8 +5,8 @@ using GuerreroNamespace;
 using BattleNamespace;
 using System.Text;
 using System.Text.Json;
-using Microsoft.VisualBasic;
 using System.Text.Json.Serialization;
+using EntrenamientoNamespace;
 
 enum GameStates{
     Menu,Seleccionar_personaje,Info,Quit,
@@ -23,7 +23,7 @@ static class Game{
     static List<string> allWarriorsPaths = new List<string>();
 
     static List<Planeta> allPlanets;
-    static Guerrero jugador;
+    public static Guerrero jugador;
 
     public static List<Planeta> AllPlanets { get => allPlanets;}
 
@@ -252,7 +252,7 @@ static class Game{
     
     //Estado de entrenamiento
     static GameStates entrenamientoState(){
-
+        Entrenamiento.Start();
         while (true)
         {
             
