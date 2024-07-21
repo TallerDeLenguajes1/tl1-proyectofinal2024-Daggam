@@ -5,6 +5,8 @@ using GuerreroNamespace;
 using BattleNamespace;
 using System.Text;
 using System.Text.Json;
+using Microsoft.VisualBasic;
+using System.Text.Json.Serialization;
 
 enum GameStates{
     Menu,Seleccionar_personaje,Info,Quit,
@@ -18,9 +20,11 @@ static class Game{
     static public (ConsoleColor bg, ConsoleColor fg) consoleColor = (bg: ConsoleColor.Black, fg: ConsoleColor.DarkCyan);
 
     static List<GuerreroInfo> allWarriors = new List<GuerreroInfo>();
+
+    static List<Planeta> allPlanets;
     static Guerrero jugador;
 
-    public static void GameInit(int xres, int yres)
+    public static async Task GameInit(int xres, int yres)
     {
         Console.CursorVisible = false;
         Console.SetWindowSize(xres,yres);
@@ -33,9 +37,18 @@ static class Game{
             GuerreroInfo w = JsonSerializer.Deserialize<GuerreroInfo>(contenido);
             allWarriors.Add(w);
         }
-        //Meter una introducción para dar a conocer los controles.
-        iniciarMaquina(GameStates.Menu);
-        
+        //Esperamos hasta que carguen los planetas
+        Console.SetCursorPosition(0,8);
+        Text.WriteCenter("CARGANDO API... ESPERE UNOS SEGUNDOS...",xres);
+        allPlanets = await getPlanetsAsync();
+        if(allPlanets!=null){
+            //Meter una introducción para dar a conocer los controles.
+            iniciarMaquina(GameStates.Menu);
+        }else{
+            Console.Clear();
+            Console.Write("LA INFORMACIÓN NO HA SIDO CARGADA CORRECTAMENTE.\n[ENTER PARA SALIR]");
+            while(Console.ReadKey(true).Key!=ConsoleKey.Enter);
+        }
     }
 
     static GameStates menuState(){
@@ -168,6 +181,7 @@ static class Game{
         //Podría agregar un estado para que confirme su personaje
         //Busqueda de personaje.
         jugador = new Guerrero(allWarriors[opciones.actual]);
+        jugador.Information.ataque=0;
 
         return GameStates.Battle;
     }
@@ -222,6 +236,8 @@ static class Game{
     
     //Estado de batalla
     static GameStates battleState(){
+        //Elegimos 5 planetas de la API.
+        
         Guerrero enemigo = new Guerrero(allWarriors[0]); //No los modifica de manera directa
         var proximo_estado = Battle.Start(jugador,enemigo); //El jugador es pasado como referencia
         //El jugador podría no ser pasado como referencia y utilizar Game.jugador (haciendolo publico)
@@ -265,6 +281,7 @@ static class Game{
 
         return (continuar) ? GameStates.Seleccionar_personaje:GameStates.Salir_juego;
     }
+    
     static void iniciarMaquina(GameStates nuevoEstado){
         bool salir=false;
         estadoActual = nuevoEstado;
@@ -296,4 +313,34 @@ static class Game{
 
         }
     }
+
+    //FUNCION QUE ME RETORNA UN DICCIONARIO CON 
+    static async Task<List<Planeta>> getPlanetsAsync(){
+        var url = "https://dragonball-api.com/api/planets?page=1&limit=5"; //Obtenemos los primeros 5 planetas.
+        try{
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            string contenido = await response.Content.ReadAsStringAsync();
+            List<Planeta> planetas;
+            using(JsonDocument jdoc = JsonDocument.Parse(contenido)){
+                JsonElement items = jdoc.RootElement.GetProperty("items");
+                planetas = JsonSerializer.Deserialize<List<Planeta>>(items);
+            }
+            return planetas;
+        }catch(HttpRequestException e)
+        {
+            return null;
+        }
+    }
+}
+
+class Planeta    
+{
+        [JsonPropertyName("id")]
+        public int id { get; set; }
+
+        [JsonPropertyName("name")]
+        public string name { get; set; }
+
 }
