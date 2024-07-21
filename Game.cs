@@ -19,7 +19,8 @@ static class Game{
     static GameStates estadoActual;
     static public (ConsoleColor bg, ConsoleColor fg) consoleColor = (bg: ConsoleColor.Black, fg: ConsoleColor.DarkCyan);
 
-    static List<GuerreroInfo> allWarriors = new List<GuerreroInfo>();
+    // static List<GuerreroInfo> allWarriors = new List<GuerreroInfo>();
+    static List<string> allWarriorsPaths = new List<string>();
 
     static List<Planeta> allPlanets;
     static Guerrero jugador;
@@ -34,11 +35,12 @@ static class Game{
         Console.BackgroundColor = consoleColor.bg;
         Console.ForegroundColor = consoleColor.fg;
         //CARGAMOS LOS GUERREROS
-        foreach (string filepath in Directory.EnumerateFiles("Personajes","*.json")){
-            string contenido = File.ReadAllText(filepath);
-            GuerreroInfo w = JsonSerializer.Deserialize<GuerreroInfo>(contenido);
-            allWarriors.Add(w);
-        }
+        allWarriorsPaths = Directory.EnumerateFiles("Personajes","*.json").ToList();
+        // foreach (string filepath in ){
+        //     string contenido = File.ReadAllText(filepath);
+        //     GuerreroInfo w = JsonSerializer.Deserialize<GuerreroInfo>(contenido);
+        //     allWarriors.Add(w);
+        // }
         //Esperamos hasta que carguen los planetas
         Console.SetCursorPosition(0,8);
         Text.WriteCenter("CARGANDO API... ESPERE UNOS SEGUNDOS...",xres);
@@ -126,11 +128,16 @@ static class Game{
         Caja cajaSeleccionadora = new Caja(2,1,101,11);
         Text.WriteCenter("Selecciona un personaje",Console.WindowWidth);
         (int x, int y) cursorPos = cajaSeleccionadora.CursorWritter;
+        List<string> nombreGuerreros = new List<string>();
 
+        foreach (string path in allWarriorsPaths)
+        {
+            nombreGuerreros.Add(getGuerreroInfo(path).nombre);
+        }
         for (int i = 1; i <= 20; i++)
         {
             Console.SetCursorPosition(cursorPos.x,cursorPos.y);
-            Console.WriteLine(allWarriors[i-1].nombre);
+            Console.WriteLine(nombreGuerreros[i-1]);
             if(i%5==0){
                 cursorPos.x +=26;
                 cursorPos.y = cajaSeleccionadora.CursorWritter.Top;
@@ -146,13 +153,13 @@ static class Game{
             if(updateSelectores){
                 Console.CursorLeft = cajaSeleccionadora.CursorWritter.Left + (opciones.anterior/5)*26;
                 Console.CursorTop = cajaSeleccionadora.CursorWritter.Top + (opciones.anterior%5)*2;
-                Console.Write(allWarriors[opciones.anterior].nombre);
+                Console.Write(nombreGuerreros[opciones.anterior]);
                 
                 Console.CursorLeft = cajaSeleccionadora.CursorWritter.Left + (opciones.actual/5)*26;
                 Console.CursorTop = cajaSeleccionadora.CursorWritter.Top + (opciones.actual%5)*2;
                 Console.BackgroundColor = ConsoleColor.White;
                 Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write(allWarriors[opciones.actual].nombre);
+                Console.Write(nombreGuerreros[opciones.actual]);
                 Console.BackgroundColor = consoleColor.bg;
                 Console.ForegroundColor = consoleColor.fg;
                 updateSelectores=false;
@@ -182,7 +189,7 @@ static class Game{
         }
         //Podría agregar un estado para que confirme su personaje
         //Busqueda de personaje.
-        jugador = new Guerrero(allWarriors[opciones.actual]);
+        jugador = new Guerrero(getGuerreroInfo(allWarriorsPaths[opciones.actual]));
         return GameStates.Battle;
     }
     static GameStates infoState(){
@@ -236,7 +243,7 @@ static class Game{
     
     //Estado de batalla
     static GameStates battleState(){
-        Guerrero enemigo = new Guerrero(allWarriors[0]); //No los modifica de manera directa
+        Guerrero enemigo = new Guerrero(getGuerreroInfo(allWarriorsPaths[0])); //No los modifica de manera directa
         var proximo_estado = Battle.Start(jugador,enemigo); //El jugador es pasado como referencia
         //El jugador podría no ser pasado como referencia y utilizar Game.jugador (haciendolo publico)
         //Y solamente pasar el enemigo como nuevo parametro
@@ -330,6 +337,12 @@ static class Game{
         {
             return null;
         }
+    }
+
+    //FUNCIONES MISCELÁNEAS.
+    static GuerreroInfo getGuerreroInfo(string wPath){
+        string contenido = File.ReadAllText(wPath);
+        return JsonSerializer.Deserialize<GuerreroInfo>(contenido);
     }
 }
 
