@@ -17,25 +17,26 @@ static class Entrenamiento{
     static Caja sideCaja;
     static Caja mainCaja;
 
-    static int dias_entrenamiento = 1;
+    static int dias_entrenamiento;
     //Comienza el modo entrenamiento
     static public void Start(){
         jugador = Game.jugador;
         sideCaja = new Caja(1,1,16,16);
         mainCaja = new Caja(21,1,70,8);
+        dias_entrenamiento = 1;
         // jugador.Salud /= 80; 
         //Printeamos la UI del personaje.
         Console.SetCursorPosition(21,10);
         Console.Write("Salud: ");
         updateVida();
         Console.SetCursorPosition(82,10);
-        Console.Write($"Nivel {0,3}");
+        Console.Write($"Nivel {jugador.Entrenamiento.Nivel,3:D2}");
         Console.SetCursorPosition(21,12);
         Text.WriteCenter("-- CARACTERISTICAS ADICIONALES--",70);
         Console.SetCursorPosition(21,14);
-        Console.Write(string.Format("{0,-35}{1,35}","Ataque: 000","Defensa: 000"));
+        Console.Write(string.Format("{0,-35}{1,35}",$"Ataque: {jugador.Entrenamiento.Ataque:D2}",$"Defensa: {jugador.Entrenamiento.Defensa,3:D2}"));
         Console.SetCursorPosition(21,16);
-        Console.Write(string.Format("{0,-35}{1,35}","Agresividad: 000","Velocidad de carga: 000"));
+        Console.Write(string.Format("{0,-35}{1,35}",$"Agresividad: {jugador.Entrenamiento.Agresividad:D2}",$"Velocidad de carga: {jugador.Entrenamiento.Velocidad_carga,3:D2}"));
         sideCaja.Escribir($"Día {dias_entrenamiento:D2} / 20",0,1);
         
         
@@ -122,6 +123,7 @@ static class Entrenamiento{
             }else if(k== ConsoleKey.Enter) break;
         }
 
+        return EntrenamientoStates.Menu;
     }
     static void iniciarMaquina(EntrenamientoStates nuevo_estado){
         estado_actual = nuevo_estado;
