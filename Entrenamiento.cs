@@ -16,6 +16,8 @@ static class Entrenamiento{
     static Guerrero jugador;
     static Caja sideCaja;
     static Caja mainCaja;
+
+    static int dias_entrenamiento = 1;
     //Comienza el modo entrenamiento
     static public void Start(){
         jugador = Game.jugador;
@@ -34,11 +36,14 @@ static class Entrenamiento{
         Console.Write(string.Format("{0,-35}{1,35}","Ataque: 000","Defensa: 000"));
         Console.SetCursorPosition(21,16);
         Console.Write(string.Format("{0,-35}{1,35}","Agresividad: 000","Velocidad de carga: 000"));
+        sideCaja.Escribir($"Día {dias_entrenamiento:D2} / 20",0,1);
+        
+        
         iniciarMaquina(EntrenamientoStates.Menu);
     }
     
     static EntrenamientoStates menuState(){
-        Console.SetCursorPosition(sideCaja.CursorWritter.Left+3,sideCaja.CursorWritter.Top+3);
+        Console.SetCursorPosition(sideCaja.CursorWritter.Left+3,sideCaja.CursorWritter.Top+5);
         Console.Write("Entrenar");
         Console.SetCursorPosition(sideCaja.CursorWritter.Left+3,Console.CursorTop+2);
         Console.Write("Explorar");
@@ -52,10 +57,11 @@ static class Entrenamiento{
         while (true)
         {
             if(actualizaMenu){
+                Text.borrarSeccion(22,2,68,5);
                 switch (opciones)
                 {
                     case 0:
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,sideCaja.CursorWritter.Top+3);
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,sideCaja.CursorWritter.Top+5);
                         Console.Write("■");
                         Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
                         Console.Write(" ");                        
@@ -64,10 +70,10 @@ static class Entrenamiento{
                         Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
                         Console.Write(" ");
 
-                        mainCaja.Escribir("Hola\ncomo");
+                        mainCaja.Escribir("Entrenando ganarás fuerza y resistencia, pero pierdes algo de\nsalud. (+ Ataque ) (+ Defensa) (- Salud)\n\nCuidado: Si te exiges demasiado, tu cuerpo se debilitará por el\nexceso de entrenamiento. (- Ataque) (- Defensa) (- Salud)");
                         break;
                     case 1:
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,sideCaja.CursorWritter.Top+3);
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,sideCaja.CursorWritter.Top+5);
                         Console.Write(" ");                        
                         Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
                         Console.Write("■");
@@ -75,9 +81,11 @@ static class Entrenamiento{
                         Console.Write(" ");                        
                         Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
                         Console.Write(" ");
+
+                        mainCaja.Escribir("¡Puedes encontrar cosas interesantes si exploras el mundo!\n\nComo también puede ser una completa perdida de tiempo...");
                         break;
                     case 2:
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,sideCaja.CursorWritter.Top+3);
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,sideCaja.CursorWritter.Top+5);
                         Console.Write(" ");                        
                         Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
                         Console.Write(" ");                        
@@ -85,9 +93,11 @@ static class Entrenamiento{
                         Console.Write("■");
                         Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
                         Console.Write(" ");
+
+                        mainCaja.Escribir("Dormir te ayudará a recuperarte más rápido...\nA costa de algo de tu entrenamiento.\n\n(- Ataque) (- Defensa) (+ Salud)");
                         break;
                     case 3:
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,sideCaja.CursorWritter.Top+3);
+                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,sideCaja.CursorWritter.Top+5);
                         Console.Write(" ");                        
                         Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
                         Console.Write(" ");                        
@@ -95,6 +105,9 @@ static class Entrenamiento{
                         Console.Write(" ");
                         Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
                         Console.Write("■");
+
+                        mainCaja.Escribir("Comerás una semilla del ermitaño que recuperará tu salud por\ncompleto.\n\nSOLO PUEDES COMER UNA SEMILLA EN TODA LA PARTIDA.");
+
                         break;
                 }
                 actualizaMenu=false;
@@ -106,8 +119,9 @@ static class Entrenamiento{
             }else if(k == ConsoleKey.UpArrow){
                 opciones = (opciones<=0) ? 3:opciones-1;
                 actualizaMenu=true;
-            }
+            }else if(k== ConsoleKey.Enter) break;
         }
+
     }
     static void iniciarMaquina(EntrenamientoStates nuevo_estado){
         estado_actual = nuevo_estado;
