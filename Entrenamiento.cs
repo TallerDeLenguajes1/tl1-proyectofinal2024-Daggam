@@ -7,7 +7,8 @@ namespace EntrenamientoNamespace;
 enum EntrenamientoStates
 {
     Menu,
-    Entrenar,Explorar,Dormir,Comer_semilla,
+    Entrenar_menu,Explorar,Dormir,Comer_semilla,
+    Entrenar_ofensivo, Entrenar_defensivo, Entrenar_intensivo,
     Fin_entrenamiento
 }
 
@@ -18,6 +19,7 @@ static class Entrenamiento{
     static Caja mainCaja;
 
     static int dias_entrenamiento;
+    static decimal grado_cansancio = 0.0m;
     //Comienza el modo entrenamiento
     static public void Start(){
         jugador = Game.jugador;
@@ -30,29 +32,21 @@ static class Entrenamiento{
         Console.Write("Salud: ");
         updateVida();
         Console.SetCursorPosition(82,10);
-        Console.Write($"Nivel {jugador.Entrenamiento.Nivel,3:D2}");
+        Console.Write($"Nivel {jugador.Entrenamiento.Nivel,3}");
         Console.SetCursorPosition(21,12);
         Text.WriteCenter("-- CARACTERISTICAS ADICIONALES--",70);
         Console.SetCursorPosition(21,14);
-        Console.Write(string.Format("{0,-35}{1,35}",$"Ataque: {jugador.Entrenamiento.Ataque:D2}",$"Defensa: {jugador.Entrenamiento.Defensa,3:D2}"));
+        Console.Write(string.Format("{0,-35}{1,35}",$"Ataque: {jugador.Entrenamiento.Ataque:D2} / {15*jugador.Entrenamiento.Nivel}",$"Defensa: {jugador.Entrenamiento.Defensa,3:D2} / {15*jugador.Entrenamiento.Nivel}"));
         Console.SetCursorPosition(21,16);
-        Console.Write(string.Format("{0,-35}{1,35}",$"Agresividad: {jugador.Entrenamiento.Agresividad:D2}",$"Velocidad de carga: {jugador.Entrenamiento.Velocidad_carga,3:D2}"));
-        sideCaja.Escribir($"Día {dias_entrenamiento:D2} / 20",0,1);
-        
-        
+        Console.Write(string.Format("{0,-35}{1,35}",$"Agresividad: {jugador.Entrenamiento.Agresividad:D2} / {15*jugador.Entrenamiento.Nivel}",$"Velocidad de carga: {jugador.Entrenamiento.Velocidad_carga,3:D2} / {15*jugador.Entrenamiento.Nivel}"));
+        // sideCaja.Escribir($"Día {dias_entrenamiento:D2} / 20",0,1);
+        sideCaja.Escribir("Entrenar\n\nExplorar\n\nDormir\n\nComer",3,5);
         iniciarMaquina(EntrenamientoStates.Menu);
     }
     
     static EntrenamientoStates menuState(){
-        Console.SetCursorPosition(sideCaja.CursorWritter.Left+3,sideCaja.CursorWritter.Top+5);
-        Console.Write("Entrenar");
-        Console.SetCursorPosition(sideCaja.CursorWritter.Left+3,Console.CursorTop+2);
-        Console.Write("Explorar");
-        Console.SetCursorPosition(sideCaja.CursorWritter.Left+3,Console.CursorTop+2);
-        Console.Write("Dormir");
-        Console.SetCursorPosition(sideCaja.CursorWritter.Left+3,Console.CursorTop+2);
-        Console.Write("Comer");
-
+        if(dias_entrenamiento==10);//Termina todo
+        sideCaja.Escribir($"Día {dias_entrenamiento:D2} / 10",0,1);
         bool actualizaMenu = true;
         int opciones = 0;
         while (true)
@@ -62,53 +56,20 @@ static class Entrenamiento{
                 switch (opciones)
                 {
                     case 0:
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,sideCaja.CursorWritter.Top+5);
-                        Console.Write("■");
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
-                        Console.Write(" ");                        
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
-                        Console.Write(" ");                        
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
-                        Console.Write(" ");
-
-                        mainCaja.Escribir("Entrenando ganarás fuerza y resistencia, pero pierdes algo de\nsalud. (+ Ataque ) (+ Defensa) (- Salud)\n\nCuidado: Si te exiges demasiado, tu cuerpo se debilitará por el\nexceso de entrenamiento. (- Ataque) (- Defensa) (- Salud)");
+                        sideCaja.Escribir("■\n\n \n\n \n\n ",1,5);
+                        mainCaja.Escribir("[Entrenar]\n\nGanarás fuerza y resistencia a cambio de salud.");
                         break;
                     case 1:
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,sideCaja.CursorWritter.Top+5);
-                        Console.Write(" ");                        
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
-                        Console.Write("■");
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
-                        Console.Write(" ");                        
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
-                        Console.Write(" ");
-
-                        mainCaja.Escribir("¡Puedes encontrar cosas interesantes si exploras el mundo!\n\nComo también puede ser una completa perdida de tiempo...");
+                        sideCaja.Escribir(" \n\n■\n\n \n\n ",1,5);
+                        mainCaja.Escribir("[Explorar]\n\n¡Puedes encontrar cosas interesantes si exploras el mundo!\nComo también puede ser una completa perdida de tiempo...");
                         break;
                     case 2:
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,sideCaja.CursorWritter.Top+5);
-                        Console.Write(" ");                        
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
-                        Console.Write(" ");                        
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
-                        Console.Write("■");
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
-                        Console.Write(" ");
-
-                        mainCaja.Escribir("Dormir te ayudará a recuperarte más rápido...\nA costa de algo de tu entrenamiento.\n\n(- Ataque) (- Defensa) (+ Salud)");
+                        sideCaja.Escribir(" \n\n \n\n■\n\n ",1,5);
+                        mainCaja.Escribir("[Dormir]\n\nDescansar te ayudará a recuperarte más rápido...\nA costa de algo de tu entrenamiento.");
                         break;
                     case 3:
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,sideCaja.CursorWritter.Top+5);
-                        Console.Write(" ");                        
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
-                        Console.Write(" ");                        
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
-                        Console.Write(" ");
-                        Console.SetCursorPosition(sideCaja.CursorWritter.Left+1,Console.CursorTop+2);
-                        Console.Write("■");
-
-                        mainCaja.Escribir("Comerás una semilla del ermitaño que recuperará tu salud por\ncompleto.\n\nSOLO PUEDES COMER UNA SEMILLA EN TODA LA PARTIDA.");
-
+                        sideCaja.Escribir(" \n\n \n\n \n\n■",1,5);
+                        mainCaja.Escribir("[Semilla del ermitaño]\n\nComerás una semilla del ermitaño que recuperará tu salud por\ncompleto.\n\nSOLO PUEDES COMER UNA SEMILLA EN TODA LA PARTIDA.");
                         break;
                 }
                 actualizaMenu=false;
@@ -123,19 +84,154 @@ static class Entrenamiento{
             }else if(k== ConsoleKey.Enter) break;
         }
 
+        Text.borrarSeccion(22,2,68,5);
+        sideCaja.Escribir(" ",1,5+2*opciones);
+        return (EntrenamientoStates) (opciones+1);
+    }
+    
+    static EntrenamientoStates entrenarMenuState(){
+        sideCaja.Escribir("Ent. Of.\n\nEnt. Def.\n\nEnt. Int.\n\nVolver",3,5);
+        bool actualizaMenu = true;
+        int opciones = 0;
+        while (true)
+        {
+            if(actualizaMenu){
+                Text.borrarSeccion(22,2,68,5);
+                switch (opciones)
+                {
+                    case 0:
+                        sideCaja.Escribir("■\n\n \n\n \n\n ",1,5);
+                        mainCaja.Escribir("[Entrenamiento Ofensivo]\n\nEs un entrenamiento basado en el ataque.");
+                        break;
+                    case 1:
+                        sideCaja.Escribir(" \n\n■\n\n \n\n ",1,5);
+                        mainCaja.Escribir("[Entrenamiento Defensivo]\n\nEs un entrenamiento basado en la defensa.");
+                        break;
+                    case 2:
+                        sideCaja.Escribir(" \n\n \n\n■\n\n ",1,5);
+                        mainCaja.Escribir("[Entrenamiento Intensivo]\n\nEntrena tu cuerpo al límite. Consume mucha salud.");
+                        break;
+                    case 3:
+                        sideCaja.Escribir(" \n\n \n\n \n\n■",1,5);
+                        mainCaja.Escribir("[Volver]\n\nRegresa al menú de selección.");
+                        break;
+                }
+                actualizaMenu=false;
+            }
+            ConsoleKey k = Console.ReadKey(true).Key;
+            if(k == ConsoleKey.DownArrow){
+                opciones = (opciones>=3) ? 0:opciones+1;
+                actualizaMenu=true;
+            }else if(k == ConsoleKey.UpArrow){
+                opciones = (opciones<=0) ? 3:opciones-1;
+                actualizaMenu=true;
+            }else if(k== ConsoleKey.Enter) break;
+        }
+        Text.borrarSeccion(22,2,68,5);
+        sideCaja.Escribir("Entrenar\n\nExplorar \n\nDormir   \n\nComer ",3,5);
+        if(opciones!=3) {
+            sideCaja.Escribir(" ",1,5+2*opciones);
+            return (EntrenamientoStates) (opciones+5);
+        }else{
+            return EntrenamientoStates.Menu;
+        }
+    }
+    
+    static EntrenamientoStates entrenarState(){
+        Random rnd = new Random();
+        string[] textos = {"Te has sobreentrenado.","No has obtenido resultados.", "Tu entrenamiento sirvio de algo.","¡Has despertado parte de tu poder oculto!"};
+        float efectividad = rnd.NextSingle();
+        int nuevo_ataque = 0, nueva_defensa = 0,vida_quitada = 0;
+        mainCaja.EscribirAnim("Entrenando...");
+        Thread.Sleep(1000);
+        switch(estado_actual){
+            case EntrenamientoStates.Entrenar_ofensivo:
+            case EntrenamientoStates.Entrenar_defensivo:
+                int principal = 0;
+                if(efectividad < 0.1 ){
+                    mainCaja.EscribirAnim(textos[3],0,2);
+                    principal = rnd.Next(10,16);
+                }else if( efectividad < 0.4){
+                    mainCaja.EscribirAnim(textos[1],0,2);
+                }else{
+                    mainCaja.EscribirAnim(textos[2],0,2);
+                    principal = rnd.Next(1,6);
+                };
+                vida_quitada = (int) Math.Ceiling(jugador.Information.salud_max * 0.1);
+                if(estado_actual == EntrenamientoStates.Entrenar_defensivo){
+                    nueva_defensa = principal;
+                    nuevo_ataque--;
+                }else{
+                    nuevo_ataque = principal;
+                    nueva_defensa--;
+                }
+                break;
+            case EntrenamientoStates.Entrenar_intensivo:
+                if(efectividad<0.5){
+                    mainCaja.EscribirAnim(textos[0],0,2);
+                    nueva_defensa = -rnd.Next(5,11);
+                    nuevo_ataque = -rnd.Next(5,11);
+                }else{
+                    mainCaja.EscribirAnim(textos[3],0,2);
+                    nueva_defensa = rnd.Next(5,11);
+                    nuevo_ataque = rnd.Next(5,11);
+                }
+                vida_quitada = (int) Math.Ceiling(jugador.Information.salud_max * 0.2);
+                break;
+        }
+    for (int i = Math.Abs(nuevo_ataque); i > 0; i--)
+    {
+        jugador.Entrenamiento.Ataque = Math.Min(Math.Max(0,jugador.Entrenamiento.Ataque + Math.Sign(nuevo_ataque)), 15* jugador.Entrenamiento.Nivel);
+        Console.SetCursorPosition(21,14);
+        Console.Write(string.Format("{0,-35}",$"Ataque: {jugador.Entrenamiento.Ataque:D2} / {15*jugador.Entrenamiento.Nivel}"));
+        Thread.Sleep(50);
+    }
+    for (int i = Math.Abs(nueva_defensa); i > 0; i--)
+    {
+        jugador.Entrenamiento.Defensa = Math.Min(Math.Max(0,jugador.Entrenamiento.Defensa + Math.Sign(nueva_defensa)), 15* jugador.Entrenamiento.Nivel);
+        Console.SetCursorPosition(56,14);
+        Console.Write(string.Format("{0,35}",$"Defensa: {jugador.Entrenamiento.Defensa,3:D2} / {15*jugador.Entrenamiento.Nivel}"));
+        Thread.Sleep(50);
+    }
+        
+        int salud_gastada = jugador.Salud - vida_quitada;
+        while(true){
+            jugador.Salud = Math.Max(salud_gastada,jugador.Salud-250);
+            updateVida();
+            if(jugador.Salud == salud_gastada){
+                break;
+            }
+            Thread.Sleep(50);
+        }
+        mainCaja.EscribirAnim($"[ {nuevo_ataque:+#;-#;0} ATAQUE ] [ {nueva_defensa:+#;-#;0} DEFENSA ]",0,3);
+        dias_entrenamiento++;
         return EntrenamientoStates.Menu;
     }
     static void iniciarMaquina(EntrenamientoStates nuevo_estado){
+        EntrenamientoStates estado_previo;
         estado_actual = nuevo_estado;
         bool salir = false;
         while(!salir){
+            estado_previo = estado_actual;
             switch(estado_actual){
                 case EntrenamientoStates.Menu:
                     estado_actual = menuState();
                     break;
+                case EntrenamientoStates.Entrenar_menu:
+                    estado_actual = entrenarMenuState();
+                    break;
+                case EntrenamientoStates.Entrenar_ofensivo:
+                case EntrenamientoStates.Entrenar_defensivo:
+                case EntrenamientoStates.Entrenar_intensivo:
+                    estado_actual = entrenarState();
+                    break;
+            }
+            if(estado_actual == EntrenamientoStates.Entrenar_menu){
+
             }
         }
     }
+    
     static void updateVida(){
         float cocienteSalud = (float) jugador.Salud/jugador.Information.salud_max * 25;
         string barra = new string('▓',(int) Math.Ceiling(cocienteSalud)) + new string('▒',25 - (int) Math.Ceiling(cocienteSalud));
@@ -145,5 +241,7 @@ static class Entrenamiento{
         
     }
 
+    static void updateCaracteristicas(GuerreroEntrenamiento wc){
 
+    }
 }

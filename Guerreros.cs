@@ -60,7 +60,7 @@ public class Guerrero{
 
 
 public class GuerreroEntrenamiento{
-    public int Nivel = 100;
+    public int Nivel = 1;
     public int Salud_max = 0;
     public int Ataque = 0;
     public int Defensa = 0;
