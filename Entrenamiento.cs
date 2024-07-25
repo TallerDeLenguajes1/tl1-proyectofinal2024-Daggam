@@ -1,3 +1,4 @@
+using System.Text;
 using GameNamespace;
 using GuerreroNamespace;
 using ToolNamespace;
@@ -19,14 +20,14 @@ static class Entrenamiento{
     static Caja mainCaja;
 
     static int dias_entrenamiento;
-    static decimal grado_cansancio = 0.0m;
+    static bool comioSemilla = false;
     //Comienza el modo entrenamiento
     static public void Start(){
         jugador = Game.jugador;
         sideCaja = new Caja(1,1,16,16);
         mainCaja = new Caja(21,1,70,8);
         dias_entrenamiento = 1;
-        // jugador.Salud /= 80; 
+        jugador.Salud = 50; 
         //Printeamos la UI del personaje.
         Console.SetCursorPosition(21,10);
         Console.Write("Salud: ");
@@ -49,39 +50,32 @@ static class Entrenamiento{
         sideCaja.Escribir($"Día {dias_entrenamiento:D2} / 10",0,1);
         bool actualizaMenu = true;
         int opciones = 0;
+        string[] textosMain = {"[Entrenar]\n\nGanarás fuerza y resistencia a cambio de salud.",
+                               "[Explorar]\n\n¡Puedes encontrar cosas interesantes si exploras el mundo!\nComo también puede ser una completa perdida de tiempo...",
+                               "[Dormir]\n\nDescansar te ayudará a recuperarte más rápido...\nA costa de algo de tu entrenamiento.",
+                               "[Semilla del ermitaño]\n\nComerás una semilla del ermitaño que recuperará tu salud por\ncompleto.\n\nSOLO PUEDES COMER UNA SEMILLA EN TODA LA PARTIDA."};
+        int opcLim = (comioSemilla) ? 2:3;
         while (true)
         {
             if(actualizaMenu){
                 Text.borrarSeccion(22,2,68,5);
-                switch (opciones)
-                {
-                    case 0:
-                        sideCaja.Escribir("■\n\n \n\n \n\n ",1,5);
-                        mainCaja.Escribir("[Entrenar]\n\nGanarás fuerza y resistencia a cambio de salud.");
-                        break;
-                    case 1:
-                        sideCaja.Escribir(" \n\n■\n\n \n\n ",1,5);
-                        mainCaja.Escribir("[Explorar]\n\n¡Puedes encontrar cosas interesantes si exploras el mundo!\nComo también puede ser una completa perdida de tiempo...");
-                        break;
-                    case 2:
-                        sideCaja.Escribir(" \n\n \n\n■\n\n ",1,5);
-                        mainCaja.Escribir("[Dormir]\n\nDescansar te ayudará a recuperarte más rápido...\nA costa de algo de tu entrenamiento.");
-                        break;
-                    case 3:
-                        sideCaja.Escribir(" \n\n \n\n \n\n■",1,5);
-                        mainCaja.Escribir("[Semilla del ermitaño]\n\nComerás una semilla del ermitaño que recuperará tu salud por\ncompleto.\n\nSOLO PUEDES COMER UNA SEMILLA EN TODA LA PARTIDA.");
-                        break;
+                StringBuilder str = new StringBuilder(" \n\n \n\n \n\n ") ;
+                str[opciones*3] = '■';
+                sideCaja.Escribir(str.ToString(),1,5);
+                mainCaja.Escribir(textosMain[opciones]);
+                if(jugador.Salud <= jugador.Information.salud_max*0.2 && (opciones==0 || opciones==1)){
+                    mainCaja.Escribir($"[ NO LO PUEDES REALIZAR. TU SALUD ES MENOR AL 20% ]",0,5);
                 }
                 actualizaMenu=false;
             }
             ConsoleKey k = Console.ReadKey(true).Key;
             if(k == ConsoleKey.DownArrow){
-                opciones = (opciones>=3) ? 0:opciones+1;
+                opciones = (opciones>=opcLim) ? 0:opciones+1;
                 actualizaMenu=true;
             }else if(k == ConsoleKey.UpArrow){
-                opciones = (opciones<=0) ? 3:opciones-1;
+                opciones = (opciones<=0) ? opcLim:opciones-1;
                 actualizaMenu=true;
-            }else if(k== ConsoleKey.Enter) break;
+            }else if(k== ConsoleKey.Enter && !(jugador.Salud <= jugador.Information.salud_max*0.2 && (opciones==0 || opciones==1))) break;
         }
 
         Text.borrarSeccion(22,2,68,5);
@@ -128,7 +122,10 @@ static class Entrenamiento{
             }else if(k== ConsoleKey.Enter) break;
         }
         Text.borrarSeccion(22,2,68,5);
-        sideCaja.Escribir("Entrenar\n\nExplorar \n\nDormir   \n\nComer ",3,5);
+        string str = "Entrenar\n\nExplorar \n\nDormir   \n\n";
+        str+= (comioSemilla) ? new string(' ',6):"Comer ";
+
+        sideCaja.Escribir(str,3,5);
         if(opciones!=3) {
             sideCaja.Escribir(" ",1,5+2*opciones);
             return (EntrenamientoStates) (opciones+5);
@@ -139,8 +136,8 @@ static class Entrenamiento{
     
     static EntrenamientoStates dormirState(){
         mainCaja.EscribirAnim("¡Has descansado por un día y recuperaste salud!");
-        float vida_factor = (float) jugador.Salud/jugador.Information.salud_max;
-        int salud_ganada = (int)Math.Ceiling((vida_factor*jugador.Salud));
+        float vida_factor = Math.Max(0.1f,(float) jugador.Salud/(jugador.Information.salud_max*2));
+        int salud_ganada = (int)Math.Ceiling((vida_factor*jugador.Information.salud_max));
         int salud_total = Math.Min(jugador.Salud + salud_ganada,jugador.Information.salud_max);
         while(true){
             jugador.Salud = Math.Min(salud_total,jugador.Salud+250);
@@ -170,6 +167,23 @@ static class Entrenamiento{
         return EntrenamientoStates.Menu;
     }
 
+    static EntrenamientoStates comerState(){
+        sideCaja.Escribir(new string(' ',6),3,11);
+        mainCaja.EscribirAnim("¡Gracias a la semilla del ermitaño recuperas toda la salud!");
+        while(true){
+            jugador.Salud = Math.Min(jugador.Information.salud_max,jugador.Salud+250);
+            updateVida();
+            if(jugador.Salud == jugador.Information.salud_max){
+                break;
+            }
+            Thread.Sleep(50);
+        }
+        mainCaja.EscribirAnim("[ +100 % SALUD]",0,2);
+        Thread.Sleep(500);
+        comioSemilla=true;
+        dias_entrenamiento++;
+        return EntrenamientoStates.Menu;
+    }
     static EntrenamientoStates entrenarState(){
         Random rnd = new Random();
         string[] textos = {"Te has sobreentrenado.","No has obtenido resultados.", "Tu entrenamiento sirvio de algo.","¡Has despertado parte de tu poder oculto!"};
@@ -236,7 +250,7 @@ static class Entrenamiento{
             }
             Thread.Sleep(50);
         }
-        mainCaja.EscribirAnim($"[ {nuevo_ataque:+#;-#;0} ATAQUE ] [ {nueva_defensa:+#;-#;0} DEFENSA ]",0,3);
+        mainCaja.EscribirAnim($"[ {nuevo_ataque:+#;-#;0} ATAQUE ] [ {nueva_defensa:+#;-#;0} DEFENSA ] [ -{((float) vida_quitada/jugador.Information.salud_max)*100} % SALUD ]",0,3);
         Thread.Sleep(500);
         dias_entrenamiento++;
         return EntrenamientoStates.Menu;
@@ -261,6 +275,9 @@ static class Entrenamiento{
                     break;
                 case EntrenamientoStates.Dormir:
                     estado_actual = dormirState();
+                    break;
+                case EntrenamientoStates.Comer_semilla:
+                    estado_actual = comerState();
                     break;
             }
             if(estado_actual == EntrenamientoStates.Menu && (estado_previo != EntrenamientoStates.Entrenar_menu)){
