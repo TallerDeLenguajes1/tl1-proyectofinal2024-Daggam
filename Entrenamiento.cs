@@ -179,33 +179,34 @@ static class Entrenamiento{
                 vida_quitada = (int) Math.Ceiling(jugador.Information.salud_max * 0.2);
                 break;
         }
-    for (int i = Math.Abs(nuevo_ataque); i > 0; i--)
-    {
-        jugador.Entrenamiento.Ataque = Math.Min(Math.Max(0,jugador.Entrenamiento.Ataque + Math.Sign(nuevo_ataque)), 15* jugador.Entrenamiento.Nivel);
-        Console.SetCursorPosition(21,14);
-        Console.Write(string.Format("{0,-35}",$"Ataque: {jugador.Entrenamiento.Ataque:D2} / {15*jugador.Entrenamiento.Nivel}"));
-        Thread.Sleep(50);
-    }
-    for (int i = Math.Abs(nueva_defensa); i > 0; i--)
-    {
-        jugador.Entrenamiento.Defensa = Math.Min(Math.Max(0,jugador.Entrenamiento.Defensa + Math.Sign(nueva_defensa)), 15* jugador.Entrenamiento.Nivel);
-        Console.SetCursorPosition(56,14);
-        Console.Write(string.Format("{0,35}",$"Defensa: {jugador.Entrenamiento.Defensa,3:D2} / {15*jugador.Entrenamiento.Nivel}"));
-        Thread.Sleep(50);
-    }
-        
-        int salud_gastada = jugador.Salud - vida_quitada;
-        while(true){
-            jugador.Salud = Math.Max(salud_gastada,jugador.Salud-250);
-            updateVida();
-            if(jugador.Salud == salud_gastada){
-                break;
-            }
+        for (int i = Math.Abs(nuevo_ataque); i > 0; i--)
+        {
+            jugador.Entrenamiento.Ataque = Math.Min(Math.Max(0,jugador.Entrenamiento.Ataque + Math.Sign(nuevo_ataque)), 15* jugador.Entrenamiento.Nivel);
+            Console.SetCursorPosition(21,14);
+            Console.Write(string.Format("{0,-35}",$"Ataque: {jugador.Entrenamiento.Ataque:D2} / {15*jugador.Entrenamiento.Nivel}"));
             Thread.Sleep(50);
         }
-        mainCaja.EscribirAnim($"[ {nuevo_ataque:+#;-#;0} ATAQUE ] [ {nueva_defensa:+#;-#;0} DEFENSA ]",0,3);
-        dias_entrenamiento++;
-        return EntrenamientoStates.Menu;
+        for (int i = Math.Abs(nueva_defensa); i > 0; i--)
+        {
+            jugador.Entrenamiento.Defensa = Math.Min(Math.Max(0,jugador.Entrenamiento.Defensa + Math.Sign(nueva_defensa)), 15* jugador.Entrenamiento.Nivel);
+            Console.SetCursorPosition(56,14);
+            Console.Write(string.Format("{0,35}",$"Defensa: {jugador.Entrenamiento.Defensa,3:D2} / {15*jugador.Entrenamiento.Nivel}"));
+            Thread.Sleep(50);
+        }
+            
+            int salud_gastada = jugador.Salud - vida_quitada;
+            while(true){
+                jugador.Salud = Math.Max(salud_gastada,jugador.Salud-250);
+                updateVida();
+                if(jugador.Salud == salud_gastada){
+                    break;
+                }
+                Thread.Sleep(50);
+            }
+            mainCaja.EscribirAnim($"[ {nuevo_ataque:+#;-#;0} ATAQUE ] [ {nueva_defensa:+#;-#;0} DEFENSA ]",0,3);
+            Thread.Sleep(500);
+            dias_entrenamiento++;
+            return EntrenamientoStates.Menu;
     }
     static void iniciarMaquina(EntrenamientoStates nuevo_estado){
         EntrenamientoStates estado_previo;
@@ -226,8 +227,9 @@ static class Entrenamiento{
                     estado_actual = entrenarState();
                     break;
             }
-            if(estado_actual == EntrenamientoStates.Entrenar_menu){
-
+            if(estado_actual == EntrenamientoStates.Menu && (estado_previo != EntrenamientoStates.Entrenar_menu)){
+                mainCaja.Escribir("Presiona [ENTER] para continuar.",0,5);
+                while(Console.ReadKey(true).Key != ConsoleKey.Enter);
             }
         }
     }
