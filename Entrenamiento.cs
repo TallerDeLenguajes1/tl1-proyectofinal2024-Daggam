@@ -137,6 +137,39 @@ static class Entrenamiento{
         }
     }
     
+    static EntrenamientoStates dormirState(){
+        mainCaja.EscribirAnim("¡Has descansado por un día y recuperaste salud!");
+        float vida_factor = (float) jugador.Salud/jugador.Information.salud_max;
+        int salud_ganada = (int)Math.Ceiling((vida_factor*jugador.Salud));
+        int salud_total = Math.Min(jugador.Salud + salud_ganada,jugador.Information.salud_max);
+        while(true){
+            jugador.Salud = Math.Min(salud_total,jugador.Salud+250);
+            updateVida();
+            if(jugador.Salud == salud_total){
+                break;
+            }
+            Thread.Sleep(50);
+        }
+        mainCaja.EscribirAnim($"[ +{((float)salud_ganada/jugador.Information.salud_max)*100:N0} % SALUD ]",0,1);
+        Thread.Sleep(500);
+        mainCaja.EscribirAnim("Tu cuerpo se debilita ligeramente...",0,2);
+
+        jugador.Entrenamiento.Ataque = Math.Max(0,jugador.Entrenamiento.Ataque - 1);
+        Console.SetCursorPosition(21,14);
+        Console.Write(string.Format("{0,-35}",$"Ataque: {jugador.Entrenamiento.Ataque:D2} / {15*jugador.Entrenamiento.Nivel}"));
+        Thread.Sleep(50);
+
+        jugador.Entrenamiento.Defensa = Math.Max(0,jugador.Entrenamiento.Defensa - 1);
+        Console.SetCursorPosition(56,14);
+        Console.Write(string.Format("{0,35}",$"Defensa: {jugador.Entrenamiento.Defensa,3:D2} / {15*jugador.Entrenamiento.Nivel}"));
+        Thread.Sleep(50);
+
+        mainCaja.EscribirAnim($"[ -1 ATAQUE ] [ -1 DEFENSA ]",0,3);
+        Thread.Sleep(500);
+        dias_entrenamiento++;
+        return EntrenamientoStates.Menu;
+    }
+
     static EntrenamientoStates entrenarState(){
         Random rnd = new Random();
         string[] textos = {"Te has sobreentrenado.","No has obtenido resultados.", "Tu entrenamiento sirvio de algo.","¡Has despertado parte de tu poder oculto!"};
@@ -194,19 +227,19 @@ static class Entrenamiento{
             Thread.Sleep(50);
         }
             
-            int salud_gastada = jugador.Salud - vida_quitada;
-            while(true){
-                jugador.Salud = Math.Max(salud_gastada,jugador.Salud-250);
-                updateVida();
-                if(jugador.Salud == salud_gastada){
-                    break;
-                }
-                Thread.Sleep(50);
+        int salud_gastada = jugador.Salud - vida_quitada;
+        while(true){
+            jugador.Salud = Math.Max(salud_gastada,jugador.Salud-250);
+            updateVida();
+            if(jugador.Salud == salud_gastada){
+                break;
             }
-            mainCaja.EscribirAnim($"[ {nuevo_ataque:+#;-#;0} ATAQUE ] [ {nueva_defensa:+#;-#;0} DEFENSA ]",0,3);
-            Thread.Sleep(500);
-            dias_entrenamiento++;
-            return EntrenamientoStates.Menu;
+            Thread.Sleep(50);
+        }
+        mainCaja.EscribirAnim($"[ {nuevo_ataque:+#;-#;0} ATAQUE ] [ {nueva_defensa:+#;-#;0} DEFENSA ]",0,3);
+        Thread.Sleep(500);
+        dias_entrenamiento++;
+        return EntrenamientoStates.Menu;
     }
     static void iniciarMaquina(EntrenamientoStates nuevo_estado){
         EntrenamientoStates estado_previo;
@@ -225,6 +258,9 @@ static class Entrenamiento{
                 case EntrenamientoStates.Entrenar_defensivo:
                 case EntrenamientoStates.Entrenar_intensivo:
                     estado_actual = entrenarState();
+                    break;
+                case EntrenamientoStates.Dormir:
+                    estado_actual = dormirState();
                     break;
             }
             if(estado_actual == EntrenamientoStates.Menu && (estado_previo != EntrenamientoStates.Entrenar_menu)){
