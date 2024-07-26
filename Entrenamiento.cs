@@ -14,6 +14,10 @@ enum EntrenamientoStates
 }
 
 static class Entrenamiento{
+    enum SeleccionadorUpdate
+    {
+        Ataque,Defensa,Agresividad,Velocidad_carga
+    }
     static EntrenamientoStates estado_actual;
     static Guerrero jugador;
     static Caja sideCaja;
@@ -21,13 +25,13 @@ static class Entrenamiento{
 
     static int dias_entrenamiento;
     static bool comioSemilla = false;
+
     //Comienza el modo entrenamiento
     static public void Start(){
         jugador = Game.jugador;
         sideCaja = new Caja(1,1,16,16);
         mainCaja = new Caja(21,1,70,8);
         dias_entrenamiento = 1;
-        jugador.Salud = 50; 
         //Printeamos la UI del personaje.
         Console.SetCursorPosition(21,10);
         Console.Write("Salud: ");
@@ -53,7 +57,7 @@ static class Entrenamiento{
         string[] textosMain = {"[Entrenar]\n\nGanarás fuerza y resistencia a cambio de salud.",
                                "[Explorar]\n\n¡Puedes encontrar cosas interesantes si exploras el mundo!\nComo también puede ser una completa perdida de tiempo...",
                                "[Dormir]\n\nDescansar te ayudará a recuperarte más rápido...\nA costa de algo de tu entrenamiento.",
-                               "[Semilla del ermitaño]\n\nComerás una semilla del ermitaño que recuperará tu salud por\ncompleto.\n\nSOLO PUEDES COMER UNA SEMILLA EN TODA LA PARTIDA."};
+                               "[Semilla del ermitaño]\n\nComerás una semilla del ermitaño que recuperará tu salud por\ncompleto."};
         int opcLim = (comioSemilla) ? 2:3;
         while (true)
         {
@@ -133,57 +137,6 @@ static class Entrenamiento{
             return EntrenamientoStates.Menu;
         }
     }
-    
-    static EntrenamientoStates dormirState(){
-        mainCaja.EscribirAnim("¡Has descansado por un día y recuperaste salud!");
-        float vida_factor = Math.Max(0.1f,(float) jugador.Salud/(jugador.Information.salud_max*2));
-        int salud_ganada = (int)Math.Ceiling((vida_factor*jugador.Information.salud_max));
-        int salud_total = Math.Min(jugador.Salud + salud_ganada,jugador.Information.salud_max);
-        while(true){
-            jugador.Salud = Math.Min(salud_total,jugador.Salud+250);
-            updateVida();
-            if(jugador.Salud == salud_total){
-                break;
-            }
-            Thread.Sleep(50);
-        }
-        mainCaja.EscribirAnim($"[ +{((float)salud_ganada/jugador.Information.salud_max)*100:N0} % SALUD ]",0,1);
-        Thread.Sleep(500);
-        mainCaja.EscribirAnim("Tu cuerpo se debilita ligeramente...",0,2);
-
-        jugador.Entrenamiento.Ataque = Math.Max(0,jugador.Entrenamiento.Ataque - 1);
-        Console.SetCursorPosition(21,14);
-        Console.Write(string.Format("{0,-35}",$"Ataque: {jugador.Entrenamiento.Ataque:D2} / {15*jugador.Entrenamiento.Nivel}"));
-        Thread.Sleep(50);
-
-        jugador.Entrenamiento.Defensa = Math.Max(0,jugador.Entrenamiento.Defensa - 1);
-        Console.SetCursorPosition(56,14);
-        Console.Write(string.Format("{0,35}",$"Defensa: {jugador.Entrenamiento.Defensa,3:D2} / {15*jugador.Entrenamiento.Nivel}"));
-        Thread.Sleep(50);
-
-        mainCaja.EscribirAnim($"[ -1 ATAQUE ] [ -1 DEFENSA ]",0,3);
-        Thread.Sleep(500);
-        dias_entrenamiento++;
-        return EntrenamientoStates.Menu;
-    }
-
-    static EntrenamientoStates comerState(){
-        sideCaja.Escribir(new string(' ',6),3,11);
-        mainCaja.EscribirAnim("¡Gracias a la semilla del ermitaño recuperas toda la salud!");
-        while(true){
-            jugador.Salud = Math.Min(jugador.Information.salud_max,jugador.Salud+250);
-            updateVida();
-            if(jugador.Salud == jugador.Information.salud_max){
-                break;
-            }
-            Thread.Sleep(50);
-        }
-        mainCaja.EscribirAnim("[ +100 % SALUD]",0,2);
-        Thread.Sleep(500);
-        comioSemilla=true;
-        dias_entrenamiento++;
-        return EntrenamientoStates.Menu;
-    }
     static EntrenamientoStates entrenarState(){
         Random rnd = new Random();
         string[] textos = {"Te has sobreentrenado.","No has obtenido resultados.", "Tu entrenamiento sirvio de algo.","¡Has despertado parte de tu poder oculto!"};
@@ -226,20 +179,8 @@ static class Entrenamiento{
                 vida_quitada = (int) Math.Ceiling(jugador.Information.salud_max * 0.2);
                 break;
         }
-        for (int i = Math.Abs(nuevo_ataque); i > 0; i--)
-        {
-            jugador.Entrenamiento.Ataque = Math.Min(Math.Max(0,jugador.Entrenamiento.Ataque + Math.Sign(nuevo_ataque)), 15* jugador.Entrenamiento.Nivel);
-            Console.SetCursorPosition(21,14);
-            Console.Write(string.Format("{0,-35}",$"Ataque: {jugador.Entrenamiento.Ataque:D2} / {15*jugador.Entrenamiento.Nivel}"));
-            Thread.Sleep(50);
-        }
-        for (int i = Math.Abs(nueva_defensa); i > 0; i--)
-        {
-            jugador.Entrenamiento.Defensa = Math.Min(Math.Max(0,jugador.Entrenamiento.Defensa + Math.Sign(nueva_defensa)), 15* jugador.Entrenamiento.Nivel);
-            Console.SetCursorPosition(56,14);
-            Console.Write(string.Format("{0,35}",$"Defensa: {jugador.Entrenamiento.Defensa,3:D2} / {15*jugador.Entrenamiento.Nivel}"));
-            Thread.Sleep(50);
-        }
+        updateCaracteristica(nuevo_ataque, SeleccionadorUpdate.Ataque);
+        updateCaracteristica(nueva_defensa,SeleccionadorUpdate.Defensa);
             
         int salud_gastada = jugador.Salud - vida_quitada;
         while(true){
@@ -255,6 +196,85 @@ static class Entrenamiento{
         dias_entrenamiento++;
         return EntrenamientoStates.Menu;
     }
+    
+    static EntrenamientoStates explorarState(){
+        mainCaja.EscribirAnim("Explorando...");
+        Thread.Sleep(1000);
+        Random rnd = new Random();
+        float buenometro = 0.1f;//rnd.NextSingle();
+        
+        if(buenometro < 0.2 && comioSemilla){
+            mainCaja.EscribirAnim("¡Te encontraste con el Maestro Karin!",0,2);
+            Thread.Sleep(1500);
+            Text.borrarSeccion(22,2,68,3);
+
+            mainCaja.EscribirAnim("¡Ah, joven guerrero!");
+            Thread.Sleep(500);
+            mainCaja.EscribirAnim("Te he observado mientras explorabas por estos parajes...",0,2);
+            Thread.Sleep(1000);
+            mainCaja.EscribirAnim("Eres fuerte y tienes un gran potencial.",0,3);
+            Thread.Sleep(800);
+            mainCaja.EscribirAnim("Por lo que he decidido compartir contigo algo muy valioso...",0,5);
+            Thread.Sleep(1000);
+            comioSemilla=false;
+            sideCaja.Escribir("Comer",3,11);
+            Text.borrarSeccion(22,2,68,5);
+            mainCaja.EscribirAnim("¡Recibiste una semilla del ermitaño!");
+            Thread.Sleep(500);
+
+        }else{
+            mainCaja.EscribirAnim("No encontraste nada...",0,2);
+            Thread.Sleep(500);
+        }
+
+        dias_entrenamiento++;
+        return EntrenamientoStates.Menu;
+    }
+
+    static EntrenamientoStates dormirState(){
+        mainCaja.EscribirAnim("¡Has descansado por un día y recuperaste salud!");
+        float vida_factor = Math.Max(0.1f,(float) jugador.Salud/(jugador.Information.salud_max*2));
+        int salud_ganada = (int)Math.Ceiling((vida_factor*jugador.Information.salud_max));
+        int salud_total = Math.Min(jugador.Salud + salud_ganada,jugador.Information.salud_max);
+        while(true){
+            jugador.Salud = Math.Min(salud_total,jugador.Salud+250);
+            updateVida();
+            if(jugador.Salud == salud_total){
+                break;
+            }
+            Thread.Sleep(50);
+        }
+        mainCaja.EscribirAnim($"[ +{((float)salud_ganada/jugador.Information.salud_max)*100:N0} % SALUD ]",0,1);
+        Thread.Sleep(500);
+        mainCaja.EscribirAnim("Tu cuerpo se debilita ligeramente...",0,2);
+
+        updateCaracteristica(-1,SeleccionadorUpdate.Ataque);
+        updateCaracteristica(-1,SeleccionadorUpdate.Defensa);
+
+        mainCaja.EscribirAnim($"[ -1 ATAQUE ] [ -1 DEFENSA ]",0,3);
+        Thread.Sleep(500);
+        dias_entrenamiento++;
+        return EntrenamientoStates.Menu;
+    }
+    
+    static EntrenamientoStates comerState(){
+        sideCaja.Escribir(new string(' ',6),3,11);
+        mainCaja.EscribirAnim("¡Gracias a la semilla del ermitaño recuperas toda la salud!");
+        while(true){
+            jugador.Salud = Math.Min(jugador.Information.salud_max,jugador.Salud+250);
+            updateVida();
+            if(jugador.Salud == jugador.Information.salud_max){
+                break;
+            }
+            Thread.Sleep(50);
+        }
+        mainCaja.EscribirAnim("[ +100 % SALUD]",0,2);
+        Thread.Sleep(500);
+        comioSemilla=true;
+        dias_entrenamiento++;
+        return EntrenamientoStates.Menu;
+    }
+    
     static void iniciarMaquina(EntrenamientoStates nuevo_estado){
         EntrenamientoStates estado_previo;
         estado_actual = nuevo_estado;
@@ -272,6 +292,9 @@ static class Entrenamiento{
                 case EntrenamientoStates.Entrenar_defensivo:
                 case EntrenamientoStates.Entrenar_intensivo:
                     estado_actual = entrenarState();
+                    break;
+                case EntrenamientoStates.Explorar:
+                    estado_actual = explorarState();
                     break;
                 case EntrenamientoStates.Dormir:
                     estado_actual = dormirState();
@@ -296,7 +319,49 @@ static class Entrenamiento{
         
     }
 
-    static void updateCaracteristicas(GuerreroEntrenamiento wc){
+    static void updateCaracteristica(int nuevo_valor,SeleccionadorUpdate seleccionador){
+        string str="";
+        (int left, int top) cursor = (0,0);
+        int caracteristica_final = 0;
+        int it=0;
+        switch(seleccionador){
+            case SeleccionadorUpdate.Ataque:
+                caracteristica_final = Math.Min(jugador.Entrenamiento.Nivel*15,Math.Max(0,jugador.Entrenamiento.Ataque + nuevo_valor));
+                str = $"Ataque: {{0:D2}} / {15*jugador.Entrenamiento.Nivel}";
+                it = caracteristica_final-jugador.Entrenamiento.Ataque;
+                jugador.Entrenamiento.Ataque = caracteristica_final;
+                cursor = (21,14);
+            break;
+            case SeleccionadorUpdate.Defensa:
+                caracteristica_final = Math.Min(jugador.Entrenamiento.Nivel*15,Math.Max(0,jugador.Entrenamiento.Defensa + nuevo_valor));
+                str = string.Format("{0,40}",$"Defensa: {{0,3:D2}} / {15*jugador.Entrenamiento.Nivel}");
+                it = caracteristica_final-jugador.Entrenamiento.Defensa;
+                jugador.Entrenamiento.Defensa = caracteristica_final;
+                cursor = (56,14);
 
+            break;
+            case SeleccionadorUpdate.Agresividad:
+                caracteristica_final = Math.Min(jugador.Entrenamiento.Nivel*15,Math.Max(0,jugador.Entrenamiento.Agresividad + nuevo_valor));
+                str = $"Agresividad: {{0:D2}} / {15*jugador.Entrenamiento.Nivel}";
+                it = caracteristica_final-jugador.Entrenamiento.Agresividad;
+                jugador.Entrenamiento.Agresividad = caracteristica_final;
+                cursor = (21,16);
+            break;
+            case SeleccionadorUpdate.Velocidad_carga:
+                caracteristica_final = Math.Min(jugador.Entrenamiento.Nivel*15,Math.Max(0,jugador.Entrenamiento.Velocidad_carga + nuevo_valor));
+                str = string.Format("{0,40}",$"Velocidad de carga: {{0,3:D2}} / {15*jugador.Entrenamiento.Nivel}");
+                it = caracteristica_final-jugador.Entrenamiento.Velocidad_carga;
+                jugador.Entrenamiento.Velocidad_carga = caracteristica_final;
+                cursor = (56,16);
+            break;
+            }
+
+
+        for (int i = Math.Abs(it); i > 0; i--)
+        {
+            Console.SetCursorPosition(cursor.left,cursor.top);
+            Console.Write(string.Format(str,caracteristica_final+Math.Sign(it)*(1-i)));
+            Thread.Sleep(50);
+        }
     }
 }
