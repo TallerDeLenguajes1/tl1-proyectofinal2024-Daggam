@@ -10,7 +10,7 @@ enum EntrenamientoStates
     Menu,
     Entrenar_menu,Explorar,Dormir,Comer_semilla,
     Entrenar_ofensivo, Entrenar_defensivo, Entrenar_intensivo,
-    Fin_entrenamiento
+    Fin_entrenamiento, Salir_entrenamiento
 }
 
 static class Entrenamiento{
@@ -23,15 +23,21 @@ static class Entrenamiento{
     static Caja sideCaja;
     static Caja mainCaja;
 
-    static int dias_entrenamiento;
+    static int dias_max = 0;
+    static int dias_entrenamiento = 0;
     static bool comioSemilla = false;
 
+    static public void Reset(){
+        dias_max = 0;
+        dias_entrenamiento = 0;
+        comioSemilla = false;
+    }
     //Comienza el modo entrenamiento
     static public void Start(){
         jugador = Game.jugador;
         sideCaja = new Caja(1,1,16,16);
         mainCaja = new Caja(21,1,70,8);
-        dias_entrenamiento = 1;
+        dias_max+=10;
         //Printeamos la UI del personaje.
         Console.SetCursorPosition(21,10);
         Console.Write("Salud: ");
@@ -44,14 +50,14 @@ static class Entrenamiento{
         Console.Write(string.Format("{0,-35}{1,35}",$"Ataque: {jugador.Entrenamiento.Ataque:D2} / {15*jugador.Entrenamiento.Nivel}",$"Defensa: {jugador.Entrenamiento.Defensa,3:D2} / {15*jugador.Entrenamiento.Nivel}"));
         Console.SetCursorPosition(21,16);
         Console.Write(string.Format("{0,-35}{1,35}",$"Agresividad: {jugador.Entrenamiento.Agresividad:D2} / {15*jugador.Entrenamiento.Nivel}",$"Velocidad de carga: {jugador.Entrenamiento.Velocidad_carga,3:D2} / {15*jugador.Entrenamiento.Nivel}"));
-        // sideCaja.Escribir($"Día {dias_entrenamiento:D2} / 20",0,1);
-        sideCaja.Escribir("Entrenar\n\nExplorar\n\nDormir\n\nComer",3,5);
+        string str = "Entrenar\n\nExplorar \n\nDormir   \n\n";
+        str+= (comioSemilla) ? new string(' ',6):"Comer ";
+        sideCaja.Escribir(str,3,5);
         iniciarMaquina(EntrenamientoStates.Menu);
     }
     
     static EntrenamientoStates menuState(){
-        if(dias_entrenamiento==10);//Termina todo
-        sideCaja.Escribir($"Día {dias_entrenamiento:D2} / 10",0,1);
+        sideCaja.Escribir($"Día {dias_entrenamiento:D2} / {dias_max}",0,1);
         bool actualizaMenu = true;
         int opciones = 0;
         string[] textosMain = {"[Entrenar]\n\nGanarás fuerza y resistencia a cambio de salud.",
@@ -128,8 +134,8 @@ static class Entrenamiento{
         Text.borrarSeccion(22,2,68,5);
         string str = "Entrenar\n\nExplorar \n\nDormir   \n\n";
         str+= (comioSemilla) ? new string(' ',6):"Comer ";
-
         sideCaja.Escribir(str,3,5);
+
         if(opciones!=3) {
             sideCaja.Escribir(" ",1,5+2*opciones);
             return (EntrenamientoStates) (opciones+5);
@@ -193,7 +199,6 @@ static class Entrenamiento{
         }
         mainCaja.EscribirAnim($"[ {nuevo_ataque:+#;-#;0} ATAQUE ] [ {nueva_defensa:+#;-#;0} DEFENSA ] [ -{((float) vida_quitada/jugador.Information.salud_max)*100} % SALUD ]",0,3);
         Thread.Sleep(500);
-        dias_entrenamiento++;
         return EntrenamientoStates.Menu;
     }
     
@@ -227,7 +232,6 @@ static class Entrenamiento{
             Thread.Sleep(500);
         }
 
-        dias_entrenamiento++;
         return EntrenamientoStates.Menu;
     }
 
@@ -253,7 +257,6 @@ static class Entrenamiento{
 
         mainCaja.EscribirAnim($"[ -1 ATAQUE ] [ -1 DEFENSA ]",0,3);
         Thread.Sleep(500);
-        dias_entrenamiento++;
         return EntrenamientoStates.Menu;
     }
     
@@ -271,19 +274,29 @@ static class Entrenamiento{
         mainCaja.EscribirAnim("[ +100 % SALUD]",0,2);
         Thread.Sleep(500);
         comioSemilla=true;
-        dias_entrenamiento++;
         return EntrenamientoStates.Menu;
+    }
+    
+    static EntrenamientoStates finEntrenamiento(){
+        Text.borrarSeccion(22,2,68,5);
+        mainCaja.EscribirAnim("Tus 10 días de entrenamiento han terminado.");
+        Thread.Sleep(1000);
+        mainCaja.EscribirAnim("¡Ha llegado el día de la batalla!",0,1);
+        Thread.Sleep(500);
+        return EntrenamientoStates.Salir_entrenamiento;
     }
     
     static void iniciarMaquina(EntrenamientoStates nuevo_estado){
         EntrenamientoStates estado_previo;
         estado_actual = nuevo_estado;
         bool salir = false;
+        bool esperar = false;
         while(!salir){
             estado_previo = estado_actual;
             switch(estado_actual){
                 case EntrenamientoStates.Menu:
                     estado_actual = menuState();
+
                     break;
                 case EntrenamientoStates.Entrenar_menu:
                     estado_actual = entrenarMenuState();
@@ -302,10 +315,36 @@ static class Entrenamiento{
                 case EntrenamientoStates.Comer_semilla:
                     estado_actual = comerState();
                     break;
+                case EntrenamientoStates.Fin_entrenamiento:
+                    estado_actual = finEntrenamiento();
+                    esperar=true;
+                    break;
+                case EntrenamientoStates.Salir_entrenamiento:
+                    Console.SetCursorPosition(0,0);
+                    for (int i = 0; i < 18; i++)
+                    {
+                        Console.Write(new string(' ',104)+"\n");
+                        Thread.Sleep(20);
+                    }
+                    salir=true;
+                    break;
+
             }
+            
             if(estado_actual == EntrenamientoStates.Menu && (estado_previo != EntrenamientoStates.Entrenar_menu)){
+                esperar=true;
+                //Termina todo
+                if(dias_entrenamiento==dias_max){
+                    estado_actual = EntrenamientoStates.Fin_entrenamiento;  
+                }else{
+                    dias_entrenamiento++;
+                }
+                
+            }
+            if(esperar){
                 mainCaja.Escribir("Presiona [ENTER] para continuar.",0,5);
                 while(Console.ReadKey(true).Key != ConsoleKey.Enter);
+                esperar=false;
             }
         }
     }

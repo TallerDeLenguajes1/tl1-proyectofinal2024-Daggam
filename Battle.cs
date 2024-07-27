@@ -18,9 +18,9 @@ static class Battle{
     //
     static int barraSaludWidth = 25;
 
-    public static GameStates Start(Guerrero jugador, Guerrero enemigo){
+    public static GameStates Start(Guerrero enemigo){
         //Por ahora los defino nomás.
-        Battle.jugador = jugador;
+        Battle.jugador = Game.jugador;
         Battle.enemigo = enemigo;
         iniciarMaquina(BattleStates.Init);
         return estado_salida;
@@ -450,7 +450,7 @@ static class Battle{
     static BattleStates salirBatalla(){
         string texto = "ESCAPAS DE LA BATALLA...";
         if(estado_actual == BattleStates.Enemigo_derrotado){
-            estado_salida = GameStates.Battle;
+            estado_salida = GameStates.Entrenamiento;
             texto = "¡GANASTE EL COMBATE!";
         }else if(estado_actual==BattleStates.Jugador_derrotado){
             estado_salida = GameStates.Game_over;

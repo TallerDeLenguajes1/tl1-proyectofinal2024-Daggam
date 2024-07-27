@@ -244,7 +244,7 @@ static class Game{
     //Estado de batalla
     static GameStates battleState(){
         Guerrero enemigo = new Guerrero(getGuerreroInfo(allWarriorsPaths[0])); //No los modifica de manera directa
-        var proximo_estado = Battle.Start(jugador,enemigo); //El jugador es pasado como referencia
+        var proximo_estado = Battle.Start(enemigo); //El jugador es pasado como referencia
         //El jugador podría no ser pasado como referencia y utilizar Game.jugador (haciendolo publico)
         //Y solamente pasar el enemigo como nuevo parametro
         return proximo_estado;
@@ -253,10 +253,6 @@ static class Game{
     //Estado de entrenamiento
     static GameStates entrenamientoState(){
         Entrenamiento.Start();
-        while (true)
-        {
-            
-        }
         return GameStates.Battle;
     }
 
@@ -270,6 +266,7 @@ static class Game{
         Text.WriteCenter("¿Deseas continuar?",105);
         Thread.Sleep(500);
         
+        Entrenamiento.Reset();
         bool continuar = true;
         bool updateOpciones = true;
         while (true)
