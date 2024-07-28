@@ -2,6 +2,8 @@ namespace BattleNamespace;
 using GuerreroNamespace;
 using ToolNamespace;
 using GameNamespace;
+using Microsoft.VisualBasic;
+
 enum BattleStates{
     Init,Turno_jugador,Turno_enemigo, Golpear, Tecnicas, Cargar_ki,
     Enemigo_derrotado,Jugador_derrotado,
@@ -140,19 +142,19 @@ static class Battle{
         int golpesDados = 0;
         int damageUI = 0;
         bool interrumpir=false;
-        int numeroInterrupcion = rand.Next(enemigo.Information.agresividad*100,enemigo.Information.agresividad*250);
+        int numeroInterrupcion = rand.Next(enemigo.getAgresividad()*100,enemigo.getAgresividad()*250);
         Timer timerInterrumpir = new Timer( _ => interrumpir=true,null,numeroInterrupcion,Timeout.Infinite);
         
         bool apretarZ=true;
         bool actualizarUI=true;
-
+        int ataqueNeto = Math.Max(15,jugador.getAtaque() - enemigo.getDefensa()) ;
         while(!interrumpir){
             if(Console.KeyAvailable){
                 ConsoleKey k = Console.ReadKey(true).Key;
                 if((k == ConsoleKey.Z && apretarZ) || (k== ConsoleKey.X && !apretarZ)){
                     golpesDados++;
-                    damageUI += jugador.Information.ataque - enemigo.Information.defensa;
-                    enemigo.Salud = Math.Max(enemigo.Salud - (jugador.Information.ataque - enemigo.Information.defensa),0);
+                    damageUI += ataqueNeto;
+                    enemigo.Salud = Math.Max(enemigo.Salud - ataqueNeto,0);
                     //ACTUALIZAMOS UI
                     actualizarUI=true;
                     apretarZ=!apretarZ;
@@ -252,13 +254,13 @@ static class Battle{
             jugador.Ki -= jugador.Information.tecnicas[opciones].cantidad_ki_necesaria;
             updateKi(jugador);
             caja_batalla.EscribirAnim($"¡Has utilizado la técnica {jugador.Information.tecnicas[opciones].nombre}!");
-            enemigo.Salud = Math.Max(enemigo.Salud - jugador.Information.tecnicas[opciones].ataque,0);
+            enemigo.Salud = Math.Max(enemigo.Salud - jugador.getTecnicaAtaque(opciones),0);
             updateVida(enemigo);
             Console.SetCursorPosition(28,12);
             Text.WriteCenter("DAÑO GENERADO:",49);
             int damageAnim = 0;
-            while(damageAnim != jugador.Information.tecnicas[opciones].ataque){
-                damageAnim = Math.Min(damageAnim+100,jugador.Information.tecnicas[opciones].ataque);
+            while(damageAnim != jugador.getTecnicaAtaque(opciones)){
+                damageAnim = Math.Min(damageAnim+100,jugador.getTecnicaAtaque(opciones));
                 Console.SetCursorPosition(28,13);
                 Text.WriteCenter(damageAnim.ToString(),49);
                 Thread.Sleep(50);
@@ -280,7 +282,7 @@ static class Battle{
         caja_batalla.EscribirAnim("Tratas de concentrarte...\nManten [C] para cargar ki.");
         
         Random rnd = new Random();
-        int dueTimeInterrumpir = rnd.Next(15000/enemigo.Information.agresividad,30000/enemigo.Information.agresividad);
+        int dueTimeInterrumpir = rnd.Next(15000/enemigo.getAgresividad(),30000/enemigo.getAgresividad());
         bool interrumpir=false;
         bool actualizarNumero=true;
         Timer timerInterrupcion = new Timer( _=>interrumpir=true,null,dueTimeInterrumpir,Timeout.Infinite);
@@ -291,7 +293,7 @@ static class Battle{
             if(Console.KeyAvailable){
                 ConsoleKey k = Console.ReadKey(true).Key;
                 if(k == ConsoleKey.C){
-                    jugador.Ki = Math.Min(jugador.Ki + jugador.Information.velocidad_carga*0.00035f,5);
+                    jugador.Ki = Math.Min(jugador.Ki + jugador.getVelocidadCarga()*0.00035f,5);
                     updateKi(jugador);
                     actualizarNumero=true;
                 }
@@ -331,11 +333,12 @@ static class Battle{
             }
 
             if(tecnicasDisponibles.Count != 0){
-                var tecnicaElegida = tecnicasDisponibles[rnd.Next(tecnicasDisponibles.Count)];
+                int randNumber = rnd.Next(tecnicasDisponibles.Count);
+                var tecnicaElegida = tecnicasDisponibles[randNumber];
                 enemigo.Ki -= tecnicaElegida.cantidad_ki_necesaria;
                 updateKi(enemigo) ;
                 caja_batalla.EscribirAnim($"¡El enemigo utiliza la tecnica {tecnicaElegida.nombre}!",0,1);
-                float totalTecnicaDamage = (float) tecnicaElegida.ataque/100;
+                float totalTecnicaDamage = (float) enemigo.getTecnicaAtaque(randNumber)/100;
                 float tecnicaDamage = 0; 
                 Console.SetCursorPosition(28,12);
                 Text.WriteCenter("DAÑO RECIBIDO:",49);
@@ -346,7 +349,7 @@ static class Battle{
                     Text.WriteCenter(tecnicaDamage.ToString("0"),49);
                     Thread.Sleep(25);
                 }
-                jugador.Salud = Math.Max(jugador.Salud-tecnicaElegida.ataque,0);
+                jugador.Salud = Math.Max(jugador.Salud-enemigo.getTecnicaAtaque(randNumber),0);
                 updateVida(jugador);
             }else{ //CARGAR KI
                 caja_batalla.EscribirAnim("El enemigo decide cargar su ki...\n\nPuedes interrumpirlo cuando aparezca la leyenda [Z] [X] ó [C].",0,2);
@@ -361,7 +364,7 @@ static class Battle{
                 bool puedeInterrumpir=false;
                 
                 //Reloj
-                System.Timers.Timer reloj = new System.Timers.Timer(rnd.Next(jugador.Information.agresividad*50,jugador.Information.agresividad*100));
+                System.Timers.Timer reloj = new System.Timers.Timer(rnd.Next(jugador.getAgresividad()*50,jugador.getAgresividad()*100));
                 reloj.Elapsed += (sender,e) =>{
                     System.Timers.Timer t = (System.Timers.Timer) sender;
                     puedeInterrumpir=!puedeInterrumpir;
@@ -370,7 +373,7 @@ static class Battle{
                     if(puedeInterrumpir){
                         t.Interval = 400; //respuesta humana
                     }else{
-                        t.Interval = rnd.Next(5000/jugador.Information.agresividad,10000/jugador.Information.agresividad);
+                        t.Interval = rnd.Next(5000/jugador.getAgresividad(),10000/jugador.getAgresividad());
                     }
                 };
                 reloj.AutoReset = true;
@@ -378,7 +381,7 @@ static class Battle{
 
                 while (true)
                 {
-                    enemigo.Ki = Math.Min(enemigo.Ki + enemigo.Information.velocidad_carga*0.0000035f,5);
+                    enemigo.Ki = Math.Min(enemigo.Ki + enemigo.getVelocidadCarga()*0.0000035f,5);
                     updateKi(enemigo);
                     Console.SetCursorPosition(28,13);
                     Text.WriteCenter(enemigo.Ki.ToString("N2"),49);
@@ -422,12 +425,13 @@ static class Battle{
             int cantidadGolpes = rnd.Next(20,30);
             caja_batalla.EscribirAnim("¡El enemigo va atacar con una ráfaga de golpes!",0,1);
             int totalDamage = 0;
+            int ataqueNeto = Math.Max(15,enemigo.getAtaque()-jugador.getDefensa());
             Console.SetCursorPosition(28,12);
             Text.WriteCenter("DAÑO RECIBIDO:",49);
             for (int i = 0; i < cantidadGolpes; i++)
             {
-                totalDamage+=enemigo.Information.ataque-jugador.Information.defensa;
-                jugador.Salud = Math.Max(0,jugador.Salud-(enemigo.Information.ataque-jugador.Information.defensa));
+                totalDamage+= ataqueNeto;
+                jugador.Salud = Math.Max(0,jugador.Salud-ataqueNeto);
                 updateVida(jugador);
                 Console.SetCursorPosition(28,13);
                 Text.WriteCenter(totalDamage.ToString(),49);
@@ -523,7 +527,7 @@ static class Battle{
     
     //FUNCIONES DE ACTUALIZACIÓN DE UI.
     static void updateVida(Guerrero w){
-        float wBarra = (float) w.Salud/w.Information.salud_max * barraSaludWidth; 
+        float wBarra = (float) w.Salud/w.getSaludMax() * barraSaludWidth; 
         if(w.Equals(jugador)){
             Console.SetCursorPosition(3,12);
         }else if(w.Equals(enemigo)){

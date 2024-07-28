@@ -22,7 +22,7 @@ public class GuerreroInfo
     public int agresividad { get; set; }
 
     [JsonPropertyName("velocidad_carga")]
-    public float velocidad_carga { get; set; }
+    public int velocidad_carga { get; set; }
 
     [JsonPropertyName("tecnicas")]
     public List<Tecnica> tecnicas { get; set; }
@@ -49,13 +49,33 @@ public class Guerrero{
     public Guerrero(GuerreroInfo wbase){
         entrenamiento = new GuerreroEntrenamiento();
         information = wbase;
-        salud = information.salud_max;
+        salud = getSaludMax();
     }
 
     public int Salud { get => salud; set => salud = value; }
     public GuerreroInfo Information {get => information; set => information = value;}
     public float Ki { get => ki; set => ki = value; }
     public GuerreroEntrenamiento Entrenamiento { get => entrenamiento; set => entrenamiento = value; }
+
+    public int getSaludMax(){
+        return information.salud_max + entrenamiento.Salud_max;
+    }
+    public int getAtaque(){
+        return information.ataque + entrenamiento.Ataque;
+    }
+    public int getDefensa(){
+        return information.defensa + entrenamiento.Defensa;
+    }
+    public int getAgresividad(){
+        return information.agresividad + entrenamiento.Agresividad;
+    }
+    public int getVelocidadCarga(){
+        return information.velocidad_carga + entrenamiento.Velocidad_carga;
+    }
+    public int getTecnicaAtaque(int i){
+        return information.tecnicas[i].ataque + 1000*entrenamiento.Nivel;
+    }
+
 }
 
 
@@ -64,7 +84,7 @@ public class GuerreroEntrenamiento{
     public int Salud_max = 0;
     public int Ataque = 0;
     public int Defensa = 0;
-    public int Agresividad = 0;
+    public int Agresividad = 0; //acotar 10 por nivel
     public int Velocidad_carga = 0;
 }
 //PODRIA CREAR DOS CLASES: UNA PARA BATALLA Y OTRA PARA ENTRENAMIENTO

@@ -73,7 +73,7 @@ static class Entrenamiento{
                 str[opciones*3] = '■';
                 sideCaja.Escribir(str.ToString(),1,5);
                 mainCaja.Escribir(textosMain[opciones]);
-                if(jugador.Salud <= jugador.Information.salud_max*0.2 && (opciones==0 || opciones==1)){
+                if(jugador.Salud <= jugador.getSaludMax()*0.2 && (opciones==0 || opciones==1)){
                     mainCaja.Escribir($"[ NO LO PUEDES REALIZAR. TU SALUD ES MENOR AL 20% ]",0,5);
                 }
                 actualizaMenu=false;
@@ -85,7 +85,7 @@ static class Entrenamiento{
             }else if(k == ConsoleKey.UpArrow){
                 opciones = (opciones<=0) ? opcLim:opciones-1;
                 actualizaMenu=true;
-            }else if(k== ConsoleKey.Enter && !(jugador.Salud <= jugador.Information.salud_max*0.2 && (opciones==0 || opciones==1))) break;
+            }else if(k== ConsoleKey.Enter && !(jugador.Salud <= jugador.getSaludMax()*0.2 && (opciones==0 || opciones==1))) break;
         }
 
         Text.borrarSeccion(22,2,68,5);
@@ -163,7 +163,7 @@ static class Entrenamiento{
                     mainCaja.EscribirAnim(textos[2],0,2);
                     principal = rnd.Next(1,6);
                 };
-                vida_quitada = (int) Math.Ceiling(jugador.Information.salud_max * 0.1);
+                vida_quitada = (int) Math.Ceiling(jugador.getSaludMax() * 0.1);
                 if(estado_actual == EntrenamientoStates.Entrenar_defensivo){
                     nueva_defensa = principal;
                     nuevo_ataque--;
@@ -182,22 +182,24 @@ static class Entrenamiento{
                     nueva_defensa = rnd.Next(5,11);
                     nuevo_ataque = rnd.Next(5,11);
                 }
-                vida_quitada = (int) Math.Ceiling(jugador.Information.salud_max * 0.2);
+                vida_quitada = (int) Math.Ceiling(jugador.getSaludMax() * 0.2);
                 break;
         }
         updateCaracteristica(nuevo_ataque, SeleccionadorUpdate.Ataque);
         updateCaracteristica(nueva_defensa,SeleccionadorUpdate.Defensa);
             
         int salud_gastada = jugador.Salud - vida_quitada;
+        int rate = 250;
         while(true){
-            jugador.Salud = Math.Max(salud_gastada,jugador.Salud-250);
+            jugador.Salud = Math.Max(salud_gastada,jugador.Salud-rate);
+            rate+=50;
             updateVida();
             if(jugador.Salud == salud_gastada){
                 break;
             }
             Thread.Sleep(50);
         }
-        mainCaja.EscribirAnim($"[ {nuevo_ataque:+#;-#;0} ATAQUE ] [ {nueva_defensa:+#;-#;0} DEFENSA ] [ -{((float) vida_quitada/jugador.Information.salud_max)*100} % SALUD ]",0,3);
+        mainCaja.EscribirAnim($"[ {nuevo_ataque:+#;-#;0} ATAQUE ] [ {nueva_defensa:+#;-#;0} DEFENSA ] [ -{((float) vida_quitada/jugador.getSaludMax())*100} % SALUD ]",0,3);
         Thread.Sleep(500);
         return EntrenamientoStates.Menu;
     }
@@ -237,9 +239,9 @@ static class Entrenamiento{
 
     static EntrenamientoStates dormirState(){
         mainCaja.EscribirAnim("¡Has descansado por un día y recuperaste salud!");
-        float vida_factor = Math.Max(0.1f,(float) jugador.Salud/(jugador.Information.salud_max*2));
-        int salud_ganada = (int)Math.Ceiling((vida_factor*jugador.Information.salud_max));
-        int salud_total = Math.Min(jugador.Salud + salud_ganada,jugador.Information.salud_max);
+        float vida_factor = Math.Max(0.1f,(float) jugador.Salud/(jugador.getSaludMax()*2));
+        int salud_ganada = (int)Math.Ceiling((vida_factor*jugador.getSaludMax()));
+        int salud_total = Math.Min(jugador.Salud + salud_ganada,jugador.getSaludMax());
         while(true){
             jugador.Salud = Math.Min(salud_total,jugador.Salud+250);
             updateVida();
@@ -248,7 +250,7 @@ static class Entrenamiento{
             }
             Thread.Sleep(50);
         }
-        mainCaja.EscribirAnim($"[ +{((float)salud_ganada/jugador.Information.salud_max)*100:N0} % SALUD ]",0,1);
+        mainCaja.EscribirAnim($"[ +{((float)salud_ganada/jugador.getSaludMax())*100:N0} % SALUD ]",0,1);
         Thread.Sleep(500);
         mainCaja.EscribirAnim("Tu cuerpo se debilita ligeramente...",0,2);
 
@@ -263,10 +265,12 @@ static class Entrenamiento{
     static EntrenamientoStates comerState(){
         sideCaja.Escribir(new string(' ',6),3,11);
         mainCaja.EscribirAnim("¡Gracias a la semilla del ermitaño recuperas toda la salud!");
+        int rate = 250;
         while(true){
-            jugador.Salud = Math.Min(jugador.Information.salud_max,jugador.Salud+250);
+            jugador.Salud = Math.Min(jugador.getSaludMax(),jugador.Salud+rate);
+            rate+=50;
             updateVida();
-            if(jugador.Salud == jugador.Information.salud_max){
+            if(jugador.Salud == jugador.getSaludMax()){
                 break;
             }
             Thread.Sleep(50);
@@ -350,10 +354,10 @@ static class Entrenamiento{
     }
     
     static void updateVida(){
-        float cocienteSalud = (float) jugador.Salud/jugador.Information.salud_max * 25;
+        float cocienteSalud = (float) jugador.Salud/jugador.getSaludMax() * 25;
         string barra = new string('▓',(int) Math.Ceiling(cocienteSalud)) + new string('▒',25 - (int) Math.Ceiling(cocienteSalud));
         Console.SetCursorPosition(28,10);
-        string line = string.Format("{0}  {1,6:N0} / {2:N0}",barra,jugador.Salud,jugador.Information.salud_max);
+        string line = string.Format("{0}  {1,6:N0} / {2:N0}",barra,jugador.Salud,jugador.getSaludMax());
         Console.Write(line);
         
     }
