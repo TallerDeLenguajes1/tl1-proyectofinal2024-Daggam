@@ -146,11 +146,17 @@ static class Game{
             }else if(k== ConsoleKey.X){
                 proximo_estado = GameStates.Menu;
                 break;
-            }else if(k==ConsoleKey.Enter)break;
+            }else if(k==ConsoleKey.Enter){
+                break;
+            }
         };
 
         if(proximo_estado==GameStates.Entrenamiento){
-            jugador = partidas[opciones.actual].Jugador;
+            if(partidas[opciones.actual].Jugador == null){
+                return GameStates.Cargar_partida;
+            }else{
+                jugador = partidas[opciones.actual].Jugador;
+            }
         }
         partida_actual = partidas[opciones.actual];
         return proximo_estado;
@@ -405,11 +411,7 @@ static class Game{
             // SaveStates p = new SaveStates();
             for (int i = 0; i < 3; i++)
             {
-                SaveStates p = new SaveStates{
-                    Id = i,
-                    Time = DateTime.Now,
-                    Jugador = new Guerrero(getGuerreroInfo(allWarriorsPaths[0]))
-                };
+                SaveStates p = new SaveStates{ Id = i };
                 partidas.Add(p);
             }
             File.WriteAllText(nombreArchivo,JsonSerializer.Serialize(partidas,new JsonSerializerOptions { WriteIndented = true }),Encoding.Unicode);
