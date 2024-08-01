@@ -150,9 +150,9 @@ static class Game{
         };
 
         if(proximo_estado==GameStates.Nueva_partida){
-
+            
         }
-
+        partida_actual = partidas[opciones.actual];
         return proximo_estado;
     }
     static GameStates seleccionarPersonajeState(){
@@ -392,7 +392,10 @@ static class Game{
 
     static void guardarPartida(){
         var partidas = obtenerPartidas();
-
+        partida_actual.Time = DateTime.Now;
+        partida_actual.Jugador = jugador;
+        partidas[partida_actual.Id] = partida_actual;
+        File.WriteAllText("Savestates.json",JsonSerializer.Serialize(partidas,new JsonSerializerOptions { WriteIndented = true }),Encoding.Unicode);
     }
 
     static List<SaveStates> obtenerPartidas(){
@@ -409,7 +412,7 @@ static class Game{
                 };
                 partidas.Add(p);
             }
-            File.WriteAllText(nombreArchivo,JsonSerializer.Serialize(partidas,new JsonSerializerOptions { WriteIndented = true }));
+            File.WriteAllText(nombreArchivo,JsonSerializer.Serialize(partidas,new JsonSerializerOptions { WriteIndented = true }),Encoding.Unicode);
             return partidas;
         }else{
             string jsonExterno = File.ReadAllText(nombreArchivo);
