@@ -25,7 +25,7 @@ static class Entrenamiento{
 
     static int dias_max = 0;
     static int dias_entrenamiento = 0;
-    static bool comioSemilla = false;
+    public static bool comioSemilla = false;
 
     static public void Reset(){
         dias_max = 0;

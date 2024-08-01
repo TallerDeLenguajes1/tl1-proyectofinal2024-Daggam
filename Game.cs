@@ -156,6 +156,7 @@ static class Game{
                 return GameStates.Cargar_partida;
             }else{
                 jugador = partidas[opciones.actual].Jugador;
+                Entrenamiento.comioSemilla = partidas[opciones.actual].comisteSemilla;
             }
         }
         partida_actual = partidas[opciones.actual];
@@ -400,6 +401,7 @@ static class Game{
         var partidas = obtenerPartidas();
         partida_actual.Time = DateTime.Now;
         partida_actual.Jugador = jugador;
+        partida_actual.comisteSemilla = Entrenamiento.comioSemilla;
         partidas[partida_actual.Id] = partida_actual;
         File.WriteAllText("Savestates.json",JsonSerializer.Serialize(partidas,new JsonSerializerOptions { WriteIndented = true }),Encoding.Unicode);
     }
@@ -438,7 +440,8 @@ class SaveStates{
     public int Id{get;set;}
     [JsonPropertyName("time")]
     public DateTime Time {get; set;}
+    [JsonPropertyName("comio_semilla")]
+    public bool comisteSemilla {get;set;}= false;
     [JsonPropertyName("jugador")]
     public Guerrero Jugador {get; set;}
-    //Agregar si comio la semilla del ermitaño
 }
