@@ -149,8 +149,8 @@ static class Game{
             }else if(k==ConsoleKey.Enter)break;
         };
 
-        if(proximo_estado==GameStates.Nueva_partida){
-            
+        if(proximo_estado==GameStates.Entrenamiento){
+            jugador = partidas[opciones.actual].Jugador;
         }
         partida_actual = partidas[opciones.actual];
         return proximo_estado;
@@ -390,7 +390,7 @@ static class Game{
         return JsonSerializer.Deserialize<GuerreroInfo>(contenido);
     }
 
-    static void guardarPartida(){
+    public static void guardarPartida(){
         var partidas = obtenerPartidas();
         partida_actual.Time = DateTime.Now;
         partida_actual.Jugador = jugador;
@@ -438,5 +438,5 @@ class SaveStates{
     public DateTime Time {get; set;}
     [JsonPropertyName("jugador")]
     public Guerrero Jugador {get; set;}
-
+    //Agregar si comio la semilla del ermitaño
 }

@@ -454,6 +454,7 @@ static class Battle{
     static BattleStates salirBatalla(){
         string texto = "ESCAPAS DE LA BATALLA...";
         if(estado_actual == BattleStates.Enemigo_derrotado){
+            Game.guardarPartida();
             estado_salida = GameStates.Entrenamiento;
             texto = "¡GANASTE EL COMBATE!";
         }else if(estado_actual==BattleStates.Jugador_derrotado){
