@@ -7,9 +7,10 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using EntrenamientoNamespace;
+using System.Reflection.Metadata;
 
 enum GameStates{
-    Menu,Seleccionar_personaje,Info,Quit,
+    Menu,Seleccionar_personaje,Seleccionar_partida,Info,Quit,
     Battle,Entrenamiento,
     Game_over,
     Salir_juego
@@ -19,7 +20,6 @@ static class Game{
     static GameStates estadoActual;
     static public (ConsoleColor bg, ConsoleColor fg) consoleColor = (bg: ConsoleColor.Black, fg: ConsoleColor.DarkCyan);
 
-    // static List<GuerreroInfo> allWarriors = new List<GuerreroInfo>();
     static List<string> allWarriorsPaths = new List<string>();
 
     static List<Planeta> allPlanets;
@@ -66,64 +66,83 @@ static class Game{
         ";
         Console.WriteLine(titulo);
         Console.MoveBufferArea(0,0,79,14,13,0);
-        Console.WriteLine(new string(' ',(105-7)/2)+" Jugar\n");
-        Console.WriteLine(new string(' ',(105-11)/2)+" Acerca de\n");
-        Console.WriteLine(new string(' ',(105-7)/2)+" Salir\n");
-        ConsoleKey k;
-        int opcion=0;
-        bool updateMenu=true;
-        
-        while(true){
-            if(updateMenu){
-                opcion%=3;
-                switch(opcion){
-                    case 0:
-                        Console.SetCursorPosition(48,8);
-                        Console.Write("■");
-                        Console.SetCursorPosition(46,10);
-                        Console.Write("*");
-                        Console.SetCursorPosition(48,12);
-                        Console.Write("*");
-                        break;
-                    case 1:
-                        Console.SetCursorPosition(48,8);
-                        Console.Write("*");
-                        Console.SetCursorPosition(46,10);
-                        Console.Write("■");
-                        Console.SetCursorPosition(48,12);
-                        Console.Write("*");
-                        break;
-                    case 2:
-                        Console.SetCursorPosition(48,8);
-                        Console.Write("*");
-                        Console.SetCursorPosition(46,10);
-                        Console.Write("*");
-                        Console.SetCursorPosition(48,12);
-                        Console.Write("■");
-                        break;
-                }
-                updateMenu=false;
+        Caja cajaEmergente = new Caja(41,8,22,9);
+        cajaEmergente.Escribir("NUEVA PARTIDA\n\nCARGAR PARTIDA\n\nINFORMACIÓN",2,1);
+        int opciones = 0;
+        bool updateOpciones = true;
+        while (true)
+        {
+            if(updateOpciones){
+                StringBuilder str = new StringBuilder(" \n\n \n\n ") ;
+                str[opciones*3] = '■';
+                cajaEmergente.Escribir(str.ToString(),0,1);
+                updateOpciones = false;
             }
-            k = Console.ReadKey(true).Key;
-            switch(k){
-                case ConsoleKey.DownArrow:
-                    opcion++;
-                    updateMenu = true;
-                    break;
-                case ConsoleKey.UpArrow:
-                    opcion = (opcion>0) ? opcion-1:2;
-                    updateMenu=true;
-                    break;
-            }
-            if(k==ConsoleKey.Enter) break;
-        }
 
+            ConsoleKey k = Console.ReadKey().Key;
+            if(k==ConsoleKey.DownArrow){
+                opciones = (opciones<2) ? opciones+1:0;
+                updateOpciones =true;
+            }else if(k == ConsoleKey.UpArrow){
+                opciones = (opciones>0) ? opciones - 1:2;
+                updateOpciones =true;
+            }else if(k == ConsoleKey.Enter) break;
+        }
         //Dependiendo de la opcion, elegimos el próximo estado.
         //Esto funciona por como está dispuesto
-        return (GameStates) (opcion+1);
+        return (GameStates) (opciones+2);
     }
     
     //Estados de los menús.
+    static GameStates seleccionarPartida(){
+        
+        
+        //CARGA DE PARTIDA
+        List<SaveStates> partidas = obtenerPartidas();
+        List<String> partidasLabel = new List<string>(3);
+        Caja cajaEmergente = new Caja(27,3,50,11);
+        cajaEmergente.Escribir("Selecciona una partida:",12,1);
+        //Iniciamos las partidas cargadas donde corresponden
+        for (int i = 0; i < partidas.Count; i++)
+        {
+            if(partidas[i].Jugador == null){
+                partidasLabel.Add(String.Format("{0,27}{1,19}","[VACÍO]"," "));
+            }else{
+                string formatJugadores = string.Format("[{0,-20}|{1,-5}]",
+                                                        partidas[i].Jugador.Information.nombre,
+                                                        $"LV: {partidas[i].Jugador.Entrenamiento.Nivel}");
+                partidasLabel.Add(String.Format("{0,-17}  {1,-27}",
+                partidas[i].Time.ToString("(dd/MM/yy, HH:mm)"),
+                formatJugadores));
+
+            }
+            cajaEmergente.Escribir(partidasLabel[i],0,(2*i+3));
+        }
+        (int actual,int anterior) opciones = (0,0);
+        bool actualizarSeleccion = true;
+        while (true){
+            if(actualizarSeleccion){
+                cajaEmergente.Escribir(partidasLabel[opciones.anterior],0,(2*opciones.anterior+3));
+                Console.BackgroundColor = ConsoleColor.White;
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                cajaEmergente.Escribir(partidasLabel[opciones.actual],0,(2*opciones.actual+3));
+                Console.BackgroundColor = consoleColor.bg;
+                Console.ForegroundColor = consoleColor.fg;
+                actualizarSeleccion=false;
+            }
+            ConsoleKey k = Console.ReadKey(true).Key;
+            if(k == ConsoleKey.DownArrow){
+                opciones.anterior = opciones.actual;
+                opciones.actual = (opciones.actual < 2) ? opciones.actual+1:0;
+                actualizarSeleccion=true;
+            }else if(k==ConsoleKey.UpArrow){
+                opciones.anterior = opciones.actual;
+                opciones.actual = (opciones.actual > 0) ? opciones.actual-1:2;
+                actualizarSeleccion=true;
+            }
+        };
+        return GameStates.Menu;
+    }
     static GameStates seleccionarPersonajeState(){
         Caja cajaSeleccionadora = new Caja(2,1,101,11);
         Text.WriteCenter("Selecciona un personaje",Console.WindowWidth);
@@ -303,6 +322,9 @@ static class Game{
                 case GameStates.Menu:
                     estadoActual = menuState();
                     break;
+                case GameStates.Seleccionar_partida:
+                    estadoActual = seleccionarPartida();
+                    break;
                 case GameStates.Seleccionar_personaje:
                     estadoActual = seleccionarPersonajeState();
                     break;
@@ -354,6 +376,41 @@ static class Game{
         string contenido = File.ReadAllText(wPath);
         return JsonSerializer.Deserialize<GuerreroInfo>(contenido);
     }
+
+    static void guardarPartida(){
+        var nombreArchivo = "Savestates.json";
+        if(!File.Exists(nombreArchivo)){
+            File.WriteAllText(nombreArchivo,"[]");
+        }
+        string jsonExterno = File.ReadAllText(nombreArchivo);
+        List<SaveStates> partidas = JsonSerializer.Deserialize<List<SaveStates>>(jsonExterno);
+        // Guerrero w = JsonSerializer.Deserialize<Guerrero>(jsonExterno,options);
+        
+        SaveStates p = new SaveStates{
+            Time = new DateTime(),
+            Jugador = null
+        };
+        partidas.Add(p);
+        File.WriteAllText(nombreArchivo,JsonSerializer.Serialize(partidas, new JsonSerializerOptions { WriteIndented = true }));
+    }
+
+    static List<SaveStates> obtenerPartidas(){
+        var nombreArchivo = "Savestates.json";
+        if(!File.Exists(nombreArchivo)){
+            List<SaveStates> partidas = new List<SaveStates>(3);
+            // SaveStates p = new SaveStates();
+            SaveStates p = new SaveStates{
+                Time = DateTime.Now,
+                Jugador = new Guerrero(getGuerreroInfo(allWarriorsPaths[0]))
+            };
+            partidas.AddRange(Enumerable.Repeat(p,3));
+            File.WriteAllText(nombreArchivo,JsonSerializer.Serialize(partidas,new JsonSerializerOptions { WriteIndented = true }));
+            return partidas;
+        }else{
+            string jsonExterno = File.ReadAllText(nombreArchivo);
+            return JsonSerializer.Deserialize<List<SaveStates>>(jsonExterno);
+        }
+    }
 }
 
 class Planeta    
@@ -363,5 +420,14 @@ class Planeta
 
         [JsonPropertyName("name")]
         public string name { get; set; }
+
+}
+
+class SaveStates{
+
+    [JsonPropertyName("time")]
+    public DateTime Time {get; set;}
+    [JsonPropertyName("jugador")]
+    public Guerrero Jugador {get; set;}
 
 }

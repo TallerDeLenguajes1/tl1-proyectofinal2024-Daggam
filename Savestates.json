@@ -1,0 +1,88 @@
+[
+  {
+    "time": "2024-07-31T23:26:50.5724986-03:00",
+    "jugador": null
+  },
+  {
+    "time": "2024-07-31T23:26:50.5724986-03:00",
+    "jugador": {
+      "salud": 50000,
+      "information": {
+        "planeta_id": 3,
+        "nombre": "Goku (Inicio)",
+        "salud_max": 50000,
+        "ataque": 300,
+        "defensa": 10,
+        "agresividad": 10,
+        "velocidad_carga": 100,
+        "tecnicas": [
+          {
+            "nombre": "Kamehameha",
+            "cantidad_ki_necesaria": 3,
+            "ataque": 6720
+          },
+          {
+            "nombre": "Ataque Kaio-Ken",
+            "cantidad_ki_necesaria": 4,
+            "ataque": 7000
+          },
+          {
+            "nombre": "Genkidama",
+            "cantidad_ki_necesaria": 5,
+            "ataque": 12630
+          }
+        ]
+      },
+      "ki": 0,
+      "entrenamiento": {
+        "nivel": 1,
+        "salud_max": 0,
+        "ataque": 0,
+        "defensa": 0,
+        "agresividad": 0,
+        "velocidad_carga": 0
+      }
+    }
+  },
+  {
+    "time": "2024-07-31T23:26:50.5724986-03:00",
+    "jugador": {
+      "salud": 50000,
+      "information": {
+        "planeta_id": 3,
+        "nombre": "Goku (Inicio)",
+        "salud_max": 50000,
+        "ataque": 300,
+        "defensa": 10,
+        "agresividad": 10,
+        "velocidad_carga": 100,
+        "tecnicas": [
+          {
+            "nombre": "Kamehameha",
+            "cantidad_ki_necesaria": 3,
+            "ataque": 6720
+          },
+          {
+            "nombre": "Ataque Kaio-Ken",
+            "cantidad_ki_necesaria": 4,
+            "ataque": 7000
+          },
+          {
+            "nombre": "Genkidama",
+            "cantidad_ki_necesaria": 5,
+            "ataque": 12630
+          }
+        ]
+      },
+      "ki": 0,
+      "entrenamiento": {
+        "nivel": 1,
+        "salud_max": 0,
+        "ataque": 0,
+        "defensa": 0,
+        "agresividad": 0,
+        "velocidad_carga": 0
+      }
+    }
+  }
+]

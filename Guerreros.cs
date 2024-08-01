@@ -41,51 +41,65 @@ public class Tecnica
 }
 
 public class Guerrero{
-    GuerreroInfo information;
-    GuerreroEntrenamiento entrenamiento;
-    int salud;
-    float ki;
+    // GuerreroInfo information;
+    // GuerreroEntrenamiento entrenamiento;
+    // int salud;
+    // float ki;
+    [JsonPropertyName("salud")]
+    public int Salud { get; set;}
+    [JsonPropertyName("information")]
 
-    public Guerrero(GuerreroInfo wbase){
-        entrenamiento = new GuerreroEntrenamiento();
-        information = wbase;
-        salud = getSaludMax();
+    public GuerreroInfo Information { get; set;}
+    [JsonPropertyName("ki")]
+    public float Ki { get; set;}
+    [JsonPropertyName("entrenamiento")]
+    public GuerreroEntrenamiento Entrenamiento { get; set;}
+
+    [JsonConstructor]
+    public Guerrero(){
+
     }
-
-    public int Salud { get => salud; set => salud = value; }
-    public GuerreroInfo Information {get => information; set => information = value;}
-    public float Ki { get => ki; set => ki = value; }
-    public GuerreroEntrenamiento Entrenamiento { get => entrenamiento; set => entrenamiento = value; }
+    public Guerrero(GuerreroInfo wbase){
+        Entrenamiento = new GuerreroEntrenamiento();
+        Information = wbase;
+        Salud = getSaludMax();
+    }
 
     public int getSaludMax(){
-        return information.salud_max + entrenamiento.Salud_max;
+        return Information.salud_max + Entrenamiento.Salud_max;
     }
     public int getAtaque(){
-        return information.ataque + entrenamiento.Ataque;
+        return Information.ataque + Entrenamiento.Ataque;
     }
     public int getDefensa(){
-        return information.defensa + entrenamiento.Defensa;
+        return Information.defensa + Entrenamiento.Defensa;
     }
     public int getAgresividad(){
-        return information.agresividad + entrenamiento.Agresividad;
+        return Information.agresividad + Entrenamiento.Agresividad;
     }
     public int getVelocidadCarga(){
-        return information.velocidad_carga + entrenamiento.Velocidad_carga;
+        return Information.velocidad_carga + Entrenamiento.Velocidad_carga;
     }
     public int getTecnicaAtaque(int i){
-        return information.tecnicas[i].ataque + 1000*entrenamiento.Nivel;
+        return Information.tecnicas[i].ataque + 1000*Entrenamiento.Nivel;
     }
 
 }
 
 
 public class GuerreroEntrenamiento{
-    public int Nivel = 1;
-    public int Salud_max = 0;
-    public int Ataque = 0;
-    public int Defensa = 0;
-    public int Agresividad = 0; //acotar 10 por nivel
-    public int Velocidad_carga = 0;
+    [JsonPropertyName("nivel")]
+    public int Nivel {get;set;}= 1;
+    [JsonPropertyName("salud_max")]
+    public int Salud_max {get;set;}= 0;
+    [JsonPropertyName("ataque")]
+    public int Ataque {get;set;}= 0;
+    [JsonPropertyName("defensa")]
+    public int Defensa {get;set;}= 0;
+    [JsonPropertyName("agresividad")]
+    public int Agresividad {get;set;}= 0; //acotar 10 por nivel
+    [JsonPropertyName("velocidad_carga")]
+    public int Velocidad_carga {get;set;}= 0;
 }
 //PODRIA CREAR DOS CLASES: UNA PARA BATALLA Y OTRA PARA ENTRENAMIENTO
 //LA DE ENTRENAMIENTO TENDRÍA QUE MODIFICAR EL GUERRERO INFO Y ADEMÁS TENDRÍA SALUD,NIVEL, TODAS LAS CARACTERISTICAS BASES ADICIONALES. Por ej: Defensa_base + defensa_entrenamiento; ESTOS SON ASPECTOS PERMANENTES (tal vez fatiga...)
