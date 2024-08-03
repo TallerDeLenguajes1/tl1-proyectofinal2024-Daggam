@@ -208,7 +208,7 @@ static class Entrenamiento{
         mainCaja.EscribirAnim("Explorando...");
         Thread.Sleep(1000);
         Random rnd = new Random();
-        double buenometro = 0.35;//rnd.NextSingle();
+        double buenometro = 0.56;//rnd.NextSingle();
         int eventoElegido=0;
         //Modificar todo para que sea una serie de eventos
         //Aumento de vida maxima - (Es necesario tener un porcentaje de vida proximo al 20%) Dende (Aumenta vida y vida máxima)
@@ -249,39 +249,80 @@ static class Entrenamiento{
                 mainCaja.EscribirAnim($"[ -1 ATAQUE ] [ -1 DEFENSA ] [ -10 % SALUD ]",0,2);
                 break;
             case 1:
-                mainCaja.EscribirAnim("¡Te encuentras con Mr. Popo en el Palacio de Kamisama!",0,2);
+                {
+                    mainCaja.EscribirAnim("¡Te encuentras con Mr. Popo en el Palacio de Kamisama!",0,2);
+                    Thread.Sleep(1500);
+                    Text.borrarSeccion(22,2,68,3);
+
+                    mainCaja.EscribirAnim("Veo que has llegado hasta aquí, guerrero.");
+                    Thread.Sleep(500);
+                    mainCaja.EscribirAnim("¿Qué es lo que buscas?",0,1);
+                    Thread.Sleep(1000);
+                    mainCaja.EscribirAnim("Ya veo... quieres dominar tu energía interior...",0,3);
+                    Thread.Sleep(800);
+                    mainCaja.EscribirAnim("No será fácil. Será un entrenamiento intenso y riguroso.",0,5);
+                    Thread.Sleep(1000);
+                    Text.borrarSeccion(22,2,68,5);
+                    float prob = rnd.NextSingle();
+                    int vel_carga = 0;
+                    int vida_quitada=0;
+                    string msjEntr="";
+                    if(prob < 0.2)
+                    { 
+                        vel_carga = rnd.Next(5,11);
+                        msjEntr = "¡Lograste sobrepasar tus limites!";
+                        vida_quitada = (int) Math.Ceiling(jugador.getSaludMax() * 0.2);
+                    }else{
+                        vel_carga = rnd.Next(1,6);
+                        msjEntr = "El entrenamiento sirvio de algo...";
+                        vida_quitada = (int) Math.Ceiling(jugador.getSaludMax() * 0.1);
+                    }
+
+                    mainCaja.EscribirAnim(msjEntr);
+                    updateCaracteristica(vel_carga,SeleccionadorUpdate.Velocidad_carga);
+                    AnimBarraVida(-vida_quitada);
+                    mainCaja.EscribirAnim($"[ +{vel_carga} VELOCIDAD DE CARGA ] [ -{((float) vida_quitada/jugador.getSaludMax())*100} % SALUD ]",0,2);
+                    break;
+                }
+            case 2:
+            {
+                mainCaja.EscribirAnim("¡Alguien se quiere comunicar contigo desde el más allá!",0,2);
                 Thread.Sleep(1500);
                 Text.borrarSeccion(22,2,68,3);
 
-                mainCaja.EscribirAnim("Veo que has llegado hasta aquí, guerrero.");
+                mainCaja.EscribirAnim("¡Joven guerrero!");
                 Thread.Sleep(500);
-                mainCaja.EscribirAnim("¿Qué es lo que buscas?",0,1);
-                Thread.Sleep(1000);
-                mainCaja.EscribirAnim("Ya veo... quieres dominar tu energía interior...",0,3);
+                mainCaja.EscribirAnim("Soy Kaiosama, el Supremo Kai del Norte.",17);
                 Thread.Sleep(800);
-                mainCaja.EscribirAnim("No será fácil. Será un entrenamiento intenso y riguroso.",0,5);
+                mainCaja.EscribirAnim("Sé que muy pronto te enfrentarás a un enemigo...",0,1);
+                Thread.Sleep(500);
+                mainCaja.EscribirAnim("Por lo que he decido guiarte en el control de tu ser interior.",0,3);
                 Thread.Sleep(1000);
                 Text.borrarSeccion(22,2,68,5);
+                mainCaja.EscribirAnim("Aceptas la ayuda.");
+                Thread.Sleep(1000);
+
                 float prob = rnd.NextSingle();
-                int vel_carga = 0;
+                int agresividad = 0;
                 int vida_quitada=0;
                 string msjEntr="";
                 if(prob < 0.2)
                 { 
-                    vel_carga = rnd.Next(5,11);
-                    msjEntr = "¡Lograste sobrepasar tus limites!";
+                    agresividad = rnd.Next(5,11);
+                    msjEntr = "¡La meditación fue muy efectiva!";
                     vida_quitada = (int) Math.Ceiling(jugador.getSaludMax() * 0.2);
                 }else{
-                    vel_carga = rnd.Next(1,6);
-                    msjEntr = "El entrenamiento sirvio de algo...";
+                    agresividad = rnd.Next(1,6);
+                    msjEntr = "La meditación sirvio de algo...";
                     vida_quitada = (int) Math.Ceiling(jugador.getSaludMax() * 0.1);
                 }
-
-                mainCaja.EscribirAnim(msjEntr);
-                updateCaracteristica(vel_carga,SeleccionadorUpdate.Velocidad_carga);
+                
+                mainCaja.EscribirAnim(msjEntr,0,2);
+                updateCaracteristica(agresividad,SeleccionadorUpdate.Agresividad);
                 AnimBarraVida(-vida_quitada);
-                mainCaja.EscribirAnim($"[ +{vel_carga} VELOCIDAD DE CARGA ] [ -{((float) vida_quitada/jugador.getSaludMax())*100} % SALUD ]",0,2);
+                mainCaja.EscribirAnim($"[ +{agresividad} AGRESIVIDAD ] [ -{((float) vida_quitada/jugador.getSaludMax())*100} % SALUD ]",0,3);
                 break;
+            }
             case 5:
                 mainCaja.EscribirAnim("¡Te encontraste con el Maestro Karin!",0,2);
                 Thread.Sleep(1500);
