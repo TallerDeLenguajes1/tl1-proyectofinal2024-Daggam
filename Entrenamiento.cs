@@ -208,7 +208,7 @@ static class Entrenamiento{
         mainCaja.EscribirAnim("Explorando...");
         Thread.Sleep(1000);
         Random rnd = new Random();
-        double buenometro = 0.91;//rnd.NextSingle();
+        double buenometro = 0.985;//rnd.NextSingle();
         int eventoElegido=0;
         //Modificar todo para que sea una serie de eventos
         //Aumento de vida maxima - (Es necesario tener un porcentaje de vida proximo al 20%) Dende (Aumenta vida y vida máxima)
@@ -411,6 +411,34 @@ static class Entrenamiento{
                 Text.borrarSeccion(22,2,68,5);
                 mainCaja.EscribirAnim("¡Recibiste una semilla del ermitaño!");
                 break;
+            case 6:
+                {
+                    mainCaja.EscribirAnim("¡Te encontraste con el Anciano Kaioshin!",0,2);
+                    Thread.Sleep(1000);
+                    Text.borrarSeccion(22,2,68,3);
+                    mainCaja.EscribirAnim("¡Ah, un guerrero errante!");
+                    Thread.Sleep(500);
+                    mainCaja.EscribirAnim("Veo en tus ojos la chispa del potencial no descubierto...",0,1);
+                    Thread.Sleep(800);
+                    mainCaja.EscribirAnim("La promesa de un poder oculto que aguarda ser desatado.",0,3);
+                    Thread.Sleep(500);
+                    mainCaja.EscribirAnim("¡Muy bien! Preparémonos para desatar ese poder latente.",0,5);
+                    Thread.Sleep(1000);
+                    Text.borrarSeccion(22,2,68,5);
+                    mainCaja.EscribirAnim("¡Has despertado tu poder oculto!");
+                    int atq_g = rnd.Next(5,11);
+                    int def_g = rnd.Next(5,11);
+                    int agr_g = rnd.Next(5,11);
+                    int carga_g = rnd.Next(5,11);
+                    updateNivel(1);
+                    updateCaracteristica(atq_g,SeleccionadorUpdate.Ataque);
+                    updateCaracteristica(def_g,SeleccionadorUpdate.Defensa);
+                    updateCaracteristica(agr_g,SeleccionadorUpdate.Agresividad);
+                    updateCaracteristica(carga_g,SeleccionadorUpdate.Velocidad_carga);
+                    mainCaja.EscribirAnim($"[ + 1 NIVEL ] [ + {atq_g} ATAQUE ] [ + {atq_g} DEFENSA ]\n[ + {agr_g} AGRESIVIDAD ] [ + {carga_g} VELOCIDAD DE CARGA ]",0,2);
+                    break;
+                }
+
         }
         //Desarrollar uno donde Aumente el nivel y otras cositas - Anciano kaioshin
         //Otro donde aumente la agresividad - Kaiosama
@@ -545,6 +573,20 @@ static class Entrenamiento{
         
     }
 
+    static void updateNivel(int nivel_ganado){
+        int nivel_final = jugador.Entrenamiento.Nivel + nivel_ganado;
+        for (int i = jugador.Entrenamiento.Nivel+1; i <= nivel_final; i++)
+        {
+            jugador.Entrenamiento.Nivel++;
+            Console.SetCursorPosition(82,10);
+            Console.Write($"Nivel {i,3}");
+            Console.SetCursorPosition(21,14);
+            Console.Write(string.Format("{0,-35}{1,35}",$"Ataque: {jugador.Entrenamiento.Ataque:D2} / {15*i}",$"Defensa: {jugador.Entrenamiento.Defensa,3:D2} / {15*i}"));
+            Console.SetCursorPosition(21,16);
+            Console.Write(string.Format("{0,-35}{1,35}",$"Agresividad: {jugador.Entrenamiento.Agresividad:D2} / {15*i}",$"Velocidad de carga: {jugador.Entrenamiento.Velocidad_carga,3:D2} / {15*i}"));
+            Thread.Sleep(50);
+        }
+    }
     static void AnimBarraVida(int salud_ganada){
         int salud_final = Math.Max(1000,Math.Min(jugador.Salud+salud_ganada,jugador.getSaludMax()));
         int rate = 250;
