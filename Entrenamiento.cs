@@ -208,7 +208,7 @@ static class Entrenamiento{
         mainCaja.EscribirAnim("Explorando...");
         Thread.Sleep(1000);
         Random rnd = new Random();
-        double buenometro = 0.56;//rnd.NextSingle();
+        double buenometro = 0.76;//rnd.NextSingle();
         int eventoElegido=0;
         //Modificar todo para que sea una serie de eventos
         //Aumento de vida maxima - (Es necesario tener un porcentaje de vida proximo al 20%) Dende (Aumenta vida y vida máxima)
@@ -323,6 +323,25 @@ static class Entrenamiento{
                 mainCaja.EscribirAnim($"[ +{agresividad} AGRESIVIDAD ] [ -{((float) vida_quitada/jugador.getSaludMax())*100} % SALUD ]",0,3);
                 break;
             }
+            case 3:
+                mainCaja.EscribirAnim("¡Te encontraste con Chi-Chi!",0,2);
+                Thread.Sleep(1500);
+                Text.borrarSeccion(22,2,68,3);
+                mainCaja.EscribirAnim("Se nota que has entrenando bastante...");
+                Thread.Sleep(800);
+                mainCaja.EscribirAnim("No te exigas demasiado.",0,2);
+                Thread.Sleep(500);
+                mainCaja.EscribirAnim("Toma, come esto.",24,2);
+                int atq_g = rnd.Next(1,5);
+                int def_g = rnd.Next(1,5);
+                updateCaracteristica(atq_g,SeleccionadorUpdate.Ataque);
+                updateCaracteristica(def_g,SeleccionadorUpdate.Defensa);
+                AnimBarraVida((int) Math.Ceiling(jugador.getSaludMax() * 0.25));
+                Thread.Sleep(500);
+                mainCaja.EscribirAnim($"[ +{atq_g} ATAQUE] [ +{def_g} DEFENSA] [ +25 % SALUD ]",0,3);
+
+
+            break;
             case 5:
                 mainCaja.EscribirAnim("¡Te encontraste con el Maestro Karin!",0,2);
                 Thread.Sleep(1500);
