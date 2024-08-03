@@ -208,69 +208,102 @@ static class Entrenamiento{
         mainCaja.EscribirAnim("Explorando...");
         Thread.Sleep(1000);
         Random rnd = new Random();
-        float buenometro = 0.6f;//rnd.NextSingle();
-        
-        if(buenometro < 0.2 && comioSemilla){
-            mainCaja.EscribirAnim("¡Te encontraste con el Maestro Karin!",0,2);
-            Thread.Sleep(1500);
-            Text.borrarSeccion(22,2,68,3);
-
-            mainCaja.EscribirAnim("¡Ah, joven guerrero!");
-            Thread.Sleep(500);
-            mainCaja.EscribirAnim("Te he observado mientras explorabas por estos parajes...",0,2);
-            Thread.Sleep(1000);
-            mainCaja.EscribirAnim("Eres fuerte y tienes un gran potencial.",0,3);
-            Thread.Sleep(800);
-            mainCaja.EscribirAnim("Por lo que he decidido compartir contigo algo muy valioso...",0,5);
-            Thread.Sleep(1000);
-            comioSemilla=false;
-            sideCaja.Escribir("Comer",3,11);
-            Text.borrarSeccion(22,2,68,5);
-            mainCaja.EscribirAnim("¡Recibiste una semilla del ermitaño!");
-        }else if(buenometro < 0.4){
-            mainCaja.EscribirAnim("¡Te encuentras con Mr. Popo en el Palacio de Kamisama!",0,2);
-            Thread.Sleep(1500);
-            Text.borrarSeccion(22,2,68,3);
-
-            mainCaja.EscribirAnim("Veo que has llegado hasta aquí, guerrero.");
-            Thread.Sleep(500);
-            mainCaja.EscribirAnim("¿Qué es lo que buscas?",0,1);
-            Thread.Sleep(1000);
-            mainCaja.EscribirAnim("Ya veo... quieres dominar tu energía interior...",0,3);
-            Thread.Sleep(800);
-            mainCaja.EscribirAnim("No será fácil. Será un entrenamiento intenso y riguroso.",0,5);
-            Thread.Sleep(1000);
-            Text.borrarSeccion(22,2,68,5);
-            float prob = rnd.NextSingle();
-            int vel_carga = 0;
-            int vida_quitada=0;
-            string msjEntr="";
-            if(prob < 0.2)
-            { 
-                vel_carga = rnd.Next(5,11);
-                msjEntr = "¡Lograste sobrepasar tus limites!";
-                vida_quitada = (int) Math.Ceiling(jugador.getSaludMax() * 0.2);
-            }else{
-                vel_carga = rnd.Next(1,6);
-                msjEntr = "El entrenamiento sirvio de algo...";
-                vida_quitada = (int) Math.Ceiling(jugador.getSaludMax() * 0.1);
+        double buenometro = 0.35;//rnd.NextSingle();
+        int eventoElegido=0;
+        //Modificar todo para que sea una serie de eventos
+        //Aumento de vida maxima - (Es necesario tener un porcentaje de vida proximo al 20%) Dende (Aumenta vida y vida máxima)
+        //Aumento de vida - chichi +50%
+        //Aumento de velocidaddeki - Mr.Popo
+        //Aumento de Agresividad - Kaiosama (Entrenamiento)
+        //Aumento de Nivel, salud máxima, ataque, defensa, agresividad, velocidaddeki - Anciano kaioshin
+        // 
+        double[] probs = {0.3,0.25,0.20,0.15,0.05,0.03,0.02};
+        // List<(int opcion,float probabilidad)> eventos = new List<(int,float)>{
+        //     // Eventos --- Escenarios más probables
+        //     (6,0.3f), //NADAAA -- 1er (0,0.3)
+        //     (2,0.25f), //Mr.Popo -- 2do (0.3,0.55)
+        //     (3,0.20f), //Kaiosama -- 3er (0.55,0.75)
+        //     (1,0.15f), //Chichi -- 4to (0.75,0.9)
+        //     (0,0.05f), //Dende -- 5to (0.9,0.95)
+        //     (5,0.03f), //Karin -- 6to  (0.95,0.98)
+        //     (4,0.02f), //Anciano Kaioshin -- 7mo (0.98,1)
+        // };
+        double sumaProbs=0;
+        for (int i = 0; i < probs.Length; i++)
+        {
+            sumaProbs+=probs[i];
+            if(buenometro<=sumaProbs){
+                eventoElegido=i;
+                break;
             }
+        }
+        switch(eventoElegido){
+            case 0: case 5 when !comioSemilla:
+                mainCaja.EscribirAnim("No encontraste nada...",0,2);
+                Thread.Sleep(1000);
+                Text.borrarSeccion(22,2,68,3);
+                mainCaja.EscribirAnim("Te debilitaste ligeramente...");
+                updateCaracteristica(-1,SeleccionadorUpdate.Ataque);
+                updateCaracteristica(-1,SeleccionadorUpdate.Defensa);
+                AnimBarraVida(-(int) Math.Ceiling(jugador.getSaludMax() * 0.1));
+                mainCaja.EscribirAnim($"[ -1 ATAQUE ] [ -1 DEFENSA ] [ -10 % SALUD ]",0,2);
+                break;
+            case 1:
+                mainCaja.EscribirAnim("¡Te encuentras con Mr. Popo en el Palacio de Kamisama!",0,2);
+                Thread.Sleep(1500);
+                Text.borrarSeccion(22,2,68,3);
 
-            mainCaja.EscribirAnim(msjEntr);
-            updateCaracteristica(vel_carga,SeleccionadorUpdate.Velocidad_carga);
-            AnimBarraVida(-vida_quitada);
-            mainCaja.EscribirAnim($"[ +{vel_carga} VELOCIDAD DE CARGA ] [ -{((float) vida_quitada/jugador.getSaludMax())*100} % SALUD ]",0,2);
+                mainCaja.EscribirAnim("Veo que has llegado hasta aquí, guerrero.");
+                Thread.Sleep(500);
+                mainCaja.EscribirAnim("¿Qué es lo que buscas?",0,1);
+                Thread.Sleep(1000);
+                mainCaja.EscribirAnim("Ya veo... quieres dominar tu energía interior...",0,3);
+                Thread.Sleep(800);
+                mainCaja.EscribirAnim("No será fácil. Será un entrenamiento intenso y riguroso.",0,5);
+                Thread.Sleep(1000);
+                Text.borrarSeccion(22,2,68,5);
+                float prob = rnd.NextSingle();
+                int vel_carga = 0;
+                int vida_quitada=0;
+                string msjEntr="";
+                if(prob < 0.2)
+                { 
+                    vel_carga = rnd.Next(5,11);
+                    msjEntr = "¡Lograste sobrepasar tus limites!";
+                    vida_quitada = (int) Math.Ceiling(jugador.getSaludMax() * 0.2);
+                }else{
+                    vel_carga = rnd.Next(1,6);
+                    msjEntr = "El entrenamiento sirvio de algo...";
+                    vida_quitada = (int) Math.Ceiling(jugador.getSaludMax() * 0.1);
+                }
+
+                mainCaja.EscribirAnim(msjEntr);
+                updateCaracteristica(vel_carga,SeleccionadorUpdate.Velocidad_carga);
+                AnimBarraVida(-vida_quitada);
+                mainCaja.EscribirAnim($"[ +{vel_carga} VELOCIDAD DE CARGA ] [ -{((float) vida_quitada/jugador.getSaludMax())*100} % SALUD ]",0,2);
+                break;
+            case 5:
+                mainCaja.EscribirAnim("¡Te encontraste con el Maestro Karin!",0,2);
+                Thread.Sleep(1500);
+                Text.borrarSeccion(22,2,68,3);
+
+                mainCaja.EscribirAnim("¡Ah, joven guerrero!");
+                Thread.Sleep(500);
+                mainCaja.EscribirAnim("Te he observado mientras explorabas por estos parajes...",0,2);
+                Thread.Sleep(1000);
+                mainCaja.EscribirAnim("Eres fuerte y tienes un gran potencial.",0,3);
+                Thread.Sleep(800);
+                mainCaja.EscribirAnim("Por lo que he decidido compartir contigo algo muy valioso...",0,5);
+                Thread.Sleep(1000);
+                comioSemilla=false;
+                sideCaja.Escribir("Comer",3,11);
+                Text.borrarSeccion(22,2,68,5);
+                mainCaja.EscribirAnim("¡Recibiste una semilla del ermitaño!");
+                break;
         }
-        else{
-            mainCaja.EscribirAnim("No encontraste nada...",0,2);
-            Thread.Sleep(1000);
-            Text.borrarSeccion(22,2,68,3);
-            mainCaja.EscribirAnim("Te debilitaste ligeramente...");
-            updateCaracteristica(-1,SeleccionadorUpdate.Ataque);
-            updateCaracteristica(-1,SeleccionadorUpdate.Defensa);
-            AnimBarraVida(-(int) Math.Ceiling(jugador.getSaludMax() * 0.1));
-            mainCaja.EscribirAnim($"[ -1 ATAQUE ] [ -1 DEFENSA ] [ -10 % SALUD ]",0,2);
-        }
+        //Desarrollar uno donde Aumente el nivel y otras cositas - Anciano kaioshin
+        //Otro donde aumente la agresividad - Kaiosama
+        //Cada que termine un combate, aumentar el nivel si tienen def/atq mayores a 10 (un habilitador)
 
         Thread.Sleep(500);
         return EntrenamientoStates.Menu;
