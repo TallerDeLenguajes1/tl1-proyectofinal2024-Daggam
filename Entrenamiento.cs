@@ -208,7 +208,7 @@ static class Entrenamiento{
         mainCaja.EscribirAnim("Explorando...");
         Thread.Sleep(1000);
         Random rnd = new Random();
-        double buenometro = 0.76;//rnd.NextSingle();
+        double buenometro = 0.91;//rnd.NextSingle();
         int eventoElegido=0;
         //Modificar todo para que sea una serie de eventos
         //Aumento de vida maxima - (Es necesario tener un porcentaje de vida proximo al 20%) Dende (Aumenta vida y vida máxima)
@@ -324,24 +324,75 @@ static class Entrenamiento{
                 break;
             }
             case 3:
-                mainCaja.EscribirAnim("¡Te encontraste con Chi-Chi!",0,2);
-                Thread.Sleep(1500);
-                Text.borrarSeccion(22,2,68,3);
-                mainCaja.EscribirAnim("Se nota que has entrenando bastante...");
-                Thread.Sleep(800);
-                mainCaja.EscribirAnim("No te exigas demasiado.",0,2);
-                Thread.Sleep(500);
-                mainCaja.EscribirAnim("Toma, come esto.",24,2);
-                int atq_g = rnd.Next(1,5);
-                int def_g = rnd.Next(1,5);
-                updateCaracteristica(atq_g,SeleccionadorUpdate.Ataque);
-                updateCaracteristica(def_g,SeleccionadorUpdate.Defensa);
-                AnimBarraVida((int) Math.Ceiling(jugador.getSaludMax() * 0.25));
-                Thread.Sleep(500);
-                mainCaja.EscribirAnim($"[ +{atq_g} ATAQUE] [ +{def_g} DEFENSA] [ +25 % SALUD ]",0,3);
+                {
+                    mainCaja.EscribirAnim("¡Te encontraste con Chi-Chi!",0,2);
+                    Thread.Sleep(1500);
+                    Text.borrarSeccion(22,2,68,3);
+                    mainCaja.EscribirAnim("Se nota que has entrenando bastante...");
+                    Thread.Sleep(800);
+                    mainCaja.EscribirAnim("No te exigas demasiado.",0,2);
+                    Thread.Sleep(500);
+                    mainCaja.EscribirAnim("Toma, come esto.",24,2);
+                    int atq_g = rnd.Next(1,5);
+                    int def_g = rnd.Next(1,5);
+                    updateCaracteristica(atq_g,SeleccionadorUpdate.Ataque);
+                    updateCaracteristica(def_g,SeleccionadorUpdate.Defensa);
+                    AnimBarraVida((int) Math.Ceiling(jugador.getSaludMax() * 0.25));
+                    Thread.Sleep(500);
+                    mainCaja.EscribirAnim($"[ +{atq_g} ATAQUE] [ +{def_g} DEFENSA] [ +25 % SALUD ]",0,3);                    
+                    break;
+                }
+            case 4:
+                {
+                    mainCaja.EscribirAnim("¡Te encontraste con Dende!",0,2);
+                    Thread.Sleep(1500);
+                    Text.borrarSeccion(22,2,68,3);
 
-
-            break;
+                    mainCaja.EscribirAnim("¡Hola guerrero!");
+                    Thread.Sleep(500);
+                    mainCaja.EscribirAnim("¿Necesitas ayuda con tu entrenamiento?",0,2);
+                    Thread.Sleep(800);
+                    mainCaja.EscribirAnim("Bueno podría ayudarte, pero tendrás que hacer un gran sacrificio.",0,4);
+                    Thread.Sleep(1000);
+                    Text.borrarSeccion(22,2,68,4);
+                    mainCaja.EscribirAnim("Aún así, ¿Estas dispuesto a correr ese riesgo?");
+                    int opciones = 0;
+                    bool actualizarMenu = true;
+                    while(true){
+                        if(actualizarMenu){
+                            StringBuilder str = new StringBuilder( new string(' ',17) + "Sí" +new string(' ',34)+ "No");
+                            str[15+opciones*36] = '■';
+                            mainCaja.Escribir(str.ToString(),0,2);
+                            actualizarMenu=false;
+                        }
+                        ConsoleKey k = Console.ReadKey().Key;
+                        if(k==ConsoleKey.RightArrow){
+                            opciones = (opciones<1) ? opciones+1:0;
+                            actualizarMenu =true;
+                        }else if(k == ConsoleKey.LeftArrow){
+                            opciones = (opciones>0) ? opciones - 1:1;
+                            actualizarMenu =true;
+                        }else if(k == ConsoleKey.Enter) break;
+                    }
+                    Text.borrarSeccion(22,2,68,2);
+                    if(opciones==0){
+                        mainCaja.EscribirAnim("Esta bien, te ayudaré con mis poderes.");
+                        int salud_actual = jugador.Salud;
+                        AnimBarraVida(-(int) Math.Ceiling(jugador.getSaludMax() * 0.35));
+                        int salud_maxima_ganada = salud_actual - jugador.Salud;
+                        jugador.Entrenamiento.Salud_max += salud_maxima_ganada;
+                        updateVida();
+                        Thread.Sleep(500);
+                        mainCaja.EscribirAnim($"[ -35% SALUD ] [ +{salud_maxima_ganada:N0} SALUD MÁXIMA ]",0,1);            
+                        Thread.Sleep(500);
+                        mainCaja.EscribirAnim("Hice un intercambio de salud. Espero que te haya sido de ayuda.",0,3);
+                    }else{
+                        mainCaja.EscribirAnim("Entendido... Entonces mucho no podré hacer.");
+                        Thread.Sleep(800);  
+                        mainCaja.EscribirAnim("¡Exitos guerrero!",0,2);
+                    }
+                    break;
+                }
             case 5:
                 mainCaja.EscribirAnim("¡Te encontraste con el Maestro Karin!",0,2);
                 Thread.Sleep(1500);
@@ -495,7 +546,7 @@ static class Entrenamiento{
     }
 
     static void AnimBarraVida(int salud_ganada){
-        int salud_final = Math.Max(0,Math.Min(jugador.Salud+salud_ganada,jugador.getSaludMax()));
+        int salud_final = Math.Max(1000,Math.Min(jugador.Salud+salud_ganada,jugador.getSaludMax()));
         int rate = 250;
         while(true){
             jugador.Salud = (Math.Sign(salud_ganada) == 1) ? Math.Min(salud_final,jugador.Salud+rate):Math.Max(salud_final,jugador.Salud-rate);
