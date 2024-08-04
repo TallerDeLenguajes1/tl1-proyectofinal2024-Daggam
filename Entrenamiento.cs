@@ -27,6 +27,7 @@ static class Entrenamiento{
     static int dias_entrenamiento = 0;
     public static bool comioSemilla = false;
 
+    public static int[] interacciones = {0,0,0,0,0,0,0};
     static public void Reset(){
         dias_max = 0;
         dias_entrenamiento = 0;
@@ -42,18 +43,26 @@ static class Entrenamiento{
         Console.SetCursorPosition(21,10);
         Console.Write("Salud: ");
         updateVida();
-        Console.SetCursorPosition(82,10);
-        Console.Write($"Nivel {jugador.Entrenamiento.Nivel,3}");
         Console.SetCursorPosition(21,12);
         Text.WriteCenter("-- CARACTERISTICAS ADICIONALES--",70);
-        Console.SetCursorPosition(21,14);
-        Console.Write(string.Format("{0,-35}{1,35}",$"Ataque: {jugador.Entrenamiento.Ataque:D2} / {15*jugador.Entrenamiento.Nivel}",$"Defensa: {jugador.Entrenamiento.Defensa,3:D2} / {15*jugador.Entrenamiento.Nivel}"));
-        Console.SetCursorPosition(21,16);
-        Console.Write(string.Format("{0,-35}{1,35}",$"Agresividad: {jugador.Entrenamiento.Agresividad:D2} / {15*jugador.Entrenamiento.Nivel}",$"Velocidad de carga: {jugador.Entrenamiento.Velocidad_carga,3:D2} / {15*jugador.Entrenamiento.Nivel}"));
+        updateNivel(jugador.Entrenamiento.Nivel);
+        // Console.SetCursorPosition(82,10);
+        // Console.Write($"Nivel {jugador.Entrenamiento.Nivel,3}");
+        // Console.SetCursorPosition(21,14);
+        // Console.Write(string.Format("{0,-35}{1,35}",$"Ataque: {jugador.Entrenamiento.Ataque:D2} / {15*jugador.Entrenamiento.Nivel}",$"Defensa: {jugador.Entrenamiento.Defensa,3:D2} / {15*jugador.Entrenamiento.Nivel}"));
+        // Console.SetCursorPosition(21,16);
+        // Console.Write(string.Format("{0,-35}{1,35}",$"Agresividad: {jugador.Entrenamiento.Agresividad:D2} / {15*jugador.Entrenamiento.Nivel}",$"Velocidad de carga: {jugador.Entrenamiento.Velocidad_carga,3:D2} / {15*jugador.Entrenamiento.Nivel}"));
         string str = "Entrenar\n\nExplorar \n\nDormir   \n\n";
         str+= (comioSemilla) ? new string(' ',6):"Comer ";
         sideCaja.Escribir(str,3,5);
-        iniciarMaquina(EntrenamientoStates.Menu);
+        int cota = jugador.Entrenamiento.Nivel*10;
+        if(jugador.Entrenamiento.Ataque >=  cota|| jugador.Entrenamiento.Defensa >= cota) {
+            sideCaja.Escribir($"Día {dias_entrenamiento:D2} / {dias_max}",0,1);
+            mainCaja.EscribirAnim("¡Aumentaste de Nivel!\n\n[+1 NIVEL]");
+            updateNivelAnim(1);
+            Thread.Sleep(1500);
+        }
+            iniciarMaquina(EntrenamientoStates.Menu);
     }
     
     static EntrenamientoStates menuState(){
@@ -199,7 +208,7 @@ static class Entrenamiento{
             }
             Thread.Sleep(50);
         }
-        mainCaja.EscribirAnim($"[ {nuevo_ataque:+#;-#;0} ATAQUE ] [ {nueva_defensa:+#;-#;0} DEFENSA ] [ -{((float) vida_quitada/jugador.getSaludMax())*100} % SALUD ]",0,3);
+        mainCaja.EscribirAnim($"[ {nuevo_ataque:+#;-#;0} ATAQUE ] [ {nueva_defensa:+#;-#;0} DEFENSA ] [ -{((float) vida_quitada/jugador.getSaludMax())*100:N0} % SALUD ]",0,3);
         Thread.Sleep(500);
         return EntrenamientoStates.Menu;
     }
@@ -211,15 +220,12 @@ static class Entrenamiento{
         double buenometro = rnd.NextSingle();
         int eventoElegido=0;
         //Modificar todo para que sea una serie de eventos
-        //Aumento de vida maxima - (Es necesario tener un porcentaje de vida proximo al 20%) Dende (Aumenta vida y vida máxima)
-        //Aumento de vida - chichi +50%
+        //Aumento de vida maxima -  Dende (Aumenta vida y vida máxima)
+        //Aumento de vida - chichi +50% salud
         //Aumento de velocidaddeki - Mr.Popo
         //Aumento de Agresividad - Kaiosama (Entrenamiento)
         //Aumento de Nivel, salud máxima, ataque, defensa, agresividad, velocidaddeki - Anciano kaioshin
-        // 
-        double[] probs = {0.35,0.25,0.20,0.1,0.05,0.03,0.02};
-        // List<(int opcion,float probabilidad)> eventos = new List<(int,float)>{
-        //     // Eventos --- Escenarios más probables
+        //      Eventos --- Escenarios más probables
         //     (6,0.3f), //NADAAA -- 1er (0,0.3)
         //     (2,0.25f), //Mr.Popo -- 2do (0.3,0.55)
         //     (3,0.20f), //Kaiosama -- 3er (0.55,0.75)
@@ -227,7 +233,8 @@ static class Entrenamiento{
         //     (0,0.05f), //Dende -- 5to (0.9,0.95)
         //     (5,0.03f), //Karin -- 6to  (0.95,0.98)
         //     (4,0.02f), //Anciano Kaioshin -- 7mo (0.98,1)
-        // };
+        double[] probs = {0.35,0.25,0.20,0.1,0.05,0.03,0.02};
+       
         double sumaProbs=0;
         for (int i = 0; i < probs.Length; i++)
         {
@@ -253,16 +260,17 @@ static class Entrenamiento{
                     mainCaja.EscribirAnim("¡Te encuentras con Mr. Popo en el Palacio de Kamisama!",0,2);
                     Thread.Sleep(1500);
                     Text.borrarSeccion(22,2,68,3);
-
-                    mainCaja.EscribirAnim("Veo que has llegado hasta aquí, guerrero.");
-                    Thread.Sleep(500);
-                    mainCaja.EscribirAnim("¿Qué es lo que buscas?",0,1);
-                    Thread.Sleep(1000);
-                    mainCaja.EscribirAnim("Ya veo... quieres dominar tu energía interior...",0,3);
-                    Thread.Sleep(800);
-                    mainCaja.EscribirAnim("No será fácil. Será un entrenamiento intenso y riguroso.",0,5);
-                    Thread.Sleep(1000);
-                    Text.borrarSeccion(22,2,68,5);
+                    if(interacciones[1] == 0){
+                        mainCaja.EscribirAnim("Veo que has llegado hasta aquí, guerrero.");
+                        Thread.Sleep(500);
+                        mainCaja.EscribirAnim("¿Qué es lo que buscas?",0,1);
+                        Thread.Sleep(1000);
+                        mainCaja.EscribirAnim("Ya veo... quieres dominar tu energía interior...",0,3);
+                        Thread.Sleep(800);
+                        mainCaja.EscribirAnim("No será fácil. Será un entrenamiento intenso y riguroso.",0,5);
+                        Thread.Sleep(1000);
+                        Text.borrarSeccion(22,2,68,5);
+                    }
                     float prob = rnd.NextSingle();
                     int vel_carga = 0;
                     int vida_quitada=0;
@@ -281,7 +289,7 @@ static class Entrenamiento{
                     mainCaja.EscribirAnim(msjEntr);
                     updateCaracteristica(vel_carga,SeleccionadorUpdate.Velocidad_carga);
                     AnimBarraVida(-vida_quitada);
-                    mainCaja.EscribirAnim($"[ +{vel_carga} VELOCIDAD DE CARGA ] [ -{((float) vida_quitada/jugador.getSaludMax())*100} % SALUD ]",0,2);
+                    mainCaja.EscribirAnim($"[ +{vel_carga} VELOCIDAD DE CARGA ] [ -{((float) vida_quitada/jugador.getSaludMax())*100:N0} % SALUD ]",0,2);
                     break;
                 }
             case 2:
@@ -289,19 +297,20 @@ static class Entrenamiento{
                 mainCaja.EscribirAnim("¡Alguien se quiere comunicar contigo desde el más allá!",0,2);
                 Thread.Sleep(1500);
                 Text.borrarSeccion(22,2,68,3);
+                if(interacciones[2]==0){
+                    mainCaja.EscribirAnim("¡Joven guerrero!");
+                    Thread.Sleep(500);
+                    mainCaja.EscribirAnim("Soy Kaiosama, el Supremo Kai del Norte.",17);
+                    Thread.Sleep(800);
+                    mainCaja.EscribirAnim("Sé que muy pronto te enfrentarás a un enemigo...",0,1);
+                    Thread.Sleep(500);
+                    mainCaja.EscribirAnim("Por lo que he decido guiarte en el control de tu ser interior.",0,3);
+                    Thread.Sleep(1000);
+                    Text.borrarSeccion(22,2,68,5);
+                }
 
-                mainCaja.EscribirAnim("¡Joven guerrero!");
-                Thread.Sleep(500);
-                mainCaja.EscribirAnim("Soy Kaiosama, el Supremo Kai del Norte.",17);
-                Thread.Sleep(800);
-                mainCaja.EscribirAnim("Sé que muy pronto te enfrentarás a un enemigo...",0,1);
-                Thread.Sleep(500);
-                mainCaja.EscribirAnim("Por lo que he decido guiarte en el control de tu ser interior.",0,3);
-                Thread.Sleep(1000);
-                Text.borrarSeccion(22,2,68,5);
                 mainCaja.EscribirAnim("Aceptas la ayuda.");
                 Thread.Sleep(1000);
-
                 float prob = rnd.NextSingle();
                 int agresividad = 0;
                 int vida_quitada=0;
@@ -320,7 +329,7 @@ static class Entrenamiento{
                 mainCaja.EscribirAnim(msjEntr,0,2);
                 updateCaracteristica(agresividad,SeleccionadorUpdate.Agresividad);
                 AnimBarraVida(-vida_quitada);
-                mainCaja.EscribirAnim($"[ +{agresividad} AGRESIVIDAD ] [ -{((float) vida_quitada/jugador.getSaludMax())*100} % SALUD ]",0,3);
+                mainCaja.EscribirAnim($"[ +{agresividad} AGRESIVIDAD ] [ -{((float) vida_quitada/jugador.getSaludMax())*100:N0} % SALUD ]",0,3);
                 break;
             }
             case 3:
@@ -347,22 +356,31 @@ static class Entrenamiento{
                     mainCaja.EscribirAnim("¡Te encontraste con Dende!",0,2);
                     Thread.Sleep(1500);
                     Text.borrarSeccion(22,2,68,3);
-
-                    mainCaja.EscribirAnim("¡Hola guerrero!");
-                    Thread.Sleep(500);
-                    mainCaja.EscribirAnim("¿Necesitas ayuda con tu entrenamiento?",0,2);
-                    Thread.Sleep(800);
-                    mainCaja.EscribirAnim("Bueno podría ayudarte, pero tendrás que hacer un gran sacrificio.",0,4);
-                    Thread.Sleep(1000);
-                    Text.borrarSeccion(22,2,68,4);
-                    mainCaja.EscribirAnim("Aún así, ¿Estas dispuesto a correr ese riesgo?");
+                    int posy = 2;
+                    if(interacciones[4]==0){
+                        mainCaja.EscribirAnim("¡Hola guerrero!");
+                        Thread.Sleep(500);
+                        mainCaja.EscribirAnim("¿Necesitas ayuda con tu entrenamiento?",0,2);
+                        Thread.Sleep(800);
+                        mainCaja.EscribirAnim("Bueno podría ayudarte, pero tendrás que hacer un gran sacrificio.",0,4);
+                        Thread.Sleep(1000);
+                        Text.borrarSeccion(22,2,68,4);
+                        mainCaja.EscribirAnim("Aún así, ¿Estas dispuesto a correr ese riesgo?");
+                    }else{
+                        mainCaja.EscribirAnim("¡Ey! ¡Hola de nuevo!");
+                        Thread.Sleep(500);
+                        mainCaja.EscribirAnim("La oferta sigue en pie.",21);
+                        Thread.Sleep(500);
+                        mainCaja.EscribirAnim("¿Aún estas dispuesto a correr ese riesgo?",0,2);
+                        posy = 4;
+                    }
                     int opciones = 0;
                     bool actualizarMenu = true;
                     while(true){
                         if(actualizarMenu){
                             StringBuilder str = new StringBuilder( new string(' ',17) + "Sí" +new string(' ',34)+ "No");
                             str[15+opciones*36] = '■';
-                            mainCaja.Escribir(str.ToString(),0,2);
+                            mainCaja.Escribir(str.ToString(),0,posy);
                             actualizarMenu=false;
                         }
                         ConsoleKey k = Console.ReadKey().Key;
@@ -374,7 +392,7 @@ static class Entrenamiento{
                             actualizarMenu =true;
                         }else if(k == ConsoleKey.Enter) break;
                     }
-                    Text.borrarSeccion(22,2,68,2);
+                    Text.borrarSeccion(22,2,68,5);
                     if(opciones==0){
                         mainCaja.EscribirAnim("Esta bien, te ayudaré con mis poderes.");
                         int salud_actual = jugador.Salud;
@@ -397,15 +415,16 @@ static class Entrenamiento{
                 mainCaja.EscribirAnim("¡Te encontraste con el Maestro Karin!",0,2);
                 Thread.Sleep(1500);
                 Text.borrarSeccion(22,2,68,3);
-
-                mainCaja.EscribirAnim("¡Ah, joven guerrero!");
-                Thread.Sleep(500);
-                mainCaja.EscribirAnim("Te he observado mientras explorabas por estos parajes...",0,2);
-                Thread.Sleep(1000);
-                mainCaja.EscribirAnim("Eres fuerte y tienes un gran potencial.",0,3);
-                Thread.Sleep(800);
-                mainCaja.EscribirAnim("Por lo que he decidido compartir contigo algo muy valioso...",0,5);
-                Thread.Sleep(1000);
+                if(interacciones[5]==0){
+                    mainCaja.EscribirAnim("¡Ah, joven guerrero!");
+                    Thread.Sleep(500);
+                    mainCaja.EscribirAnim("Te he observado mientras explorabas por estos parajes...",0,2);
+                    Thread.Sleep(1000);
+                    mainCaja.EscribirAnim("Eres fuerte y tienes un gran potencial.",0,3);
+                    Thread.Sleep(800);
+                    mainCaja.EscribirAnim("Por lo que he decidido compartir contigo algo muy valioso...",0,5);
+                    Thread.Sleep(1000);
+                }
                 comioSemilla=false;
                 sideCaja.Escribir("Comer",3,11);
                 Text.borrarSeccion(22,2,68,5);
@@ -416,21 +435,23 @@ static class Entrenamiento{
                     mainCaja.EscribirAnim("¡Te encontraste con el Anciano Kaioshin!",0,2);
                     Thread.Sleep(1000);
                     Text.borrarSeccion(22,2,68,3);
-                    mainCaja.EscribirAnim("¡Ah, un guerrero errante!");
-                    Thread.Sleep(500);
-                    mainCaja.EscribirAnim("Veo en tus ojos la chispa del potencial no descubierto...",0,1);
-                    Thread.Sleep(800);
-                    mainCaja.EscribirAnim("La promesa de un poder oculto que aguarda ser desatado.",0,3);
-                    Thread.Sleep(500);
-                    mainCaja.EscribirAnim("¡Muy bien! Preparémonos para desatar ese poder latente.",0,5);
-                    Thread.Sleep(1000);
-                    Text.borrarSeccion(22,2,68,5);
+                    if(interacciones[6]==0){
+                        mainCaja.EscribirAnim("¡Ah, un guerrero errante!");
+                        Thread.Sleep(500);
+                        mainCaja.EscribirAnim("Veo en tus ojos la chispa del potencial no descubierto...",0,1);
+                        Thread.Sleep(800);
+                        mainCaja.EscribirAnim("La promesa de un poder oculto que aguarda ser desatado.",0,3);
+                        Thread.Sleep(500);
+                        mainCaja.EscribirAnim("¡Muy bien! Preparémonos para desatar ese poder latente.",0,5);
+                        Thread.Sleep(1000);
+                        Text.borrarSeccion(22,2,68,5);
+                    }
                     mainCaja.EscribirAnim("¡Has despertado tu poder oculto!");
                     int atq_g = rnd.Next(5,11);
                     int def_g = rnd.Next(5,11);
                     int agr_g = rnd.Next(5,11);
                     int carga_g = rnd.Next(5,11);
-                    updateNivel(1);
+                    updateNivelAnim(1);
                     updateCaracteristica(atq_g,SeleccionadorUpdate.Ataque);
                     updateCaracteristica(def_g,SeleccionadorUpdate.Defensa);
                     updateCaracteristica(agr_g,SeleccionadorUpdate.Agresividad);
@@ -438,12 +459,8 @@ static class Entrenamiento{
                     mainCaja.EscribirAnim($"[ + 1 NIVEL ] [ + {atq_g} ATAQUE ] [ + {atq_g} DEFENSA ]\n[ + {agr_g} AGRESIVIDAD ] [ + {carga_g} VELOCIDAD DE CARGA ]",0,2);
                     break;
                 }
-
         }
-        //Desarrollar uno donde Aumente el nivel y otras cositas - Anciano kaioshin
-        //Otro donde aumente la agresividad - Kaiosama
-        //Cada que termine un combate, aumentar el nivel si tienen def/atq mayores a 10 (un habilitador)
-
+        interacciones[eventoElegido] = (interacciones[eventoElegido]%5==0) ? 1:interacciones[eventoElegido] + 1; //Pongo una cota para que no sobrapase de 5.
         Thread.Sleep(500);
         return EntrenamientoStates.Menu;
     }
@@ -573,19 +590,22 @@ static class Entrenamiento{
         
     }
 
-    static void updateNivel(int nivel_ganado){
+    static void updateNivelAnim(int nivel_ganado){
         int nivel_final = jugador.Entrenamiento.Nivel + nivel_ganado;
         for (int i = jugador.Entrenamiento.Nivel+1; i <= nivel_final; i++)
         {
-            jugador.Entrenamiento.Nivel++;
-            Console.SetCursorPosition(82,10);
-            Console.Write($"Nivel {i,3}");
-            Console.SetCursorPosition(21,14);
-            Console.Write(string.Format("{0,-35}{1,35}",$"Ataque: {jugador.Entrenamiento.Ataque:D2} / {15*i}",$"Defensa: {jugador.Entrenamiento.Defensa,3:D2} / {15*i}"));
-            Console.SetCursorPosition(21,16);
-            Console.Write(string.Format("{0,-35}{1,35}",$"Agresividad: {jugador.Entrenamiento.Agresividad:D2} / {15*i}",$"Velocidad de carga: {jugador.Entrenamiento.Velocidad_carga,3:D2} / {15*i}"));
+            updateNivel(i);
             Thread.Sleep(50);
         }
+    }
+    static void updateNivel(int nivel){
+            jugador.Entrenamiento.Nivel = nivel;
+            Console.SetCursorPosition(82,10);
+            Console.Write($"Nivel {nivel,3}");
+            Console.SetCursorPosition(21,14);
+            Console.Write(string.Format("{0,-35}{1,35}",$"Ataque: {jugador.Entrenamiento.Ataque:D2} / {15*nivel}",$"Defensa: {jugador.Entrenamiento.Defensa,3:D2} / {15*nivel}"));
+            Console.SetCursorPosition(21,16);
+            Console.Write(string.Format("{0,-35}{1,35}",$"Agresividad: {jugador.Entrenamiento.Agresividad:D2} / {15*nivel}",$"Velocidad de carga: {jugador.Entrenamiento.Velocidad_carga,3:D2} / {15*nivel}"));
     }
     static void AnimBarraVida(int salud_ganada){
         int salud_final = Math.Max(1000,Math.Min(jugador.Salud+salud_ganada,jugador.getSaludMax()));

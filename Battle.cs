@@ -364,14 +364,18 @@ static class Battle{
                 bool puedeInterrumpir=false;
                 
                 //Reloj
-                System.Timers.Timer reloj = new System.Timers.Timer(rnd.Next(jugador.getAgresividad()*50,jugador.getAgresividad()*100));
+                double factor_agresivo = 10/(double) jugador.getAgresividad();
+                System.Timers.Timer reloj = new System.Timers.Timer(
+                                            rnd.Next(Math.Max((int) (factor_agresivo*500),100),
+                                                    Math.Max((int) (factor_agresivo*1000),500))
+                                            );
                 reloj.Elapsed += (sender,e) =>{
                     System.Timers.Timer t = (System.Timers.Timer) sender;
                     puedeInterrumpir=!puedeInterrumpir;
                     actualizarTecla=true;
 
                     if(puedeInterrumpir){
-                        t.Interval = 400; //respuesta humana
+                        t.Interval = 400;
                     }else{
                         t.Interval = rnd.Next(5000/jugador.getAgresividad(),10000/jugador.getAgresividad());
                     }
