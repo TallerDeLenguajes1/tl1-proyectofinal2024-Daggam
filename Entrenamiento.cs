@@ -217,22 +217,17 @@ static class Entrenamiento{
         Random rnd = new Random();
         double buenometro = rnd.NextSingle();
         int eventoElegido=0;
-        //Modificar todo para que sea una serie de eventos
-        //Aumento de vida maxima -  Dende (Aumenta vida y vida máxima)
-        //Aumento de vida - chichi +50% salud
-        //Aumento de velocidaddeki - Mr.Popo
-        //Aumento de Agresividad - Kaiosama (Entrenamiento)
-        //Aumento de Nivel, salud máxima, ataque, defensa, agresividad, velocidaddeki - Anciano kaioshin
-        //      Eventos --- Escenarios más probables
-        //     (6,0.3f), //NADAAA -- 1er (0,0.3)
-        //     (2,0.25f), //Mr.Popo -- 2do (0.3,0.55)
-        //     (3,0.20f), //Kaiosama -- 3er (0.55,0.75)
-        //     (1,0.15f), //Chichi -- 4to (0.75,0.9)
-        //     (0,0.05f), //Dende -- 5to (0.9,0.95)
-        //     (5,0.03f), //Karin -- 6to  (0.95,0.98)
-        //     (4,0.02f), //Anciano Kaioshin -- 7mo (0.98,1)
+        /*
+                    Eventos --- Escenarios más probables
+        (6,0.3f), //NADAAA -- 1er (0,0.35)
+        (2,0.25f), //Mr.Popo -- 2do (0.35,0.6) -- Aumento de velocidad de ki
+        (3,0.20f), //Kaiosama -- 3er (0.6,0.8) -- Aumento de Agresividad
+        (1,0.15f), //Chichi -- 4to (0.8,0.9) -- Aumento de salud +25%
+        (0,0.05f), //Dende -- 5to (0.9,0.95) -- Aumento de salud máxima. (Entre 5000 - 8000 p)
+        (5,0.03f), //Karin -- 6to  (0.95,0.98) -- Te da una semilla del ermitaño
+        (4,0.02f), //Anciano Kaioshin -- 7mo (0.98,1) -- Aumento de Nivel, ataque, defensa, agresividad, Velocidad de ki.
+       */
         double[] probs = {0.35,0.25,0.20,0.1,0.05,0.03,0.02};
-       
         double sumaProbs=0;
         for (int i = 0; i < probs.Length; i++)
         {
@@ -393,13 +388,13 @@ static class Entrenamiento{
                     Text.borrarSeccion(22,2,68,5);
                     if(opciones==0){
                         mainCaja.EscribirAnim("Esta bien, te ayudaré con mis poderes.");
-                        int salud_actual = jugador.Salud;
-                        AnimBarraVida(-(int) Math.Ceiling(jugador.getSaludMax() * 0.35));
-                        int salud_maxima_ganada = salud_actual - jugador.Salud;
+                        int salud_anterior = jugador.Salud;
+                        AnimBarraVida(-rnd.Next(8000,13000));
+                        int salud_maxima_ganada = salud_anterior - jugador.Salud;
                         jugador.Entrenamiento.Salud_max += salud_maxima_ganada;
                         updateVida();
                         Thread.Sleep(500);
-                        mainCaja.EscribirAnim($"[ -35% SALUD ] [ +{salud_maxima_ganada:N0} SALUD MÁXIMA ]",0,1);            
+                        mainCaja.EscribirAnim($"[ - {salud_maxima_ganada:N0} SALUD ] [ + {salud_maxima_ganada:N0}  SALUD MÁXIMA ]",0,1);            
                         Thread.Sleep(500);
                         mainCaja.EscribirAnim("Hice un intercambio de salud. Espero que te haya sido de ayuda.",0,3);
                     }else{
