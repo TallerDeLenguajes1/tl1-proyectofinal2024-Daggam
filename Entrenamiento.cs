@@ -46,12 +46,6 @@ static class Entrenamiento{
         Console.SetCursorPosition(21,12);
         Text.WriteCenter("-- CARACTERISTICAS ADICIONALES--",70);
         updateNivel(jugador.Entrenamiento.Nivel);
-        // Console.SetCursorPosition(82,10);
-        // Console.Write($"Nivel {jugador.Entrenamiento.Nivel,3}");
-        // Console.SetCursorPosition(21,14);
-        // Console.Write(string.Format("{0,-35}{1,35}",$"Ataque: {jugador.Entrenamiento.Ataque:D2} / {15*jugador.Entrenamiento.Nivel}",$"Defensa: {jugador.Entrenamiento.Defensa,3:D2} / {15*jugador.Entrenamiento.Nivel}"));
-        // Console.SetCursorPosition(21,16);
-        // Console.Write(string.Format("{0,-35}{1,35}",$"Agresividad: {jugador.Entrenamiento.Agresividad:D2} / {15*jugador.Entrenamiento.Nivel}",$"Velocidad de carga: {jugador.Entrenamiento.Velocidad_carga,3:D2} / {15*jugador.Entrenamiento.Nivel}"));
         string str = "Entrenar\n\nExplorar \n\nDormir   \n\n";
         str+= (comioSemilla) ? new string(' ',6):"Comer ";
         sideCaja.Escribir(str,3,5);
@@ -469,15 +463,7 @@ static class Entrenamiento{
         mainCaja.EscribirAnim("¡Has descansado por un día y recuperaste salud!");
         float vida_factor = Math.Max(0.1f,(float) jugador.Salud/(jugador.getSaludMax()*2));
         int salud_ganada = (int)Math.Ceiling((vida_factor*jugador.getSaludMax()));
-        int salud_total = Math.Min(jugador.Salud + salud_ganada,jugador.getSaludMax());
-        while(true){
-            jugador.Salud = Math.Min(salud_total,jugador.Salud+250);
-            updateVida();
-            if(jugador.Salud == salud_total){
-                break;
-            }
-            Thread.Sleep(50);
-        }
+        AnimBarraVida(salud_ganada);
         mainCaja.EscribirAnim($"[ +{((float)salud_ganada/jugador.getSaludMax())*100:N0} % SALUD ]",0,1);
         Thread.Sleep(500);
         mainCaja.EscribirAnim("Tu cuerpo se debilita ligeramente...",0,2);
@@ -493,16 +479,7 @@ static class Entrenamiento{
     static EntrenamientoStates comerState(){
         sideCaja.Escribir(new string(' ',6),3,11);
         mainCaja.EscribirAnim("¡Gracias a la semilla del ermitaño recuperas toda la salud!");
-        int rate = 250;
-        while(true){
-            jugador.Salud = Math.Min(jugador.getSaludMax(),jugador.Salud+rate);
-            rate+=50;
-            updateVida();
-            if(jugador.Salud == jugador.getSaludMax()){
-                break;
-            }
-            Thread.Sleep(50);
-        }
+        AnimBarraVida(jugador.getSaludMax());
         mainCaja.EscribirAnim("[ +100 % SALUD]",0,2);
         Thread.Sleep(500);
         comioSemilla=true;
