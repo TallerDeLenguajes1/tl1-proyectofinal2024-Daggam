@@ -208,7 +208,7 @@ static class Entrenamiento{
         mainCaja.EscribirAnim("Explorando...");
         Thread.Sleep(1000);
         Random rnd = new Random();
-        double buenometro = 0.985;//rnd.NextSingle();
+        double buenometro = rnd.NextSingle();
         int eventoElegido=0;
         //Modificar todo para que sea una serie de eventos
         //Aumento de vida maxima - (Es necesario tener un porcentaje de vida proximo al 20%) Dende (Aumenta vida y vida máxima)
@@ -217,7 +217,7 @@ static class Entrenamiento{
         //Aumento de Agresividad - Kaiosama (Entrenamiento)
         //Aumento de Nivel, salud máxima, ataque, defensa, agresividad, velocidaddeki - Anciano kaioshin
         // 
-        double[] probs = {0.3,0.25,0.20,0.15,0.05,0.03,0.02};
+        double[] probs = {0.35,0.25,0.20,0.1,0.05,0.03,0.02};
         // List<(int opcion,float probabilidad)> eventos = new List<(int,float)>{
         //     // Eventos --- Escenarios más probables
         //     (6,0.3f), //NADAAA -- 1er (0,0.3)

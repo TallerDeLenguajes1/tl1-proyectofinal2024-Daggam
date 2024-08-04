@@ -329,7 +329,7 @@ static class Game{
             }else if(k==ConsoleKey.Enter) break;
         }
 
-        return (continuar) ? GameStates.Seleccionar_personaje:GameStates.Salir_juego;
+        return (continuar) ? GameStates.Menu:GameStates.Salir_juego;
     }
     
     static void iniciarMaquina(GameStates nuevoEstado){
