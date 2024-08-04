@@ -23,7 +23,7 @@ static class Game{
 
     static List<string> allWarriorsPaths = new List<string>();
 
-    static SaveStates partida_actual;
+    public static SaveStates partida_actual;
     static List<Planeta> allPlanets;
     public static Guerrero jugador;
 
@@ -151,15 +151,15 @@ static class Game{
             }
         };
 
+        partida_actual = partidas[opciones.actual];
         if(proximo_estado==GameStates.Entrenamiento){
-            if(partidas[opciones.actual].Jugador == null){
+            if(partida_actual.Jugador == null){
                 return GameStates.Cargar_partida;
             }else{
-                jugador = partidas[opciones.actual].Jugador;
-                Entrenamiento.comioSemilla = partidas[opciones.actual].comisteSemilla;
+                jugador = partida_actual.Jugador;
+                Entrenamiento.Reset();
             }
         }
-        partida_actual = partidas[opciones.actual];
         return proximo_estado;
     }
     static GameStates seleccionarPersonajeState(){
@@ -401,7 +401,9 @@ static class Game{
         var partidas = obtenerPartidas();
         partida_actual.Time = DateTime.Now;
         partida_actual.Jugador = jugador;
-        partida_actual.comisteSemilla = Entrenamiento.comioSemilla;
+        partida_actual.ComisteSemilla = Entrenamiento.comioSemilla;
+        partida_actual.DiasEntrenamiento = Entrenamiento.dias_max;
+        partida_actual.Interacciones = Entrenamiento.interacciones;
         partidas[partida_actual.Id] = partida_actual;
         File.WriteAllText("Savestates.json",JsonSerializer.Serialize(partidas,new JsonSerializerOptions { WriteIndented = true }),Encoding.Unicode);
     }
@@ -441,7 +443,12 @@ class SaveStates{
     [JsonPropertyName("time")]
     public DateTime Time {get; set;}
     [JsonPropertyName("comio_semilla")]
-    public bool comisteSemilla {get;set;}= false;
+    public bool ComisteSemilla {get;set;}= false;
+    [JsonPropertyName("dias_entrenamiento")]
+    public int DiasEntrenamiento{get;set;} = 0;
+    [JsonPropertyName("interacciones")]
+    public int[] Interacciones {get;set;} = {0,0,0,0,0,0,0};
+    
     [JsonPropertyName("jugador")]
     public Guerrero Jugador {get; set;}
 }

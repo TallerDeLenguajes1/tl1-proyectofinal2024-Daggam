@@ -23,18 +23,18 @@ static class Entrenamiento{
     static Caja sideCaja;
     static Caja mainCaja;
 
-    static int dias_max = 0;
+    public static int dias_max = 0;
     static int dias_entrenamiento = 0;
     public static bool comioSemilla = false;
 
     public static int[] interacciones = {0,0,0,0,0,0,0};
     static public void Reset(){
-        dias_max = 0;
-        dias_entrenamiento = 0;
-        comioSemilla = false;
+        dias_max = Game.partida_actual.DiasEntrenamiento;
+        dias_entrenamiento = dias_max;
+        comioSemilla = Game.partida_actual.ComisteSemilla;
         for (int i = 0; i < interacciones.Length; i++)
         {
-            interacciones[i] = 0;
+            interacciones[i] = Game.partida_actual.Interacciones[i];
         }
     }
     //Comienza el modo entrenamiento
