@@ -32,6 +32,10 @@ static class Entrenamiento{
         dias_max = 0;
         dias_entrenamiento = 0;
         comioSemilla = false;
+        for (int i = 0; i < interacciones.Length; i++)
+        {
+            interacciones[i] = 0;
+        }
     }
     //Comienza el modo entrenamiento
     static public void Start(){
