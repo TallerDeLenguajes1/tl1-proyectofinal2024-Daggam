@@ -81,7 +81,7 @@ static class Game{
                 updateOpciones = false;
             }
 
-            ConsoleKey k = Console.ReadKey().Key;
+            ConsoleKey k = Console.ReadKey(true).Key;
             if(k==ConsoleKey.DownArrow){
                 opciones = (opciones<2) ? opciones+1:0;
                 updateOpciones =true;
@@ -231,14 +231,54 @@ static class Game{
         return GameStates.Entrenamiento;
     }
     static GameStates infoState(){
+        Caja cajaEmergente = new Caja(22,3,60,10);
+        int carteles = 0;
+        bool actualizarCarteles = true;
+        Console.SetCursorPosition(0,0);
+        Console.SetCursorPosition(0,15);
+        Console.Write(string.Format("  <{0,-49}{0,50}>  ","-----------"));
+        Console.SetCursorPosition(0,15);
+        Text.WriteCenter("[PRESIONA ENTER PARA IR AL MENÚ PRINCIPAL]",105);
+        Console.SetCursorPosition(2,16);
+        Text.WriteCenter("ANTERIOR",12);
+        Console.SetCursorPosition(91,16);
+        Text.WriteCenter("SIGUIENTE",12);
+        string[,] textos = {
+                                {
+                                    "CONTROLES",
+                                    "[Flechas de dirección]: Movimiento\n\n[ENTER]: Confirmar\n\n[Z]: Tecla de acción 1\n[X]: Tecla de acción 2\n[C]: Tecla de acción 3"
+                                },
+                                {
+                                    "DESCRIPCIÓN",
+                                    "Basado en el modo de juego Dragon Sim del videojuego\nFighter Arena: Dragon Ball Budokai Tenkaichi 3.\n\nEs un minijuego RPG que consta de entrenar uno de los\nveinte guerreros disponibles durante 10 días.\n\nFinalizado el entrenamiento, pasas a una etapa de\ncombate donde te enfrentaras a los guerreros restantes."
+                                },
+                                {
+                                    "CRÉDITOS",
+                                    "Creador: Benjamin Villa\n\nAsignatura: Taller de lenguajes I\n\nLenguaje de programación: C#\n\nSDK: .NET 8.0.101"
+                                }
+                            };
         while (true)
         {
-            
+            if(actualizarCarteles){       
+                Text.borrarSeccion(0,1,105,0);
+                Console.SetCursorPosition(0,1);
+                Text.WriteCenter(textos[carteles,0],105);
+                Text.borrarSeccion(23,4,58,7);
+                cajaEmergente.Escribir(textos[carteles,1]);
+                actualizarCarteles=false;
+            }
+            ConsoleKey k = Console.ReadKey(true).Key;
+            if(k == ConsoleKey.RightArrow){
+                carteles = (carteles < 2) ? carteles+1:0; 
+                actualizarCarteles=true;
+            }else if(k==ConsoleKey.LeftArrow){
+                carteles = (carteles > 0) ? carteles-1:2; 
+                actualizarCarteles=true;
+            }else if(k== ConsoleKey.Enter) break;
         }
         return GameStates.Menu;
     }
     static GameStates quitState(){
-        //26 = (105 - 52)/2
         Caja cajaEmergente = new Caja(26,4,52,6);
         string msj = "¿Estás seguro que quieres salir?";
         Console.SetCursorPosition(cajaEmergente.X,cajaEmergente.Y+1);
