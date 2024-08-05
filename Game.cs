@@ -231,6 +231,10 @@ static class Game{
         return GameStates.Entrenamiento;
     }
     static GameStates infoState(){
+        while (true)
+        {
+            
+        }
         return GameStates.Menu;
     }
     static GameStates quitState(){
