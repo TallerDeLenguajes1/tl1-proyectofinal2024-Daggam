@@ -19,7 +19,11 @@ Cada vez que ganes el combate, si las condiciones son aceptables, subiras de niv
 ## Controles.
 
 Flechas de dirección: Movimiento.
+
 ENTER: Confirmar
+
 Z: Tecla de acción 1
+
 X: Tecla de acción 2
+
 C: Tecla de acción 3
