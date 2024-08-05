@@ -40,18 +40,13 @@ static class Game{
         Console.ForegroundColor = consoleColor.fg;
         //CARGAMOS LOS GUERREROS
         allWarriorsPaths = Directory.EnumerateFiles("Personajes","*.json").ToList();
-        // foreach (string filepath in ){
-        //     string contenido = File.ReadAllText(filepath);
-        //     GuerreroInfo w = JsonSerializer.Deserialize<GuerreroInfo>(contenido);
-        //     allWarriors.Add(w);
-        // }
         //Esperamos hasta que carguen los planetas
         Console.SetCursorPosition(0,8);
         Text.WriteCenter("CARGANDO API... ESPERE UNOS SEGUNDOS...",xres);
         allPlanets = await getPlanetsAsync();
         if(allPlanets!=null){
             //Meter una introducción para dar a conocer los controles.
-            iniciarMaquina(GameStates.Menu);
+            iniciarMaquina(GameStates.Info);
         }else{
             Console.Clear();
             Console.Write("LA INFORMACIÓN NO HA SIDO CARGADA CORRECTAMENTE.\n[ENTER PARA SALIR]");
@@ -413,7 +408,6 @@ static class Game{
     //Estado Final.
     static GameStates finalState(){
         string [] dialogos_finales = {"Eres un guerrero formidable... ","Lograste acabar con una serie de enemigos poderosos.","¡Me alegra saber que el destino de la tierra está en buenas manos!","Contigo aquí... ","¡reinará la paz en la tierra durante muchos años!","¡Muchas gracias!"};
-        
         
         Thread.Sleep(1500);
         int n = (105-dialogos_finales[0].Length)/2;

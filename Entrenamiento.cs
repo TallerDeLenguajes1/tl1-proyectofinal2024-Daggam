@@ -247,6 +247,7 @@ static class Entrenamiento{
                 updateCaracteristica(-1,SeleccionadorUpdate.Defensa);
                 AnimBarraVida(-(int) Math.Ceiling(jugador.getSaludMax() * 0.1));
                 mainCaja.EscribirAnim($"[ -1 ATAQUE ] [ -1 DEFENSA ] [ -10 % SALUD ]",0,2);
+                eventoElegido=0; //PARA CUANDO VAYA A INTERACCIONES
                 break;
             case 1:
                 {
