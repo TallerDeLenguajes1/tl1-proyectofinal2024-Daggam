@@ -455,6 +455,7 @@ static class Battle{
 
     //ESTADOS DE VICTORIA Y DERROTA.
     static BattleStates salirBatalla(){
+        Reproductor.Stop();
         string texto = "ESCAPAS DE LA BATALLA...";
         jugador.Ki = 0;
         if(estado_actual == BattleStates.Enemigo_derrotado){

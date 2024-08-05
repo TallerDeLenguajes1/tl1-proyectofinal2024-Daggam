@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using EntrenamientoNamespace;
-
+using System.Media;
 enum GameStates{
     Menu,Nueva_partida,Cargar_partida,Info,Quit,
     Seleccionar_personaje,Battle,Entrenamiento,
@@ -46,6 +46,7 @@ static class Game{
         allPlanets = await getPlanetsAsync();
         if(allPlanets!=null){
             //Meter una introducción para dar a conocer los controles.
+            Reproductor.PlayMusic("Audio/M705.wav");
             iniciarMaquina(GameStates.Info);
         }else{
             Console.Clear();
@@ -401,8 +402,12 @@ static class Game{
                 continuar=true;
             }else if(k==ConsoleKey.Enter) break;
         }
-
-        return (continuar) ? GameStates.Menu:GameStates.Salir_juego;
+        if(continuar){
+            Reproductor.PlayMusic("Audio/M705.wav");
+            return GameStates.Menu;
+        }else{
+            return GameStates.Salir_juego;
+        }
     }
     
     //Estado Final.
@@ -453,6 +458,7 @@ static class Game{
                     estadoActual = seleccionarPartida();
                     break;
                 case GameStates.Seleccionar_personaje:
+                    Reproductor.PlayMusic("Audio/M-2024.wav");
                     estadoActual = seleccionarPersonajeState();
                     break;
                 case GameStates.Info:
@@ -462,15 +468,19 @@ static class Game{
                     estadoActual = quitState();
                     break;
                 case GameStates.Battle:
+                    Reproductor.PlayMusic("Audio/M1525.wav");
                     estadoActual = battleState();
                     break;
                 case GameStates.Entrenamiento:
+                    Reproductor.PlayMusic("Audio/Solid State Scouter.wav");
                     estadoActual = entrenamientoState();
                     break;
                 case GameStates.Game_over:
+                    Reproductor.PlayMusic("Audio/M-1623.wav");
                     estadoActual = gameOverState();
                     break;
                 case GameStates.Final:
+                    Reproductor.PlayMusic("Audio/M-1420.wav");
                     estadoActual = finalState();
                     break;
                 case GameStates.Salir_juego:
@@ -564,4 +574,15 @@ class SaveStates{
     public Dictionary<char,List<int>> EnemigosPorDerrotar{get;set;}
     [JsonPropertyName("jugador")]
     public Guerrero Jugador {get; set;}
+}
+
+static class Reproductor{
+    static SoundPlayer player = new SoundPlayer();
+    static public void PlayMusic(string path){
+        player.SoundLocation = path;
+        player.PlayLooping();
+    }
+    static public void Stop(){
+        player.Stop();
+    }
 }
