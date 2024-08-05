@@ -1,7 +1,10 @@
 # PROJECTO DE TALLER: DRAGON SIM
 Creador: Benjamin Villa
+
 Asignatura: Taller de lenguajes I
+
 Lenguaje de programación: C#
+
 SDK: .NET 8.0.101
 
 ## Descripción.
