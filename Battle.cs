@@ -2,7 +2,6 @@ namespace BattleNamespace;
 using GuerreroNamespace;
 using ToolNamespace;
 using GameNamespace;
-using Microsoft.VisualBasic;
 
 enum BattleStates{
     Init,Turno_jugador,Turno_enemigo, Golpear, Tecnicas, Cargar_ki,
@@ -459,7 +458,6 @@ static class Battle{
         string texto = "ESCAPAS DE LA BATALLA...";
         jugador.Ki = 0;
         if(estado_actual == BattleStates.Enemigo_derrotado){
-            Game.guardarPartida();
             estado_salida = GameStates.Entrenamiento;
             texto = "¡GANASTE EL COMBATE!";
         }else if(estado_actual==BattleStates.Jugador_derrotado){

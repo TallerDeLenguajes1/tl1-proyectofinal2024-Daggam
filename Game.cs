@@ -7,13 +7,11 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using EntrenamientoNamespace;
-using System.Reflection.Metadata;
-using System.Data.Common;
 
 enum GameStates{
     Menu,Nueva_partida,Cargar_partida,Info,Quit,
     Seleccionar_personaje,Battle,Entrenamiento,
-    Game_over,
+    Game_over,Final,
     Salir_juego
 }
 static class Game{
@@ -21,12 +19,16 @@ static class Game{
     static GameStates estadoActual;
     static public (ConsoleColor bg, ConsoleColor fg) consoleColor = (bg: ConsoleColor.Black, fg: ConsoleColor.DarkCyan);
 
+    //Variable relacionadas a los guerreros.
     static List<string> allWarriorsPaths = new List<string>();
-
+    
+    //Variables relacionadas al jugador y la partida
     public static SaveStates partida_actual;
-    static List<Planeta> allPlanets;
     public static Guerrero jugador;
+    static Dictionary<char,List<int>> guerrerosPorDerrotar;
 
+    //Variables relacionadas a los planetas
+    static List<Planeta> allPlanets;
     public static List<Planeta> AllPlanets { get => allPlanets;}
 
     public static async Task GameInit(int xres, int yres)
@@ -72,6 +74,7 @@ static class Game{
         cajaEmergente.Escribir("NUEVA PARTIDA\n\nCARGAR PARTIDA\n\nINFORMACIÓN",2,1);
         int opciones = 0;
         bool updateOpciones = true;
+        
         while (true)
         {
             if(updateOpciones){
@@ -157,8 +160,15 @@ static class Game{
                 return GameStates.Cargar_partida;
             }else{
                 jugador = partida_actual.Jugador;
+                guerrerosPorDerrotar = partida_actual.EnemigosPorDerrotar.ToDictionary();
                 Entrenamiento.Reset();
             }
+        }else{
+            guerrerosPorDerrotar = new Dictionary<char, List<int>>{
+                                        {'F',new List<int> {12,8}},
+                                        {'M',new List<int> {6,7,3,4,9,14,15,16}},
+                                        {'D',new List<int> {0,1,2,5,10,11,13,17,18,19}},
+                                    };
         }
         return proximo_estado;
     }
@@ -228,6 +238,10 @@ static class Game{
         //Podría agregar un estado para que confirme su personaje
         //Busqueda de personaje.
         jugador = new Guerrero(getGuerreroInfo(allWarriorsPaths[opciones.actual]));
+        //ELIMINO DE LA LISTA DE GUERREROS POR DERROTAR AL PERSONAJE SELECCIONADO
+        foreach(char dificultad in guerrerosPorDerrotar.Keys){
+            if(guerrerosPorDerrotar[dificultad].Remove(opciones.actual)) break;
+        }
         return GameStates.Entrenamiento;
     }
     static GameStates infoState(){
@@ -325,10 +339,30 @@ static class Game{
     
     //Estado de batalla
     static GameStates battleState(){
-        Guerrero enemigo = new Guerrero(getGuerreroInfo(allWarriorsPaths[0])); //No los modifica de manera directa
+        Random rnd = new Random();
+        int enemigoID = 0;
+        char dificultad = ' ';
+        foreach(char d in guerrerosPorDerrotar.Keys){
+            if(guerrerosPorDerrotar[d].Count!=0){
+                enemigoID = guerrerosPorDerrotar[d][rnd.Next(guerrerosPorDerrotar[d].Count)];
+                dificultad = d;
+                break;
+            }
+        }
+        Guerrero enemigo = new Guerrero(getGuerreroInfo(allWarriorsPaths[enemigoID])); //No los modifica de manera directa
         var proximo_estado = Battle.Start(enemigo); //El jugador es pasado como referencia
         //El jugador podría no ser pasado como referencia y utilizar Game.jugador (haciendolo publico)
         //Y solamente pasar el enemigo como nuevo parametro
+        if(proximo_estado != GameStates.Game_over){
+            guerrerosPorDerrotar[dificultad].Remove(enemigoID);
+            bool termino = (guerrerosPorDerrotar['F'].Count==0 && guerrerosPorDerrotar['M'].Count==0 && guerrerosPorDerrotar['D'].Count==0);
+            if(termino){
+                proximo_estado = GameStates.Final;
+            }else{
+                guardarPartida();
+            }
+        }
+
         return proximo_estado;
     }
     
@@ -348,7 +382,7 @@ static class Game{
         Text.WriteCenter("¿Deseas continuar?",105);
         Thread.Sleep(500);
         
-        Entrenamiento.Reset();
+        // Entrenamiento.Reset();
         bool continuar = true;
         bool updateOpciones = true;
         while (true)
@@ -376,6 +410,41 @@ static class Game{
         return (continuar) ? GameStates.Menu:GameStates.Salir_juego;
     }
     
+    //Estado Final.
+    static GameStates finalState(){
+        string [] dialogos_finales = {"Eres un guerrero formidable... ","Lograste acabar con una serie de enemigos poderosos.","¡Me alegra saber que el destino de la tierra está en buenas manos!","Contigo aquí... ","¡reinará la paz en la tierra durante muchos años!","¡Muchas gracias!"};
+        
+        
+        Thread.Sleep(1500);
+        int n = (105-dialogos_finales[0].Length)/2;
+        Console.SetCursorPosition(n,6);
+        Text.Start(dialogos_finales[0]);
+        Thread.Sleep(1500);
+
+        n=(105-dialogos_finales[1].Length)/2;
+        Console.SetCursorPosition(n,7);
+        Text.Start(dialogos_finales[1]);
+        Thread.Sleep(2000);
+        
+        n=(105-dialogos_finales[2].Length)/2;
+        Console.SetCursorPosition(n,9);
+        Text.Start(dialogos_finales[2]);
+        Thread.Sleep(2000);
+
+        n=(105-(dialogos_finales[3].Length+dialogos_finales[4].Length))/2;
+        Console.SetCursorPosition(n,10);
+        Text.Start(dialogos_finales[3]);
+        Thread.Sleep(1000);
+        Text.Start(dialogos_finales[4]);
+        Thread.Sleep(2000);
+
+        n=(105-dialogos_finales[5].Length)/2;
+        Console.SetCursorPosition(n,12);
+        Text.Start(dialogos_finales[5]);
+
+        while (Console.ReadKey(true).Key != ConsoleKey.Enter);
+        return GameStates.Salir_juego;
+    }
     static void iniciarMaquina(GameStates nuevoEstado){
         bool salir=false;
         estadoActual = nuevoEstado;
@@ -406,6 +475,9 @@ static class Game{
                     break;
                 case GameStates.Game_over:
                     estadoActual = gameOverState();
+                    break;
+                case GameStates.Final:
+                    estadoActual = finalState();
                     break;
                 case GameStates.Salir_juego:
                     salir=true;
@@ -444,10 +516,12 @@ static class Game{
     public static void guardarPartida(){
         var partidas = obtenerPartidas();
         partida_actual.Time = DateTime.Now;
-        partida_actual.Jugador = jugador;
+        partida_actual.Jugador = jugador; //Podría ser mejor
         partida_actual.ComisteSemilla = Entrenamiento.comioSemilla;
         partida_actual.DiasEntrenamiento = Entrenamiento.dias_max;
         partida_actual.Interacciones = Entrenamiento.interacciones;
+        partida_actual.EnemigosPorDerrotar = guerrerosPorDerrotar.ToDictionary();
+        //PONER LOS ENEMIGOS QUE VAS DERROTANDO
         partidas[partida_actual.Id] = partida_actual;
         File.WriteAllText("Savestates.json",JsonSerializer.Serialize(partidas,new JsonSerializerOptions { WriteIndented = true }),Encoding.Unicode);
     }
@@ -492,7 +566,8 @@ class SaveStates{
     public int DiasEntrenamiento{get;set;} = 0;
     [JsonPropertyName("interacciones")]
     public int[] Interacciones {get;set;} = {0,0,0,0,0,0,0};
-    
+    [JsonPropertyName("enemigos_derrotados")]
+    public Dictionary<char,List<int>> EnemigosPorDerrotar{get;set;}
     [JsonPropertyName("jugador")]
     public Guerrero Jugador {get; set;}
 }
