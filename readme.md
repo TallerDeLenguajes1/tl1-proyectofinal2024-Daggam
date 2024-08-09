@@ -67,7 +67,7 @@ El juego está seccionado de la siguiente forma:
 
 Necesitarás descargar el proyecto, o en su defecto, clonar el repositorio con `git clone`.
 
-Además, debes tener descargado el .Net8.0 SDK para compilar el proyecto y correrlo. Si no lo tienes y no sabes como descargarlo, tiene el siguiente [video](https://www.youtube.com/watch?v=oY8C4UninuM).
+Además, debes tener descargado el .Net8.0 SDK para compilar el proyecto y correrlo. Si no lo tienes y no sabes como descargarlo, tienes el siguiente [video](https://www.youtube.com/watch?v=oY8C4UninuM).
 
 Una completado estos pasos, debes abrir la consola y direccionarte a la ruta donde tienes descargado el proyecto y poner el siguiente comando:
 
